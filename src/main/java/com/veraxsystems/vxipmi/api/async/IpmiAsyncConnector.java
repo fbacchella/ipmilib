@@ -161,6 +161,25 @@ public class IpmiAsyncConnector implements ConnectionListener {
 		return result;
 	}
 
+	public List<CipherSuite> getAllCipherSuites(
+                       ConnectionHandle connectionHandle) throws Exception {
+               int tries = 0;
+               List<CipherSuite> result = null;
+               while (tries <= retries && result == null) {
+                       try {
+                               ++tries;
+                               result = connectionManager
+                                               .getAllCipherSuites(connectionHandle.getHandle());
+                       } catch (Exception e) {
+                               logger.warn("Failed to receive answer, cause:", e);
+                               if (tries > retries) {
+                                       throw e;
+                               }
+                       }
+               }
+               return result;
+       }
+
 	/**
 	 * Gets the authentication capabilities for the connection with the remote
 	 * host.

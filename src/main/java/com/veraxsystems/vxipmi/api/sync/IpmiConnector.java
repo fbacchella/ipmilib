@@ -122,6 +122,11 @@ public class IpmiConnector {
         return asyncConnector.getAvailableCipherSuites(connectionHandle);
     }
 
+
+    public List<CipherSuite> getAllCipherSuites(ConnectionHandle connectionHandle) throws Exception {
+        return asyncConnector.getAllCipherSuites(connectionHandle);
+    }
+
     /**
      * Gets the authentication capabilities for the connection with the remote host.
      * @param connectionHandle

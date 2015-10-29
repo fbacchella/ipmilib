@@ -269,6 +269,20 @@ public class ConnectionManager {
 		return suites;
 	}
 
+	public List<CipherSuite> getAllCipherSuites(int connection)
+                throws Exception {
+	    int tag = generateSessionlessTag();
+            List<CipherSuite> suites;
+            try {
+                    suites = connections.get(connection).getAllCipherSuites(tag);
+            } catch (Exception e) {
+                    freeTag(tag);
+                    throw e;
+            }
+            freeTag(tag);
+            return suites;
+	}
+	
 	/**
 	 * Queries the managed system for the details of the authentification
 	 * process. Must be performed after {@link #getAvailableCipherSuites(int)}

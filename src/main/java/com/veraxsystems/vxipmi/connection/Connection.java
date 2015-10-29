@@ -15,6 +15,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -255,6 +256,24 @@ public class Connection extends TimerTask implements MachineObserver {
 		}
 
 		return CipherSuite.getCipherSuites(csRaw);
+	}
+
+	public List<CipherSuite> getAllCipherSuites(int tag) throws Exception {
+
+		if (!(stateMachine.getCurrent().getClass() == Uninitialized.class)) {
+			throw new ConnectionException("Illegal connection state: "
+					+ stateMachine.getCurrent().getClass().getSimpleName());
+		}
+		stateMachine.doTransition(new GetChannelCipherSuitesPending(tag));
+		stateMachine.doTransition(new DefaultAck());
+		CipherSuite[] allCs = new CipherSuite[] {
+			new CipherSuite((byte) 0,(byte) 0,(byte) 0,(byte) 0),
+			new CipherSuite((byte) 1,(byte) 1,(byte) 0,(byte) 0),
+			new CipherSuite((byte) 2,(byte) 1,(byte) 1,(byte) 0),
+			new CipherSuite((byte) 3,(byte) 1,(byte) 1,(byte) 1),
+			new CipherSuite((byte) 4,(byte) 1,(byte) 1,(byte) 2),
+		};
+		return Arrays.asList(allCs);
 	}
 
 	private void waitForResponse() throws Exception {
