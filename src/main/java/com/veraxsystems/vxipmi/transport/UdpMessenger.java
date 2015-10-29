@@ -17,8 +17,10 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.nio.channels.ClosedByInterruptException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
@@ -79,12 +81,13 @@ public class UdpMessenger extends Thread implements Messenger {
 	 *             bind to the specified local port.
 	 */
 	public UdpMessenger(int port, InetAddress address) throws SocketException {
-		sentPackets = 0;
 		this.port = port;
 		listeners = new ArrayList<UdpListener>();
 		bufferSize = DEFAULTBUFFERSIZE;
 		socket = new DatagramSocket(this.port, address);
 		socket.setSoTimeout(0);
+		this.setDaemon(true);
+		this.setName("IPMIListener" + address + ":" + socket.getLocalPort());
 		this.start();
 	}
 
@@ -135,7 +138,13 @@ public class UdpMessenger extends Thread implements Messenger {
 				} else {
 					logger.error(se.getMessage(), se);
 				}
-			} catch (Exception e) {
+			} catch (ClosedByInterruptException e) {
+				if (closing) {
+					run = false;
+				} else {
+					logger.error(e.getMessage(), e);
+				}
+			} catch (IOException e) {
 				logger.error(e.getMessage(), e);
 			} finally {
 				if (socket.isClosed()) {
@@ -151,6 +160,7 @@ public class UdpMessenger extends Thread implements Messenger {
 	public void closeConnection() {
 		closing = true;
 		socket.close();
+		interrupt();
 	}
 
 	/**
@@ -178,14 +188,14 @@ public class UdpMessenger extends Thread implements Messenger {
 		}
 	}
 
-	private static int sentPackets = 0;
+	private static final AtomicInteger sentPackets = new AtomicInteger(0);
 
 	/**
 	 * Returns number of packets sent since last creation of the instance of
 	 * {@link UdpMessenger}. For debug/testing purposes only.
 	 */
 	public static int getSentPackets() {
-		return sentPackets;
+		return sentPackets.get();
 	}
 
 	/**
@@ -201,11 +211,11 @@ public class UdpMessenger extends Thread implements Messenger {
 				message.getMessage().length, message.getAddress(),
 				message.getPort());
 		socket.send(packet);
+		Thread.yield();
 		try {
 			Thread.sleep(1);
 		} catch (InterruptedException e) {
-			// TODO: log
 		}
-		++sentPackets;
+		sentPackets.incrementAndGet();
 	}
 }
