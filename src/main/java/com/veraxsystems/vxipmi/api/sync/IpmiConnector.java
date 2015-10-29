@@ -208,6 +208,8 @@ public class IpmiConnector {
                 data = listener.waitForAnswer(tag);
             } catch (IllegalArgumentException e) {
                 throw e;
+            } catch (InterruptedException e) {
+                throw e;
             } catch (IPMIException e) {
                 if (e.getCompletionCode() == CompletionCode.InitializationInProgress
                         || e.getCompletionCode() == CompletionCode.InsufficientResources
