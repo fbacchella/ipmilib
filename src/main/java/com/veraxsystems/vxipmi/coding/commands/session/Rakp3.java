@@ -102,7 +102,7 @@ public class Rakp3 extends IpmiCommandCoder {
      * @param statusCode
      *            Status of the previous message.
      * @param managedSystemSessionId
-     *            The Managed System�s Session ID for this session. Must be as
+     *            The Managed System's Session ID for this session. Must be as
      *            returned by the Managed System in the Open Session Response
      *            message.
      * @param cipherSuite
