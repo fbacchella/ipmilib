@@ -354,6 +354,8 @@ public class IpmiConnector {
                 messageSent = true;
             } catch (IllegalArgumentException e) {
                 throw e;
+            } catch (InterruptedException e) {
+                throw e;
             } catch (IPMIException e) {
                 handleErrorResponse(tries, e);
             } catch (Exception e) {
