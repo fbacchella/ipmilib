@@ -204,8 +204,7 @@ public class Connection extends TimerTask implements MachineObserver {
 	public List<CipherSuite> getAvailableCipherSuites(int tag) throws Exception {
 
 		if (!(stateMachine.getCurrent().getClass() == Uninitialized.class)) {
-			throw new ConnectionException("Illegal connection state: "
-					+ stateMachine.getCurrent().getClass().getSimpleName());
+			throw new StateConnectionException(stateMachine.getCurrent());
 		}
 
 		boolean process = true;
@@ -258,11 +257,10 @@ public class Connection extends TimerTask implements MachineObserver {
 		return CipherSuite.getCipherSuites(csRaw);
 	}
 
-	public List<CipherSuite> getAllCipherSuites(int tag) throws Exception {
+	public List<CipherSuite> getAllCipherSuites(int tag) throws StateConnectionException {
 
 		if (!(stateMachine.getCurrent().getClass() == Uninitialized.class)) {
-			throw new ConnectionException("Illegal connection state: "
-					+ stateMachine.getCurrent().getClass().getSimpleName());
+			throw new StateConnectionException(stateMachine.getCurrent());
 		}
 		stateMachine.doTransition(new GetChannelCipherSuitesPending(tag));
 		stateMachine.doTransition(new DefaultAck());
@@ -290,7 +288,7 @@ public class Connection extends TimerTask implements MachineObserver {
 
 		if (lastAction == null) {
 			stateMachine.doTransition(new Timeout());
-			throw new ConnectionException("Command timed out");
+			throw new IOException("Command timed out");
 		}
 		if (!(lastAction instanceof ResponseAction || lastAction instanceof GetSikAction)) {
 			if (lastAction instanceof ErrorAction) {
@@ -323,8 +321,7 @@ public class Connection extends TimerTask implements MachineObserver {
 			PrivilegeLevel requestedPrivilegeLevel) throws Exception {
 
 		if (!(stateMachine.getCurrent().getClass() == Ciphers.class)) {
-			throw new ConnectionException("Illegal connection state: "
-					+ stateMachine.getCurrent().getClass().getSimpleName());
+			throw new StateConnectionException(stateMachine.getCurrent());
 		}
 
 		lastAction = null;
@@ -383,8 +380,7 @@ public class Connection extends TimerTask implements MachineObserver {
 			PrivilegeLevel privilegeLevel, String username, String password,
 			byte[] bmcKey) throws Exception {
 		if (!(stateMachine.getCurrent().getClass() == Authcap.class)) {
-			throw new ConnectionException("Illegal connection state: "
-					+ stateMachine.getCurrent().getClass().getSimpleName());
+			throw new StateConnectionException(stateMachine.getCurrent());
 		}
 
 		lastAction = null;
@@ -469,8 +465,7 @@ public class Connection extends TimerTask implements MachineObserver {
 	 */
 	public void closeSession() throws ConnectionException {
 		if (!(stateMachine.getCurrent().getClass() == SessionValid.class)) {
-			throw new ConnectionException("Illegal connection state: "
-					+ stateMachine.getCurrent().getClass().getSimpleName());
+			throw new StateConnectionException(stateMachine.getCurrent());
 		}
 
 		stateMachine.doTransition(new CloseSession(managedSystemSessionId,
@@ -495,8 +490,7 @@ public class Connection extends TimerTask implements MachineObserver {
 	public int sendIpmiCommand(IpmiCommandCoder commandCoder)
 			throws ConnectionException, ArithmeticException {
 		if (!(stateMachine.getCurrent().getClass() == SessionValid.class)) {
-			throw new ConnectionException("Illegal connection state: "
-					+ stateMachine.getCurrent().getClass().getSimpleName());
+			throw new StateConnectionException(stateMachine.getCurrent());
 		}
 
 		int seq = messageQueue.add(commandCoder);

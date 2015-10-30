@@ -270,12 +270,12 @@ public class ConnectionManager {
 	}
 
 	public List<CipherSuite> getAllCipherSuites(int connection)
-                throws Exception {
+                throws StateConnectionException {
 	    int tag = generateSessionlessTag();
             List<CipherSuite> suites;
             try {
                     suites = connections.get(connection).getAllCipherSuites(tag);
-            } catch (Exception e) {
+            } catch (StateConnectionException e) {
                     freeTag(tag);
                     throw e;
             }

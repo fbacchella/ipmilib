@@ -32,6 +32,7 @@ import com.veraxsystems.vxipmi.common.PropertiesManager;
 import com.veraxsystems.vxipmi.connection.Connection;
 import com.veraxsystems.vxipmi.connection.ConnectionException;
 import com.veraxsystems.vxipmi.connection.ConnectionManager;
+import com.veraxsystems.vxipmi.connection.StateConnectionException;
 
 /**
  * <p> Synchronous API for connecting to BMC via IPMI. </p> <p> Creating connection consists of the following steps:
@@ -210,6 +211,8 @@ public class IpmiConnector {
                 throw e;
             } catch (InterruptedException e) {
                 throw e;
+            } catch (StateConnectionException e) {
+                throw e;
             } catch (IPMIException e) {
                 if (e.getCompletionCode() == CompletionCode.InitializationInProgress
                         || e.getCompletionCode() == CompletionCode.InsufficientResources
@@ -230,10 +233,16 @@ public class IpmiConnector {
                 if (tries > retries) {
                     throw e;
                 } else {
+                	if(e instanceof IOException) {
+                		// Network exception common case, no stack needed
+                        logger.warn("Receiving message failed " + e.getMessage() + ", retrying");                		
+                	} else {
+                		// Unexcepted exception, needs investigation
+                        logger.warn("Receiving message failed, retrying", e);
+                		
+                	}
                     long sleepTime = (random.nextLong() % (idleTime / 2)) + (idleTime / 2);
-
                     Thread.sleep(sleepTime);
-                    logger.warn("Receiving message failed, retrying", e);
                 }
             }
         }

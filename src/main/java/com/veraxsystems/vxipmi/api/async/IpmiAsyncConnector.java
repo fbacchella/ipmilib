@@ -26,12 +26,14 @@ import com.veraxsystems.vxipmi.coding.commands.IpmiCommandCoder;
 import com.veraxsystems.vxipmi.coding.commands.PrivilegeLevel;
 import com.veraxsystems.vxipmi.coding.commands.ResponseData;
 import com.veraxsystems.vxipmi.coding.commands.session.GetChannelAuthenticationCapabilitiesResponseData;
+import com.veraxsystems.vxipmi.coding.payload.lan.IPMIException;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
 import com.veraxsystems.vxipmi.common.PropertiesManager;
 import com.veraxsystems.vxipmi.connection.Connection;
 import com.veraxsystems.vxipmi.connection.ConnectionException;
 import com.veraxsystems.vxipmi.connection.ConnectionListener;
 import com.veraxsystems.vxipmi.connection.ConnectionManager;
+import com.veraxsystems.vxipmi.connection.StateConnectionException;
 
 /**
  * <p>
@@ -151,8 +153,23 @@ public class IpmiAsyncConnector implements ConnectionListener {
 				++tries;
 				result = connectionManager
 						.getAvailableCipherSuites(connectionHandle.getHandle());
+            } catch (IPMIException e) {
+                logger.warn("Failed to receive answer, cause:");
+                logger.warn(e.getCompletionCode());
+                logger.warn(e.getMessage());
+                if (tries > retries) {
+                        throw e;
+                }
+            } catch (StateConnectionException e) {
+            	// state error, no retry
+				throw e;
 			} catch (Exception e) {
-				logger.warn("Failed to receive answer, cause:", e);
+				if(e instanceof IOException) {
+					// Normal network error
+					logger.warn("Failed to receive answer, cause:" +  e.getMessage());					
+				} else {
+					logger.warn("Failed to receive answer, cause:", e);					
+				}
 				if (tries > retries) {
 					throw e;
 				}
@@ -162,21 +179,9 @@ public class IpmiAsyncConnector implements ConnectionListener {
 	}
 
 	public List<CipherSuite> getAllCipherSuites(
-                       ConnectionHandle connectionHandle) throws Exception {
-               int tries = 0;
-               List<CipherSuite> result = null;
-               while (tries <= retries && result == null) {
-                       try {
-                               ++tries;
-                               result = connectionManager
-                                               .getAllCipherSuites(connectionHandle.getHandle());
-                       } catch (Exception e) {
-                               logger.warn("Failed to receive answer, cause:", e);
-                               if (tries > retries) {
-                                       throw e;
-                               }
-                       }
-               }
+                       ConnectionHandle connectionHandle) throws StateConnectionException {
+               List<CipherSuite> result = connectionManager
+                       .getAllCipherSuites(connectionHandle.getHandle());
                return result;
        }
 
@@ -211,7 +216,16 @@ public class IpmiAsyncConnector implements ConnectionListener {
 								requestedPrivilegeLevel);
 				connectionHandle.setCipherSuite(cipherSuite);
 				connectionHandle.setPrivilegeLevel(requestedPrivilegeLevel);
+            } catch (StateConnectionException e) {
+            	// state error, no retry
+				throw e;
 			} catch (Exception e) {
+				if(e instanceof IOException) {
+					// Normal network error
+					logger.warn("Failed to receive answer, cause:" +  e.getMessage());					
+				} else {
+					logger.warn("Failed to receive answer, cause:", e);					
+				}
 				logger.warn("Failed to receive answer, cause:", e);
 				if (tries > retries) {
 					throw e;
@@ -252,8 +266,16 @@ public class IpmiAsyncConnector implements ConnectionListener {
 						connectionHandle.getPrivilegeLevel(), username,
 						password, bmcKey);
 				succeded = true;
+            } catch (StateConnectionException e) {
+            	// state error, no retry
+				throw e;
 			} catch (Exception e) {
-				logger.warn("Failed to receive answer, cause:", e);
+				if(e instanceof IOException) {
+					// Normal network error
+					logger.warn("Failed to receive answer, cause:" +  e.getMessage());					
+				} else {
+					logger.warn("Failed to receive answer, cause:", e);					
+				}
 				if (tries > retries) {
 					throw e;
 				}
@@ -288,8 +310,16 @@ public class IpmiAsyncConnector implements ConnectionListener {
 				connectionManager.getConnection(connectionHandle.getHandle())
 						.closeSession();
 				succeded = true;
+            } catch (StateConnectionException e) {
+            	// state error, no retry
+				throw e;
 			} catch (Exception e) {
-				logger.warn("Failed to receive answer, cause:", e);
+				if(e instanceof IOException) {
+					// Normal network error
+					logger.warn("Failed to receive answer, cause:" +  e.getMessage());					
+				} else {
+					logger.warn("Failed to receive answer, cause:", e);					
+				}
 				if (tries > retries) {
 					throw e;
 				}
@@ -334,10 +364,16 @@ public class IpmiAsyncConnector implements ConnectionListener {
 				}
 				logger.debug("Sending message with tag " + tag + ", try "
 						+ tries);
-			} catch (IllegalArgumentException e) {
+            } catch (StateConnectionException e) {
+            	// state error, no retry
 				throw e;
 			} catch (Exception e) {
-				logger.warn("Failed to send message, cause:", e);
+				if(e instanceof IOException) {
+					// Normal network error
+					logger.warn("Failed to receive answer, cause:" +  e.getMessage());					
+				} else {
+					logger.warn("Failed to receive answer, cause:", e);					
+				}
 				if (tries > retries) {
 					throw e;
 				}

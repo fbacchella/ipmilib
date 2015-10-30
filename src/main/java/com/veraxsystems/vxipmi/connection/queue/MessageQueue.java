@@ -332,7 +332,7 @@ public class MessageQueue extends TimerTask {
 						releaseTag(tag);
 						if (!done) {
 							connection.notifyListeners(connection.getHandle(),
-									tag, null, new ConnectionException(
+									tag, null, new IOException(
 											"Message timed out"));
 						}
 					} else {
