@@ -154,9 +154,7 @@ public class IpmiAsyncConnector implements ConnectionListener {
 				result = connectionManager
 						.getAvailableCipherSuites(connectionHandle.getHandle());
             } catch (IPMIException e) {
-                logger.warn("Failed to receive answer, cause:");
-                logger.warn(e.getCompletionCode());
-                logger.warn(e.getMessage());
+                logger.warn("Failed to receive answer, cause:", e);
                 if (tries > retries) {
                         throw e;
                 }
@@ -166,7 +164,7 @@ public class IpmiAsyncConnector implements ConnectionListener {
 			} catch (Exception e) {
 				if(e instanceof IOException) {
 					// Normal network error
-					logger.warn("Failed to receive answer, cause:" +  e.getMessage());					
+					logger.warn("Failed to receive answer, cause: " +  e.getMessage());					
 				} else {
 					logger.warn("Failed to receive answer, cause:", e);					
 				}
