@@ -28,11 +28,11 @@ public class PropertiesManager {
 
     private void loadProperties(String name) {
         try {
-            Properties properties = new Properties();
-            properties.load(getClass().getResourceAsStream(name));
+            Properties loadedProperties = new Properties();
+            loadedProperties.load(getClass().getResourceAsStream(name));
 
-            for (Object key : properties.keySet()) {
-                properties.put(key.toString(), properties.getProperty(key.toString()));
+            for (Object key : loadedProperties.keySet()) {
+                properties.put(key.toString(), loadedProperties.getProperty(key.toString()));
             }
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
