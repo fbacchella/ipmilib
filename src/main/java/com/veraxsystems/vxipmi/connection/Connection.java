@@ -67,8 +67,11 @@ import com.veraxsystems.vxipmi.transport.Messenger;
  * A connection with the specific remote host.
  */
 public class Connection extends TimerTask implements MachineObserver {
-	private List<ConnectionListener> listeners;
-	private StateMachine stateMachine;
+	private final static Timer timer = new Timer("IPMIConnectionTimer", true);;
+	private static final Logger logger = Logger.getLogger(Connection.class);
+
+	private final List<ConnectionListener> listeners = new ArrayList<ConnectionListener>();
+	private final StateMachine stateMachine;
 	/**
 	 * Time in ms after which a message times out.
 	 */
@@ -78,27 +81,9 @@ public class Connection extends TimerTask implements MachineObserver {
 	private int sessionId;
 	private int managedSystemSessionId;
 	private byte[] sik;
-	private int handle;
+	private final int handle;
 	private int lastReceivedSequenceNumber = 0;
-
-	private Logger logger = Logger.getLogger(getClass());
-
-	public int getHandle() {
-		return handle;
-	}
-
 	private MessageQueue messageQueue;
-
-	private Timer timer;
-
-	public int getTimeout() {
-		return timeout;
-	}
-
-	public void setTimeout(int timeout) {
-		this.timeout = timeout;
-		messageQueue.setTimeout(timeout);
-	}
 
 	/**
 	 * Creates the connection.
@@ -116,9 +101,21 @@ public class Connection extends TimerTask implements MachineObserver {
     public Connection(Messenger messenger, int handle) throws FileNotFoundException, IOException {
         stateMachine = new StateMachine(messenger);
         this.handle = handle;
-        listeners = new ArrayList<ConnectionListener>();
         timeout = Integer.parseInt(PropertiesManager.getInstance().getProperty("timeout"));
     }
+
+	public int getHandle() {
+		return handle;
+	}
+
+	public int getTimeout() {
+		return timeout;
+	}
+
+	public void setTimeout(int timeout) {
+		this.timeout = timeout;
+		messageQueue.setTimeout(timeout);
+	}
 
 	/**
 	 * Registers the listener so it will receive notifications from this
@@ -158,7 +155,6 @@ public class Connection extends TimerTask implements MachineObserver {
 	public void connect(InetAddress address, int pingPeriod)
 			throws FileNotFoundException, IOException {
 		messageQueue = new MessageQueue(this, timeout);
-		timer = new Timer();
 		timer.schedule(this, pingPeriod, pingPeriod);
 		stateMachine.register(this);
 		stateMachine.start(address);
@@ -170,7 +166,7 @@ public class Connection extends TimerTask implements MachineObserver {
 	 * @see #connect(InetAddress, int)
 	 */
 	public void disconnect() {
-		timer.cancel();
+		cancel();
 		stateMachine.stop();
 		messageQueue.tearDown();
 	}
