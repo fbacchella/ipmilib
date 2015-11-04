@@ -21,14 +21,16 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.2</version>
+                <configuration>
+                    <source>${buildSource}</source>
+                    <target>${buildTarget}</target>
+                    <showWarnings>true</showWarnings>
+                </configuration>
+            </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -86,6 +88,10 @@
 	<properties>
 		<project.build.mainClass>com.veraxsystems.vxipmi.encoding.DecoderRunner</project.build.mainClass>
 		<junit.version>4.0</junit.version>
+        <!-- The project should have a source encoding set. -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <buildSource>1.7</buildSource>
+        <buildTarget>1.7</buildTarget>
 	</properties>
 
 </project>
