@@ -31,11 +31,13 @@ import com.veraxsystems.vxipmi.connection.Connection;
  */
 public class MessageListener implements IpmiListener {
 
-	private ConnectionHandle handle;
+	private final static class IpmiResponseHandler {
+		private IpmiResponse response = null;
+	}
+		
+	private final ConnectionHandle handle;
 
-	private int tag;
-
-	private IpmiResponse response;
+	private final IpmiResponseHandler response = new IpmiResponseHandler();
 
 	/**
 	 * Messages that have proper connection handle but arrived before tag was
@@ -44,7 +46,9 @@ public class MessageListener implements IpmiListener {
 	 * cannot be initialized before sending message since tag is not yet known
 	 * then)
 	 */
-	private List<IpmiResponse> quickMessages;
+	private final List<IpmiResponse> quickMessages = new ArrayList<IpmiResponse>();
+
+	private int tag;
 
 	/**
 	 * Initiates the {@link MessageListener}
@@ -55,10 +59,8 @@ public class MessageListener implements IpmiListener {
 	 *            message from.
 	 */
 	public MessageListener(ConnectionHandle handle) {
-		quickMessages = new ArrayList<IpmiResponse>();
 		this.handle = handle;
 		tag = -1;
-		response = null;
 	}
 
 	/**
@@ -71,7 +73,7 @@ public class MessageListener implements IpmiListener {
 	 * @throws Exception
 	 *             when message delivery fails
 	 */
-	public ResponseData waitForAnswer(int tag) throws Exception {
+	public ResponseData waitForAnswer(int tag, int timeout) throws Exception {
 		if (tag < 0 || tag > 63) {
 			throw new Exception("Corrupted message tag");
 		}
@@ -80,15 +82,17 @@ public class MessageListener implements IpmiListener {
 			this.notify(response);
 		}
 
-		while (response == null) {
-			Thread.sleep(1);
+		synchronized(response) {
+			while (response.response == null) {
+				response.wait(timeout);
+			}			
 		}
-		if (response instanceof IpmiResponseData) {
+		if (response.response instanceof IpmiResponseData) {
 			this.tag = -1;
 			quickMessages.clear();
-			return ((IpmiResponseData) response).getResponseData();
+			return ((IpmiResponseData) response.response).getResponseData();
 		} else /* response instanceof IpmiError */{
-			throw ((IpmiError) response).getException();
+			throw ((IpmiError) response.response).getException();
 		}
 	}
 
@@ -98,7 +102,10 @@ public class MessageListener implements IpmiListener {
 			if (tag == -1) {
 				quickMessages.add(response);
 			} else if (response.getTag() == tag) {
-				this.response = response;
+				synchronized(this.response) {
+					this.response.response = response;
+					this.response.notify();					
+				}
 			}
 		}
 	}

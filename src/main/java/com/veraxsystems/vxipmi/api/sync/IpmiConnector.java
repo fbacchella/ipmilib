@@ -49,13 +49,15 @@ import com.veraxsystems.vxipmi.connection.StateConnectionException;
  */
 public class IpmiConnector {
 
-    private static Logger logger = Logger.getLogger(IpmiConnector.class);
+    private static final Logger logger = Logger.getLogger(IpmiConnector.class);
 
-    private IpmiAsyncConnector asyncConnector;
+    private final IpmiAsyncConnector asyncConnector;
 
     private int retries;
 
     private int idleTime;
+    
+    private int timeout;
 
     private Random random = new Random(System.currentTimeMillis());
 
@@ -206,7 +208,7 @@ public class IpmiConnector {
                 int tag = asyncConnector.sendMessage(connectionHandle, request);
                 logger.debug("Sending message with tag " + tag + ", try " + tries + ", previous tag " + previousTag);
                 previousTag = tag;
-                data = listener.waitForAnswer(tag);
+                data = listener.waitForAnswer(tag, timeout);
             } catch (IllegalArgumentException e) {
                 throw e;
             } catch (InterruptedException e) {
@@ -273,5 +275,6 @@ public class IpmiConnector {
      */
     public void setTimeout(ConnectionHandle handle, int timeout) {
         asyncConnector.setTimeout(handle, timeout);
+        this.timeout = timeout;
     }
 }
