@@ -24,26 +24,21 @@ import org.apache.log4j.Logger;
 import com.veraxsystems.vxipmi.coding.commands.IpmiCommandCoder;
 import com.veraxsystems.vxipmi.common.PropertiesManager;
 import com.veraxsystems.vxipmi.connection.Connection;
-import com.veraxsystems.vxipmi.connection.ConnectionException;
 
 /**
  * Queues messages to send and checks for timeouts.
  */
 public class MessageQueue extends TimerTask {
 
-	private List<QueueElement> queue;
+	private final static Timer timer = new Timer("IPMIMessageQueueTimer", true);;
+	private final static Logger logger = Logger.getLogger(MessageQueue.class);
+
+	private final List<QueueElement> queue = new ArrayList<QueueElement>();
 	private int timeout;
-	private Timer timer;
-	private Connection connection;
-	private int lastSequenceNumber;
-	private Object lastSequenceNumberLock = new Object();
-
-	private static Logger logger = Logger.getLogger(MessageQueue.class);
-
-	/**
-	 * Frequency of checking messages for timeouts in ms.
-	 */
-	private static int cleaningFrequency = 500;
+	private final Connection connection;
+	private int lastSequenceNumber = 0;
+	private final Object lastSequenceNumberLock = new Object();
+	private final List<Integer> reservedTags = new ArrayList<Integer>();
 
 	/**
 	 * Size of the queue determined by IPMI sliding window algorithm
@@ -51,6 +46,13 @@ public class MessageQueue extends TimerTask {
 	 * When queue size is 16, BMC drops some of the messages under heavy load.
 	 */
 	private static final int QUEUE_SIZE = 8;
+
+	public MessageQueue(Connection connection, int timeout) throws FileNotFoundException, IOException {
+		this.connection = connection;
+		setTimeout(timeout);
+		int cleaningFrequency = Integer.parseInt(PropertiesManager.getInstance().getProperty("cleaningFrequency"));
+		timer.schedule(this, cleaningFrequency, cleaningFrequency);
+	}
 
 	public int getTimeout() {
 		return timeout;
@@ -60,36 +62,18 @@ public class MessageQueue extends TimerTask {
 		this.timeout = timeout;
 	}
 
-    public MessageQueue(Connection connection, int timeout) throws FileNotFoundException, IOException {
-        if (cleaningFrequency == -1) {
-            cleaningFrequency = Integer.parseInt(PropertiesManager.getInstance().getProperty("cleaningFrequency"));
-        }
-        reservedTags = new ArrayList<Integer>();
-        lastSequenceNumber = 0;
-        this.connection = connection;
-        queue = new ArrayList<QueueElement>();
-        setTimeout(timeout);
-        timer = new Timer();
-        timer.schedule(this, cleaningFrequency, cleaningFrequency);
-	}
-
 	/**
 	 * Stops the MessageQueue
 	 */
 	public void tearDown() {
-		timer.cancel();
+		cancel();
 	}
-
-	private List<Integer> reservedTags;
 
 	/**
 	 * Check if the tag is reserved.
 	 */
 	private synchronized boolean isReserved(int tag) {
-		if (reservedTags.contains(tag)) {
-			return true;
-		}
-		return false;
+		return reservedTags.contains(tag);
 	}
 
 	/**
@@ -108,7 +92,7 @@ public class MessageQueue extends TimerTask {
 	}
 
 	private synchronized void releaseTag(int tag) {
-		reservedTags.remove((Integer) tag);
+		reservedTags.remove(tag);
 	}
 
 	/**
@@ -317,27 +301,25 @@ public class MessageQueue extends TimerTask {
 	 */
 	@Override
 	public void run() {
-		if (queue != null) {
-			synchronized (queue) {
-				boolean process = true;
-				while (process && queue.size() > 0) {
-					Date now = new Date();
-					if (now.getTime() - queue.get(0).getTimestamp().getTime() > (long) timeout
-							|| queue.get(0).getRequest() == null) {
-						int tag = queue.get(0).getId() % 64;
-						boolean done = queue.get(0).getRequest() == null;
-						queue.remove(0);
-						logger.info("Removing message after timeout, tag: "
-								+ tag);
-						releaseTag(tag);
-						if (!done) {
-							connection.notifyListeners(connection.getHandle(),
-									tag, null, new IOException(
-											"Message timed out"));
-						}
-					} else {
-						process = false;
+		synchronized (queue) {
+			boolean process = true;
+			while (process && queue.size() > 0) {
+				Date now = new Date();
+				if (now.getTime() - queue.get(0).getTimestamp().getTime() > (long) timeout
+						|| queue.get(0).getRequest() == null) {
+					int tag = queue.get(0).getId() % 64;
+					boolean done = queue.get(0).getRequest() == null;
+					queue.remove(0);
+					logger.info("Removing message after timeout, tag: "
+							+ tag);
+					releaseTag(tag);
+					if (!done) {
+						connection.notifyListeners(connection.getHandle(),
+								tag, null, new IOException(
+										"Message timed out"));
 					}
+				} else {
+					process = false;
 				}
 			}
 		}
