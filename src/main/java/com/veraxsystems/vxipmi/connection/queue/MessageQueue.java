@@ -92,7 +92,7 @@ public class MessageQueue extends TimerTask {
 	}
 
 	private synchronized void releaseTag(int tag) {
-		reservedTags.remove(tag);
+		reservedTags.remove((Integer)tag);
 	}
 
 	/**
