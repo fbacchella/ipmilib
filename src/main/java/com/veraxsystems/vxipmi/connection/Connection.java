@@ -278,6 +278,7 @@ public class Connection extends TimerTask implements MachineObserver {
 				Thread.sleep(1);
 			} catch (InterruptedException e) {
 				logger.error(e.getMessage(), e);
+				break;
 			}
 			++time;
 		}
