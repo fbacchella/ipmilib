@@ -14,8 +14,7 @@ package com.veraxsystems.vxipmi.api.async;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 
@@ -110,9 +109,9 @@ public class IpmiAsyncConnector implements ConnectionListener {
 		loadProperties();
 	}
 
-    private void loadProperties() throws IOException {
+	private void loadProperties() throws IOException {
         retries = Integer.parseInt(PropertiesManager.getInstance().getProperty("retries"));
-    }
+	}
 
 	/**
 	 * Creates connection to the remote host.
@@ -153,23 +152,13 @@ public class IpmiAsyncConnector implements ConnectionListener {
 				++tries;
 				result = connectionManager
 						.getAvailableCipherSuites(connectionHandle.getHandle());
-            } catch (IPMIException e) {
-                logger.warn("Failed to receive answer, cause:", e);
-                if (tries > retries) {
-                        throw e;
-                }
-            } catch (StateConnectionException e) {
-            	// state error, no retry
-				throw e;
 			} catch (Exception e) {
-				if(e instanceof IOException) {
-					// Normal network error
-					logger.warn("Failed to receive answer, cause: " +  e.getMessage());					
-				} else {
-					logger.warn("Failed to receive answer, cause:", e);					
-				}
+				logger.warn("Failed to receive answer, cause:", e);
 				if (tries > retries) {
-					throw e;
+					logger.warn("Failed to receive answer, cause: "
+							+ e.getMessage());
+
+					return Arrays.asList(CipherSuite.getEmpty());
 				}
 			}
 		}
@@ -177,11 +166,11 @@ public class IpmiAsyncConnector implements ConnectionListener {
 	}
 
 	public List<CipherSuite> getAllCipherSuites(
-                       ConnectionHandle connectionHandle) throws StateConnectionException {
-               List<CipherSuite> result = connectionManager
-                       .getAllCipherSuites(connectionHandle.getHandle());
-               return result;
-       }
+			ConnectionHandle connectionHandle) throws StateConnectionException {
+		List<CipherSuite> result = connectionManager
+				.getAllCipherSuites(connectionHandle.getHandle());
+		return result;
+	}
 
 	/**
 	 * Gets the authentication capabilities for the connection with the remote
@@ -214,15 +203,15 @@ public class IpmiAsyncConnector implements ConnectionListener {
 								requestedPrivilegeLevel);
 				connectionHandle.setCipherSuite(cipherSuite);
 				connectionHandle.setPrivilegeLevel(requestedPrivilegeLevel);
-            } catch (StateConnectionException e) {
-            	// state error, no retry
+			} catch (StateConnectionException e) {
+				// state error, no retry
 				throw e;
 			} catch (Exception e) {
-				if(e instanceof IOException) {
+				if (e instanceof IOException) {
 					// Normal network error
 					logger.warn("Failed to receive answer, cause:" +  e.getMessage());					
 				} else {
-					logger.warn("Failed to receive answer, cause:", e);					
+					logger.warn("Failed to receive answer, cause:", e);
 				}
 				logger.warn("Failed to receive answer, cause:", e);
 				if (tries > retries) {
@@ -264,15 +253,15 @@ public class IpmiAsyncConnector implements ConnectionListener {
 						connectionHandle.getPrivilegeLevel(), username,
 						password, bmcKey);
 				succeded = true;
-            } catch (StateConnectionException e) {
-            	// state error, no retry
+			} catch (StateConnectionException e) {
+				// state error, no retry
 				throw e;
 			} catch (Exception e) {
-				if(e instanceof IOException) {
+				if (e instanceof IOException) {
 					// Normal network error
 					logger.warn("Failed to receive answer, cause:" +  e.getMessage());					
 				} else {
-					logger.warn("Failed to receive answer, cause:", e);					
+					logger.warn("Failed to receive answer, cause:", e);
 				}
 				if (tries > retries) {
 					throw e;
@@ -308,15 +297,15 @@ public class IpmiAsyncConnector implements ConnectionListener {
 				connectionManager.getConnection(connectionHandle.getHandle())
 						.closeSession();
 				succeded = true;
-            } catch (StateConnectionException e) {
-            	// state error, no retry
+			} catch (StateConnectionException e) {
+				// state error, no retry
 				throw e;
 			} catch (Exception e) {
-				if(e instanceof IOException) {
+				if (e instanceof IOException) {
 					// Normal network error
 					logger.warn("Failed to receive answer, cause:" +  e.getMessage());					
 				} else {
-					logger.warn("Failed to receive answer, cause:", e);					
+					logger.warn("Failed to receive answer, cause:", e);
 				}
 				if (tries > retries) {
 					throw e;
@@ -362,15 +351,15 @@ public class IpmiAsyncConnector implements ConnectionListener {
 				}
 				logger.debug("Sending message with tag " + tag + ", try "
 						+ tries);
-            } catch (StateConnectionException e) {
-            	// state error, no retry
+			} catch (StateConnectionException e) {
+				// state error, no retry
 				throw e;
 			} catch (Exception e) {
-				if(e instanceof IOException) {
+				if (e instanceof IOException) {
 					// Normal network error
 					logger.warn("Failed to receive answer, cause:" +  e.getMessage());					
 				} else {
-					logger.warn("Failed to receive answer, cause:", e);					
+					logger.warn("Failed to receive answer, cause:", e);
 				}
 				if (tries > retries) {
 					throw e;
@@ -444,15 +433,15 @@ public class IpmiAsyncConnector implements ConnectionListener {
 	public void tearDown() {
 		connectionManager.close();
 	}
-	
-    /**
-     * Changes the timeout value for connection with the given handle.
-     * @param handle
-     * - {@link ConnectionHandle} associated with the remote host.
-     * @param timeout
-     * - new timeout value in ms
-     */
-    public void setTimeout(ConnectionHandle handle, int timeout) {
-        connectionManager.getConnection(handle.getHandle()).setTimeout(timeout);
-    }
+
+	/**
+	 * Changes the timeout value for connection with the given handle.
+	 * @param handle
+	 *            - {@link ConnectionHandle} associated with the remote host.
+	 * @param timeout
+	 *            - new timeout value in ms
+	 */
+	public void setTimeout(ConnectionHandle handle, int timeout) {
+		connectionManager.getConnection(handle.getHandle()).setTimeout(timeout);
+	}
 }
