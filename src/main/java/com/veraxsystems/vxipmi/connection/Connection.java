@@ -99,10 +99,10 @@ public class Connection extends TimerTask implements MachineObserver {
 	 *             - when properties file was not found
 	 */
     public Connection(Messenger messenger, int handle) throws FileNotFoundException, IOException {
-        stateMachine = new StateMachine(messenger);
-        this.handle = handle;
+		stateMachine = new StateMachine(messenger);
+		this.handle = handle;
         timeout = Integer.parseInt(PropertiesManager.getInstance().getProperty("timeout"));
-    }
+	}
 
 	public int getHandle() {
 		return handle;
@@ -260,11 +260,11 @@ public class Connection extends TimerTask implements MachineObserver {
 		}
 		stateMachine.doTransition(new GetChannelCipherSuitesPending(tag));
 		stateMachine.doTransition(new DefaultAck());
-		CipherSuite[] allCs = new CipherSuite[] {
-			new CipherSuite((byte) 0,(byte) 0,(byte) 0,(byte) 0),
-			new CipherSuite((byte) 1,(byte) 1,(byte) 0,(byte) 0),
-			new CipherSuite((byte) 2,(byte) 1,(byte) 1,(byte) 0),
-			new CipherSuite((byte) 3,(byte) 1,(byte) 1,(byte) 1),
+		CipherSuite[] allCs = new CipherSuite[]{
+				new CipherSuite((byte) 0, (byte) 0, (byte) 0, (byte) 0),
+				new CipherSuite((byte) 1, (byte) 1, (byte) 0, (byte) 0),
+				new CipherSuite((byte) 2, (byte) 1, (byte) 1, (byte) 0),
+				new CipherSuite((byte) 3, (byte) 1, (byte) 1, (byte) 1),
 			new CipherSuite((byte) 4,(byte) 1,(byte) 1,(byte) 2),
 		};
 		return Arrays.asList(allCs);
@@ -318,7 +318,7 @@ public class Connection extends TimerTask implements MachineObserver {
 			PrivilegeLevel requestedPrivilegeLevel) throws Exception {
 
 		if (!(stateMachine.getCurrent().getClass() == Ciphers.class)) {
-			throw new StateConnectionException(stateMachine.getCurrent());
+			stateMachine.setCurrent(new Ciphers());
 		}
 
 		lastAction = null;
@@ -602,10 +602,10 @@ public class Connection extends TimerTask implements MachineObserver {
 			sik = ((GetSikAction) action).getSik();
 		} else if (!(action instanceof MessageAction)) {
 			lastAction = action;
-            if (action instanceof ErrorAction) {
-                ErrorAction errorAction = (ErrorAction) action;
+			if (action instanceof ErrorAction) {
+				ErrorAction errorAction = (ErrorAction) action;
                 logger.error(errorAction.getException().getMessage(), errorAction.getException());
-            }
+			}
 		} else {
 			handleIncomingMessage(((MessageAction) action).getIpmiv20Message());
 		}

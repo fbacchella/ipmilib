@@ -33,7 +33,7 @@ import com.veraxsystems.vxipmi.common.TypeConverter;
  */
 public class GetSensorReading extends IpmiCommandCoder {
 
-	private byte sensorId;
+	private final byte sensorId;
 
 	/**
 	 * Initiates class for both encoding and decoding.
@@ -67,7 +67,7 @@ public class GetSensorReading extends IpmiCommandCoder {
 	@Override
 	protected IpmiPayload preparePayload(int sequenceNumber)
 			throws NoSuchAlgorithmException, InvalidKeyException {
-		byte[] payloadData = new byte[] { sensorId };
+		byte[] payloadData = new byte[]{sensorId};
 		return new IpmiLanRequest(getNetworkFunction(), getCommandCode(),
 				payloadData, TypeConverter.intToByte(sequenceNumber % 64));
 	}
@@ -92,10 +92,6 @@ public class GetSensorReading extends IpmiCommandCoder {
 
 		byte[] raw = message.getPayload().getIpmiCommandData();
 
-		if (raw.length < 3) {
-			throw new IllegalArgumentException("Invalid response length");
-		}
-
 		GetSensorReadingResponseData responseData = new GetSensorReadingResponseData();
 
 		responseData.setSensorReading(raw[0]);
@@ -103,25 +99,25 @@ public class GetSensorReading extends IpmiCommandCoder {
 		responseData
 				.setSensorStateValid((TypeConverter.byteToInt(raw[1]) & 0x20) == 0);
 
-		responseData.setSensorState(SensorState.parseInt((TypeConverter
-				.byteToInt(raw[2])) & 0x3f));
+		if (raw.length > 2)
+			responseData.setSensorState(SensorState.parseInt((TypeConverter
+					.byteToInt(raw[2])) & 0x3f));
 
 		boolean[] states = null;
 
-		if (raw.length > 3) {
+		if (raw.length > 3)
 			states = new boolean[16];
-		} else {
+		else
 			states = new boolean[8];
-		}
 
-		for (int i = 0; i < 8; ++i) {
-			states[i] = (TypeConverter.byteToInt(raw[2]) & (0x1 << i)) != 0;
-		}
+		if (raw.length > 2)
+			for (int i = 0; i < 8; ++i)
+				states[i] = (TypeConverter.byteToInt(raw[2]) & (0x1 << i)) != 0;
 
 		if (raw.length > 3) {
-			for (int i = 0; i < 7; ++i) {
+			for (int i = 0; i < 7; ++i)
 				states[i + 8] = (TypeConverter.byteToInt(raw[3]) & (0x1 << i)) != 0;
-			}
+
 			states[15] = false;
 		}
 
