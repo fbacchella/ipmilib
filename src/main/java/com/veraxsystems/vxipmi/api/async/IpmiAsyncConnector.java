@@ -164,9 +164,9 @@ public class IpmiAsyncConnector implements ConnectionListener {
 			} catch (Exception e) {
 				if(e instanceof IOException) {
 					// Normal network error
-					logger.warn("Failed to receive answer, cause: " +  e.getMessage());					
+					logger.warn("Failed to receive answer, cause: " + e.getMessage());
 				} else {
-					logger.warn("Failed to receive answer, cause:", e);					
+					logger.warn("Failed to receive answer, cause:", e);
 				}
 				if (tries > retries) {
 					throw e;
@@ -219,7 +219,7 @@ public class IpmiAsyncConnector implements ConnectionListener {
 			} catch (Exception e) {
 				if(e instanceof IOException) {
 					// Normal network error
-					logger.warn("Failed to receive answer, cause:" +  e.getMessage());
+					logger.warn("Failed to receive answer, cause:" + e.getMessage());
 				} else {
 					logger.warn("Failed to receive answer, cause:", e);
 				}
@@ -269,9 +269,9 @@ public class IpmiAsyncConnector implements ConnectionListener {
 			} catch (Exception e) {
 				if(e instanceof IOException) {
 					// Normal network error
-					logger.warn("Failed to receive answer, cause:" +  e.getMessage());					
+					logger.warn("Failed to receive answer, cause:" + e.getMessage());
 				} else {
-					logger.warn("Failed to receive answer, cause:", e);					
+					logger.warn("Failed to receive answer, cause:", e);
 				}
 				if (tries > retries) {
 					throw e;
@@ -304,8 +304,7 @@ public class IpmiAsyncConnector implements ConnectionListener {
 		while (tries <= retries && !succeded) {
 			try {
 				++tries;
-				connectionManager.getConnection(connectionHandle.getHandle())
-						.closeSession();
+				connectionManager.getConnection(connectionHandle.getHandle()).closeSession();
 				succeded = true;
 			} catch (StateConnectionException e) {
 				// state error, no retry
@@ -313,9 +312,9 @@ public class IpmiAsyncConnector implements ConnectionListener {
 			} catch (Exception e) {
 				if(e instanceof IOException) {
 					// Normal network error
-					logger.warn("Failed to receive answer, cause:" +  e.getMessage());					
+					logger.warn("Failed to receive answer, cause:" + e.getMessage());
 				} else {
-					logger.warn("Failed to receive answer, cause:", e);					
+					logger.warn("Failed to receive answer, cause:", e);
 				}
 				if (tries > retries) {
 					throw e;
@@ -352,24 +351,22 @@ public class IpmiAsyncConnector implements ConnectionListener {
 				++tries;
 				while (tag < 0) {
 					tag = connectionManager.getConnection(
-							connectionHandle.getHandle()).sendIpmiCommand(
-							request);
+							connectionHandle.getHandle()).sendIpmiCommand(request);
 					if (tag < 0) {
-						Thread.sleep(10); // tag < 0 means that MessageQueue is
+						Thread.sleep(10);	// tag < 0 means that MessageQueue is
 											// full so we need to wait and retry
 					}
 				}
-				logger.debug("Sending message with tag " + tag + ", try "
-						+ tries);
+				logger.debug("Sending message with tag " + tag + ", try " + tries);
 			} catch (StateConnectionException e) {
 				// state error, no retry
 				throw e;
 			} catch (Exception e) {
 				if(e instanceof IOException) {
 					// Normal network error
-					logger.warn("Failed to receive answer, cause:" +  e.getMessage());					
+					logger.warn("Failed to receive answer, cause:" + e.getMessage());
 				} else {
-					logger.warn("Failed to receive answer, cause:", e);					
+					logger.warn("Failed to receive answer, cause:", e);
 				}
 				if (tries > retries) {
 					throw e;
@@ -443,14 +440,14 @@ public class IpmiAsyncConnector implements ConnectionListener {
 	public void tearDown() {
 		connectionManager.close();
 	}
-	
-    /**
-     * Changes the timeout value for connection with the given handle.
-     * @param handle
-     * - {@link ConnectionHandle} associated with the remote host.
-     * @param timeout
-     * - new timeout value in ms
-     */
+
+	/**
+	 * Changes the timeout value for connection with the given handle.
+	 * @param handle
+	 * - {@link ConnectionHandle} associated with the remote host.
+	 * @param timeout
+	 * - new timeout value in ms
+	 */
 	public void setTimeout(ConnectionHandle handle, int timeout) {
 		connectionManager.getConnection(handle.getHandle()).setTimeout(timeout);
 	}
