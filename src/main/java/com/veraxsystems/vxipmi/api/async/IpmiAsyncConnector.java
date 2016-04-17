@@ -176,6 +176,20 @@ public class IpmiAsyncConnector implements ConnectionListener {
 		return result;
 	}
 
+	/**getAvailableCipherSuites fails on some IPMI, because it's an anonymous request and
+	 * some IPMI interfaces don't like that.
+	 * 
+	 * So getAllCipherSuites simulate a request (and keep the state machine happy)
+	 * but returns all cipher, without requesting the IPMI.
+	 * 
+	 * @param connectionHandle
+	 *            {@link ConnectionHandle} to the connection created before
+	 * @see #createConnection(InetAddress)
+	 * @return list of the {@link CipherSuite}s that are allowed during the
+	 *         connection
+	 * @throws Exception
+	 *             when sending message to the managed system fails
+	 */
 	public List<CipherSuite> getAllCipherSuites(
 			ConnectionHandle connectionHandle) throws StateConnectionException {
 		List<CipherSuite> result = connectionManager.getAllCipherSuites(connectionHandle.getHandle());

@@ -253,6 +253,20 @@ public class Connection extends TimerTask implements MachineObserver {
 		return CipherSuite.getCipherSuites(csRaw);
 	}
 
+	/**getAvailableCipherSuites fails on some IPMI, because it's an anonymous request and
+	 * some IPMI interfaces don't like that.
+	 * 
+	 * So getAllCipherSuites simulate a request (and keep the state machine happy)
+	 * but returns all cipher, without requesting the IPMI.
+	 * 
+	 * @param tag
+	 *            - a dummy tag in the range 0-63
+	 * 
+	 * @return list of all the {@link CipherSuite}s.
+	 * @throws ConnectionException
+	 *             when connection is in the state that does not allow to
+	 *             perform this operation.
+	 */
 	public List<CipherSuite> getAllCipherSuites(int tag) throws StateConnectionException {
 
 		if (!(stateMachine.getCurrent().getClass() == Uninitialized.class)) {

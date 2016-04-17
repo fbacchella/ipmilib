@@ -269,6 +269,23 @@ public class ConnectionManager {
 		return suites;
 	}
 
+	/**
+	 * The method getAvailableCipherSuites fails on some IPMI, because it's an anonymous request and
+	 * some IPMI interfaces don't like that.
+	 * 
+	 * So getAllCipherSuites simulate a request (and keep the state machine happy)
+	 * but returns all cipher, without requesting the IPMI.
+	 * 	 * 
+	 * @param connection
+	 *            - index of the connection to get available Cipher Suites from
+	 * 
+	 * @return list of the {@link CipherSuite}s supported by the managed system.
+	 * @throws ConnectionException
+	 *             when connection is in the state that does not allow to
+	 *             perform this operation.
+	 * @throws Exception
+	 *             when sending message to the managed system fails
+	 */
 	public List<CipherSuite> getAllCipherSuites(int connection)
 			throws StateConnectionException {
 		int tag = generateSessionlessTag();
