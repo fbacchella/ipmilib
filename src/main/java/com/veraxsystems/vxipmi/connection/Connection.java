@@ -98,11 +98,11 @@ public class Connection extends TimerTask implements MachineObserver {
 	 * @throws FileNotFoundException
 	 *             - when properties file was not found
 	 */
-    public Connection(Messenger messenger, int handle) throws FileNotFoundException, IOException {
-        stateMachine = new StateMachine(messenger);
-        this.handle = handle;
-        timeout = Integer.parseInt(PropertiesManager.getInstance().getProperty("timeout"));
-    }
+	public Connection(Messenger messenger, int handle) throws FileNotFoundException, IOException {
+		stateMachine = new StateMachine(messenger);
+		this.handle = handle;
+		timeout = Integer.parseInt(PropertiesManager.getInstance().getProperty("timeout"));
+	}
 
 	public int getHandle() {
 		return handle;
@@ -602,10 +602,10 @@ public class Connection extends TimerTask implements MachineObserver {
 			sik = ((GetSikAction) action).getSik();
 		} else if (!(action instanceof MessageAction)) {
 			lastAction = action;
-            if (action instanceof ErrorAction) {
-                ErrorAction errorAction = (ErrorAction) action;
-                logger.error(errorAction.getException().getMessage(), errorAction.getException());
-            }
+			if (action instanceof ErrorAction) {
+				ErrorAction errorAction = (ErrorAction) action;
+				logger.error(errorAction.getException().getMessage(), errorAction.getException());
+			}
 		} else {
 			handleIncomingMessage(((MessageAction) action).getIpmiv20Message());
 		}

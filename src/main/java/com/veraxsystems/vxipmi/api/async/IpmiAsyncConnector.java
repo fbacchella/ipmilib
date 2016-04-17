@@ -110,9 +110,9 @@ public class IpmiAsyncConnector implements ConnectionListener {
 		loadProperties();
 	}
 
-    private void loadProperties() throws IOException {
-        retries = Integer.parseInt(PropertiesManager.getInstance().getProperty("retries"));
-    }
+	private void loadProperties() throws IOException {
+		retries = Integer.parseInt(PropertiesManager.getInstance().getProperty("retries"));
+	}
 
 	/**
 	 * Creates connection to the remote host.
@@ -153,13 +153,13 @@ public class IpmiAsyncConnector implements ConnectionListener {
 				++tries;
 				result = connectionManager
 						.getAvailableCipherSuites(connectionHandle.getHandle());
-            } catch (IPMIException e) {
-                logger.warn("Failed to receive answer, cause:", e);
-                if (tries > retries) {
-                        throw e;
-                }
-            } catch (StateConnectionException e) {
-            	// state error, no retry
+			} catch (IPMIException e) {
+				logger.warn("Failed to receive answer, cause:", e);
+				if (tries > retries) {
+					throw e;
+				}
+			} catch (StateConnectionException e) {
+				// state error, no retry
 				throw e;
 			} catch (Exception e) {
 				if(e instanceof IOException) {
@@ -177,11 +177,10 @@ public class IpmiAsyncConnector implements ConnectionListener {
 	}
 
 	public List<CipherSuite> getAllCipherSuites(
-                       ConnectionHandle connectionHandle) throws StateConnectionException {
-               List<CipherSuite> result = connectionManager
-                       .getAllCipherSuites(connectionHandle.getHandle());
-               return result;
-       }
+			ConnectionHandle connectionHandle) throws StateConnectionException {
+		List<CipherSuite> result = connectionManager.getAllCipherSuites(connectionHandle.getHandle());
+		return result;
+	}
 
 	/**
 	 * Gets the authentication capabilities for the connection with the remote
@@ -214,15 +213,15 @@ public class IpmiAsyncConnector implements ConnectionListener {
 								requestedPrivilegeLevel);
 				connectionHandle.setCipherSuite(cipherSuite);
 				connectionHandle.setPrivilegeLevel(requestedPrivilegeLevel);
-            } catch (StateConnectionException e) {
-            	// state error, no retry
+			} catch (StateConnectionException e) {
+				// state error, no retry
 				throw e;
 			} catch (Exception e) {
 				if(e instanceof IOException) {
 					// Normal network error
-					logger.warn("Failed to receive answer, cause:" +  e.getMessage());					
+					logger.warn("Failed to receive answer, cause:" +  e.getMessage());
 				} else {
-					logger.warn("Failed to receive answer, cause:", e);					
+					logger.warn("Failed to receive answer, cause:", e);
 				}
 				logger.warn("Failed to receive answer, cause:", e);
 				if (tries > retries) {
@@ -264,8 +263,8 @@ public class IpmiAsyncConnector implements ConnectionListener {
 						connectionHandle.getPrivilegeLevel(), username,
 						password, bmcKey);
 				succeded = true;
-            } catch (StateConnectionException e) {
-            	// state error, no retry
+			} catch (StateConnectionException e) {
+				// state error, no retry
 				throw e;
 			} catch (Exception e) {
 				if(e instanceof IOException) {
@@ -308,8 +307,8 @@ public class IpmiAsyncConnector implements ConnectionListener {
 				connectionManager.getConnection(connectionHandle.getHandle())
 						.closeSession();
 				succeded = true;
-            } catch (StateConnectionException e) {
-            	// state error, no retry
+			} catch (StateConnectionException e) {
+				// state error, no retry
 				throw e;
 			} catch (Exception e) {
 				if(e instanceof IOException) {
@@ -362,8 +361,8 @@ public class IpmiAsyncConnector implements ConnectionListener {
 				}
 				logger.debug("Sending message with tag " + tag + ", try "
 						+ tries);
-            } catch (StateConnectionException e) {
-            	// state error, no retry
+			} catch (StateConnectionException e) {
+				// state error, no retry
 				throw e;
 			} catch (Exception e) {
 				if(e instanceof IOException) {
@@ -452,7 +451,7 @@ public class IpmiAsyncConnector implements ConnectionListener {
      * @param timeout
      * - new timeout value in ms
      */
-    public void setTimeout(ConnectionHandle handle, int timeout) {
-        connectionManager.getConnection(handle.getHandle()).setTimeout(timeout);
-    }
+	public void setTimeout(ConnectionHandle handle, int timeout) {
+		connectionManager.getConnection(handle.getHandle()).setTimeout(timeout);
+	}
 }

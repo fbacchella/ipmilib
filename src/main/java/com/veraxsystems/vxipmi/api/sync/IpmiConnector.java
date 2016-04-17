@@ -237,7 +237,7 @@ public class IpmiConnector {
                 } else {
                 	if(e instanceof IOException) {
                 		// Network exception common case, no stack needed
-                        logger.warn("Receiving message failed " + e.getMessage() + ", retrying");                		
+                        logger.warn("Receiving message failed " + e.getMessage() + ", retrying");
                 	} else {
                 		// Unexcepted exception, needs investigation
                         logger.warn("Receiving message failed, retrying", e);
