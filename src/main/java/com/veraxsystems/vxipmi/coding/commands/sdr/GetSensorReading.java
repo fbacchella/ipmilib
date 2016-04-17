@@ -33,7 +33,7 @@ import com.veraxsystems.vxipmi.common.TypeConverter;
  */
 public class GetSensorReading extends IpmiCommandCoder {
 
-	private byte sensorId;
+	private final byte sensorId;
 
 	/**
 	 * Initiates class for both encoding and decoding.
@@ -85,16 +85,10 @@ public class GetSensorReading extends IpmiCommandCoder {
 			throw new IllegalArgumentException("Invalid response payload");
 		}
 		if (((IpmiLanResponse) message.getPayload()).getCompletionCode() != CompletionCode.Ok) {
-			throw new IPMIException(
-					((IpmiLanResponse) message.getPayload())
-							.getCompletionCode());
+			throw new IPMIException(((IpmiLanResponse) message.getPayload()).getCompletionCode());
 		}
 
 		byte[] raw = message.getPayload().getIpmiCommandData();
-
-		if (raw.length < 3) {
-			throw new IllegalArgumentException("Invalid response length");
-		}
 
 		GetSensorReadingResponseData responseData = new GetSensorReadingResponseData();
 
@@ -103,9 +97,11 @@ public class GetSensorReading extends IpmiCommandCoder {
 		responseData
 				.setSensorStateValid((TypeConverter.byteToInt(raw[1]) & 0x20) == 0);
 
-		responseData.setSensorState(SensorState.parseInt((TypeConverter
-				.byteToInt(raw[2])) & 0x3f));
-
+		// Don't fail on invalid response length, just walk around it
+		if (raw.length > 2) {
+			responseData.setSensorState(SensorState
+					.parseInt((TypeConverter.byteToInt(raw[2])) & 0x3f));
+		}
 		boolean[] states = null;
 
 		if (raw.length > 3) {
@@ -114,10 +110,12 @@ public class GetSensorReading extends IpmiCommandCoder {
 			states = new boolean[8];
 		}
 
-		for (int i = 0; i < 8; ++i) {
-			states[i] = (TypeConverter.byteToInt(raw[2]) & (0x1 << i)) != 0;
+		// Don't fail on invalid response length, just walk around it
+		if (raw.length > 2) {
+			for (int i = 0; i < 8; ++i) {
+				states[i] = (TypeConverter.byteToInt(raw[2]) & (0x1 << i)) != 0;
+			} 
 		}
-
 		if (raw.length > 3) {
 			for (int i = 0; i < 7; ++i) {
 				states[i + 8] = (TypeConverter.byteToInt(raw[3]) & (0x1 << i)) != 0;
