@@ -80,13 +80,13 @@ public class ConnectionManager {
 		initialize();
 	}
 
-    private void initialize() throws IOException {
-        connections = new ArrayList<Connection>();
-        reservedTags = new ArrayList<Integer>();
-        if (pingPeriod == -1) {
-            pingPeriod = Integer.parseInt(PropertiesManager.getInstance().getProperty("pingPeriod"));
-        }
-    }
+	private void initialize() throws IOException {
+		connections = new ArrayList<Connection>();
+		reservedTags = new ArrayList<Integer>();
+		if (pingPeriod == -1) {
+			pingPeriod = Integer.parseInt(PropertiesManager.getInstance().getProperty("pingPeriod"));
+		}
+	}
 
 	/**
 	 * Closes all open connections and disconnects {@link UdpListener}.
@@ -270,19 +270,19 @@ public class ConnectionManager {
 	}
 
 	public List<CipherSuite> getAllCipherSuites(int connection)
-                throws StateConnectionException {
-	    int tag = generateSessionlessTag();
-            List<CipherSuite> suites;
-            try {
-                    suites = connections.get(connection).getAllCipherSuites(tag);
-            } catch (StateConnectionException e) {
-                    freeTag(tag);
-                    throw e;
-            }
-            freeTag(tag);
-            return suites;
+			throws StateConnectionException {
+		int tag = generateSessionlessTag();
+		List<CipherSuite> suites;
+		try {
+			suites = connections.get(connection).getAllCipherSuites(tag);
+		} catch (StateConnectionException e) {
+			freeTag(tag);
+			throw e;
+		}
+		freeTag(tag);
+		return suites;
 	}
-	
+
 	/**
 	 * Queries the managed system for the details of the authentification
 	 * process. Must be performed after {@link #getAvailableCipherSuites(int)}
