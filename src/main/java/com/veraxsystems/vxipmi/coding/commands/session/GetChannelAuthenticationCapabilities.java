@@ -56,7 +56,7 @@ public class GetChannelAuthenticationCapabilities extends IpmiCommandCoder {
      * Sets the channel number that will be put into IPMI command.
      *
      * @param channelNumber
-     *            - must be 0h-Bh or Eh-Fh <br>
+     *            must be 0h-Bh or Eh-Fh <br>
      *            Eh = retrieve information for channel this request was issued
      *            on
      * @throws IllegalArgumentException
@@ -103,13 +103,13 @@ public class GetChannelAuthenticationCapabilities extends IpmiCommandCoder {
      * contain information for channel this request was issued on.
      *
      * @param version
-     *            - Version of IPMI protocol used
+     *            Version of IPMI protocol used
      * @param requestVersion
-     *            - If Get Channel Authentication Capabilities command is sent
+     *            If Get Channel Authentication Capabilities command is sent
      *            to BMC with requestVersion = {@link IpmiVersion#V15} it will
      *            respond, that it does not support IPMI v2.0 even if it does.
      * @param cipherSuite
-     *            - {@link CipherSuite} containing authentication,
+     *            {@link CipherSuite} containing authentication,
      *            confidentiality and integrity algorithms for this session.
      * @see IpmiVersion
      */
@@ -126,19 +126,19 @@ public class GetChannelAuthenticationCapabilities extends IpmiCommandCoder {
      * level privilegeLevel. Sets channel number to channelNumber.
      *
      * @param version
-     *            - Version of IPMI protocol used
+     *            Version of IPMI protocol used
      * @param requestVersion
-     *            - If Get Channel Authentication Capabilities command is sent
+     *            If Get Channel Authentication Capabilities command is sent
      *            to BMC with requestVersion = {@link IpmiVersion#V15} it will
      *            respond, that it does not support IPMI v2.0 even if it does.
      * @param cipherSuite
-     *            - {@link CipherSuite} containing authentication,
+     *            {@link CipherSuite} containing authentication,
      *            confidentiality and integrity algorithms for this session.
      * @param privilegeLevel
-     *            - Maximum requested privilege level. Can't be
+     *            Maximum requested privilege level. Can't be
      *            {@link PrivilegeLevel#MaximumAvailable}.
      * @param channelNumber
-     *            - must be 0h-Bh or Eh-Fh <br>
+     *            must be 0h-Bh or Eh-Fh <br>
      *            Eh = retrieve information for channel this request was issued
      *            on.
      * @see IpmiVersion
@@ -285,12 +285,12 @@ public class GetChannelAuthenticationCapabilities extends IpmiCommandCoder {
      * Sets session parameters.
      *
      * @param version
-     *            - IPMI version of the command.
+     *            IPMI version of the command.
      * @param cipherSuite
-     *            - {@link CipherSuite} containing authentication,
+     *            {@link CipherSuite} containing authentication,
      *            confidentiality and integrity algorithms for this session.
      * @param authenticationType
-     *            - Type of authentication used. Must be RMCPPlus for IPMI v2.0.
+     *            Type of authentication used. Must be RMCPPlus for IPMI v2.0.
      */
     @Override
     public void setSessionParameters(IpmiVersion version,

@@ -138,25 +138,25 @@ public class Rakp1 extends IpmiCommandCoder {
      * Authentication Type to RMCP+.
      *
      * @param managedSystemSessionId
-     *            - The Managed System's Session ID for this session. Must be as
+     *            The Managed System's Session ID for this session. Must be as
      *            returned by the Managed System in the Open Session Response
      *            message.
      * @param privilegeLevel
-     *            - Requested Maximum {@link PrivilegeLevel}
+     *            Requested Maximum {@link PrivilegeLevel}
      * @param username
-     *            - ASCII character Name that the user at the Remote Console
+     *            ASCII character Name that the user at the Remote Console
      *            wishes to assume for this session. It's length cannot exceed
      *            16.
      * @param password
-     *            - password matching username
+     *            password matching username
      * @param bmcKey
-     *            - BMC specific key. Should be null if Get Channel
+     *            BMC specific key. Should be null if Get Channel
      *            Authentication Capabilities Response indicated that Kg is
      *            disabled which means that 'one-key' logins are being used (
      *            {@link GetChannelAuthenticationCapabilitiesResponseData#isKgEnabled()}
      *            == false)
      * @param cipherSuite
-     *            - {@link CipherSuite} containing authentication,
+     *            {@link CipherSuite} containing authentication,
      *            confidentiality and integrity algorithms for this session.
      */
     public Rakp1(int managedSystemSessionId, PrivilegeLevel privilegeLevel,
@@ -260,10 +260,10 @@ public class Rakp1 extends IpmiCommandCoder {
      *             when message is not a response for class-specific command,
      *             response has invalid length or authentication check fails.
      * @throws NoSuchAlgorithmException
-     *             - when authentication, confidentiality or integrity algorithm
+     *             when authentication, confidentiality or integrity algorithm
      *             fails.
      * @throws InvalidKeyException
-     *             - when creating of the algorithm key fails
+     *             when creating of the algorithm key fails
      */
     @Override
     public ResponseData getResponseData(IpmiMessage message) throws IPMIException, NoSuchAlgorithmException, InvalidKeyException {
@@ -379,10 +379,10 @@ public class Rakp1 extends IpmiCommandCoder {
      *            RAKP Message 2 data
      * @return Session Integrity Key
      * @throws NoSuchAlgorithmException
-     *             - when authentication, confidentiality or integrity algorithm
+     *             when authentication, confidentiality or integrity algorithm
      *             fails.
      * @throws InvalidKeyException
-     *             - when creating of the algorithm key fails
+     *             when creating of the algorithm key fails
      */
     public byte[] calculateSik(Rakp1ResponseData responseData)
             throws InvalidKeyException, NoSuchAlgorithmException {

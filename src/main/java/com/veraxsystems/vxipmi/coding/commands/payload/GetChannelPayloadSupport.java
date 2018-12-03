@@ -62,14 +62,14 @@ public class GetChannelPayloadSupport extends IpmiCommandCoder {
      * Initiates class for both encoding and decoding.
      *
      * @param channelNumber
-     *            - must be 0h-Bh or Eh-Fh <br>
+     *            must be 0h-Bh or Eh-Fh <br>
      *            Eh = retrieve information for channel this request was issued
      *            on
      * @param cipherSuite
-     *            - {@link CipherSuite} containing authentication,
+     *            {@link CipherSuite} containing authentication,
      *            confidentiality and integrity algorithms for this session.
      * @param authenticationType
-     *            - Type of authentication used. Must be RMCPPlus for IPMI v2.0.
+     *            Type of authentication used. Must be RMCPPlus for IPMI v2.0.
      */
     public GetChannelPayloadSupport(byte channelNumber, CipherSuite cipherSuite, AuthenticationType authenticationType) {
         super(IpmiVersion.V20, cipherSuite, authenticationType);
@@ -84,7 +84,7 @@ public class GetChannelPayloadSupport extends IpmiCommandCoder {
      * Sets the channel number that will be put into IPMI command.
      *
      * @param channelNumber
-     *            - must be 0h-Bh or Eh-Fh <br>
+     *            must be 0h-Bh or Eh-Fh <br>
      *            Eh = retrieve information for channel this request was issued
      *            on
      * @throws IllegalArgumentException

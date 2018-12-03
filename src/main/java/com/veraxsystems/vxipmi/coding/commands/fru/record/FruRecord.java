@@ -24,16 +24,19 @@ public abstract class FruRecord {
      * Decodes string using the type/length field specification.
      *
      * @param typeFormat
-     *            - 00 - binary or unspecified 01 - BCD plus (see below) 10 -
-     *            6-bit ASCII, packed (overrides Language Codes) 11 -
-     *            Interpretation depends on Language Codes. 11b indicates 8-bit
+     *            <ul>
+     *            <li>00 - binary or unspecified</li>
+     *            <li>01 - BCD plus (see below)</li>
+     *            <li>10 - 6-bit ASCII, packed (overrides Language Codes)</li>
+     *            <li>11 - Interpretation depends on Language Codes. 11b indicates 8-bit
      *            ASCII + Latin 1 if the Language Code is English for the area
      *            or record containing the field, or 2-byte UNICODE (least
-     *            significant byte first) if the Language Code is not English.
+     *            significant byte first) if the Language Code is not English.</li>
+     *            </ul>
      * @param data
-     *            - encoded data
+     *            encoded data
      * @param isEnglishLanguageCode
-     *            - true if the Language Code is English
+     *            true if the Language Code is English
      * @return - decoded string
      */
     protected static String decodeString(int typeFormat, byte[] data,

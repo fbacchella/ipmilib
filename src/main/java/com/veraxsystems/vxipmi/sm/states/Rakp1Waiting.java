@@ -30,8 +30,11 @@ import com.veraxsystems.vxipmi.sm.events.StateMachineEvent;
 import com.veraxsystems.vxipmi.sm.events.Timeout;
 
 /**
- * Waiting for RAKP Message 2. Transition to: <li> {@link Rakp1Complete} on
- * {@link DefaultAck} <li> {@link Authcap} on {@link Timeout}
+ * Waiting for RAKP Message 2. Transition to:
+ * <ul>
+ *   <li> {@link Rakp1Complete} on {@link DefaultAck}</li>
+ *   <li> {@link Authcap} on {@link Timeout}</li>
+ * </ul>
  */
 public class Rakp1Waiting extends State {
 

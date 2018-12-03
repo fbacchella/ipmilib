@@ -47,17 +47,17 @@ public class GetSdr extends IpmiCommandCoder {
      * 'bytes to read' fields are set to read whole record.
      *
      * @param version
-     *            - IPMI version of the command.
+     *            IPMI version of the command.
      * @param cipherSuite
-     *            - {@link CipherSuite} containing authentication,
+     *            {@link CipherSuite} containing authentication,
      *            confidentiality and integrity algorithms for this session.
      * @param authenticationType
-     *            - Type of authentication used. Must be RMCPPlus for IPMI v2.0.
+     *            Type of authentication used. Must be RMCPPlus for IPMI v2.0.
      * @param reservationId
-     *            - SDR reservation ID received via {@link ReserveSdrRepository}
+     *            SDR reservation ID received via {@link ReserveSdrRepository}
      *            command
      * @param recordId
-     *            - ID of the record to get
+     *            ID of the record to get
      */
     public GetSdr(IpmiVersion version, CipherSuite cipherSuite,
             AuthenticationType authenticationType, int reservationId,
@@ -70,21 +70,21 @@ public class GetSdr extends IpmiCommandCoder {
      * Initiates GetSdr for both encoding and decoding.
      *
      * @param version
-     *            - IPMI version of the command.
+     *            IPMI version of the command.
      * @param cipherSuite
-     *            - {@link CipherSuite} containing authentication,
+     *            {@link CipherSuite} containing authentication,
      *            confidentiality and integrity algorithms for this session.
      * @param authenticationType
-     *            - Type of authentication used. Must be RMCPPlus for IPMI v2.0.
+     *            Type of authentication used. Must be RMCPPlus for IPMI v2.0.
      * @param reservationId
-     *            - SDR reservation ID received via {@link ReserveSdrRepository}
+     *            SDR reservation ID received via {@link ReserveSdrRepository}
      *            command
      * @param recordId
-     *            - ID of the record to get
+     *            ID of the record to get
      * @param offset
-     *            - the offset into record, at which reading should be started
+     *            the offset into record, at which reading should be started
      * @param bytesToRead
-     *            - number of bytes to read
+     *            number of bytes to read
      */
     public GetSdr(IpmiVersion version, CipherSuite cipherSuite,
             AuthenticationType authenticationType, int reservationId,

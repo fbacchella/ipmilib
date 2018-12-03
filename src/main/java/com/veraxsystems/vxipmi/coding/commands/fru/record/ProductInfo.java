@@ -44,9 +44,9 @@ public class ProductInfo extends FruRecord {
      * Creates and populates record
      *
      * @param fruData
-     *            - raw data containing record
+     *            raw data containing record
      * @param offset
-     *            - offset to the record in the data
+     *            offset to the record in the data
      */
     public ProductInfo(final byte[] fruData, final int offset) {
         super();

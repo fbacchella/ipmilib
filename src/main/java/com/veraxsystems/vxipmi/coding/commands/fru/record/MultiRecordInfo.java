@@ -26,9 +26,9 @@ public abstract class MultiRecordInfo extends FruRecord {
      * Creates and populates record
      *
      * @param fruData
-     *            - raw data containing record
+     *            raw data containing record
      * @param offset
-     *            - offset to the record in the data
+     *            offset to the record in the data
      */
     public static MultiRecordInfo populateMultiRecord(final byte[] fruData, final int offset) {
         MultiRecordInfo recordInfo = null;

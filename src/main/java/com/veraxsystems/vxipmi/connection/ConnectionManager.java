@@ -44,7 +44,7 @@ public class ConnectionManager {
      * Initiates the connection manager. Wildcard IP address will be used.
      *
      * @param port
-     *            - the port at which {@link UdpListener} will work
+     *            the port at which {@link UdpListener} will work
      * @throws IOException
      *             when properties file was not found
      */
@@ -57,9 +57,9 @@ public class ConnectionManager {
      * Initiates the connection manager.
      *
      * @param port
-     *            - the port at which {@link UdpListener} will work
+     *            the port at which {@link UdpListener} will work
      * @param address
-     *            - the IP interface {@link UdpListener} will bind to
+     *            the IP interface {@link UdpListener} will bind to
      * @throws IOException
      *             when properties file was not found
      */
@@ -72,8 +72,7 @@ public class ConnectionManager {
      * Initiates the connection manager.
      *
      * @param messenger
-     *            - {@link Messenger} to be used in communication
-     * @throws IOException
+     *            {@link Messenger} to be used in communication
      */
     public ConnectionManager(Messenger messenger) {
         this.messenger = messenger;
@@ -165,7 +164,7 @@ public class ConnectionManager {
      * Returns first {@link Connection} associated with the address
      *
      * @param address
-     *            - {@link InetAddress} of the remote host to get connection
+     *            {@link InetAddress} of the remote host to get connection
      *            with.
      * @return First {@link Connection} to the address or null if none found
      */
@@ -185,14 +184,14 @@ public class ConnectionManager {
     /**
      * Creates and initiates {@link Connection} to the remote host.
      * @param address
-     * - {@link InetAddress} of the remote host
+     * {@link InetAddress} of the remote host
      * @param pingPeriod
-     * - frequency of the no-op commands that will be sent to keep up the session
+     * frequency of the no-op commands that will be sent to keep up the session
      * @param skipCiphers
-     * - determines if the getAvailableCipherSuites and getChannelAuthenticationCapabilities phases should be skipped
+     * determines if the getAvailableCipherSuites and getChannelAuthenticationCapabilities phases should be skipped
      * @return index of the connection
      * @throws IOException
-     * - when properties file was not found
+     * when properties file was not found
      */
     public int createConnection(InetAddress address, int port, int pingPeriod, boolean skipCiphers) throws IOException {
         Connection connection = new Connection(messenger, 0);

@@ -22,13 +22,13 @@ public class IpmiLanRequest extends IpmiLanMessage {
      * Builds IpmiLanRequest addressed at LUN 0.
      *
      * @param networkFunction
-     *            - command specific {@link NetworkFunction}
+     *            command specific {@link NetworkFunction}
      * @param commandCode
-     *            - command specific {@link CommandCodes}
+     *            command specific {@link CommandCodes}
      * @param requestData
-     *            - command specific payload
+     *            command specific payload
      * @param sequenceNumber
-     *            - used to match request and response - must be in range <0-63>
+     *            used to match request and response - must be in range &lt;0-63&gt;
      */
     public IpmiLanRequest(NetworkFunction networkFunction, byte commandCode,
             byte[] requestData, byte sequenceNumber) {
@@ -40,15 +40,15 @@ public class IpmiLanRequest extends IpmiLanMessage {
      * Builds IpmiLanRequest.
      *
      * @param networkFunction
-     *            - command specific {@link NetworkFunction}
+     *            command specific {@link NetworkFunction}
      * @param commandCode
-     *            - command specific {@link CommandCodes}
+     *            command specific {@link CommandCodes}
      * @param requestData
-     *            - command specific payload
+     *            command specific payload
      * @param sequenceNumber
-     *            - used to match request and response - must be in range <0-63>
+     *            used to match request and response - must be in range &lt;0-63&gt;
      * @param lun
-     *            - target Logical Unit Number. Must be in range <0-3>.
+     *            target Logical Unit Number. Must be in range &lt;0-3&gt;.
      */
     public IpmiLanRequest(NetworkFunction networkFunction, byte commandCode,
             byte[] requestData, byte sequenceNumber, byte lun) {

@@ -37,15 +37,20 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * <p> Synchronous API for connecting to BMC via IPMI. </p> <p> Creating connection consists of the following steps:
- * <li>Create {@link Connection} and get associated with it {@link ConnectionHandle} via
- * {@link #createConnection(InetAddress)} <li>Get {@link CipherSuite}s that are available for the connection via
- * {@link #getAvailableCipherSuites(ConnectionHandle)} <li>Pick {@link CipherSuite} and {@link PrivilegeLevel} that will
+ * <p> Synchronous API for connecting to BMC via IPMI. </p> <p> Creating connection consists of the following steps:</p>
+ * <ul>
+ *   <li>Create {@link Connection} and get associated with it {@link ConnectionHandle} via
+ * {@link #createConnection(InetAddress)}</li>
+ * <li>Get {@link CipherSuite}s that are available for the connection via
+ * {@link #getAvailableCipherSuites(ConnectionHandle)}</li>
+ * <li>Pick {@link CipherSuite} and {@link PrivilegeLevel} that will
  * be used during session and get {@link GetChannelAuthenticationCapabilitiesResponseData} to find out allowed
  * authentication options via
- * {@link #getChannelAuthenticationCapabilities(ConnectionHandle, CipherSuite, PrivilegeLevel)} <li>Provide username,
+ * {@link #getChannelAuthenticationCapabilities(ConnectionHandle, CipherSuite, PrivilegeLevel)}</li>
+ * <li>Provide username,
  * password and (if the BMC needs it) the BMC Kg key and start session via
- * {@link #openSession(ConnectionHandle, String, String, byte[])} </p> <br> <p> Send message register via
+ * {@link #openSession(ConnectionHandle, String, String, byte[])}</li>
+ * </ul> <p> Send message register via
  * {@link #sendMessage(ConnectionHandle, PayloadCoder)} </p> <br> <p> To close session call
  * {@link #closeSession(ConnectionHandle)} </p> <p> When done with work, clean up via {@link #tearDown()} </p> <br>
  */
@@ -65,7 +70,7 @@ public class IpmiConnector {
      * Starts {@link IpmiConnector} and initiates the {@link ConnectionManager} at the given port. Wildcard IP address
      * will be used.
      * @param port
-     * - the port that will be used by {@link IpmiAsyncConnector} to communicate with the remote hosts.
+     * the port that will be used by {@link IpmiAsyncConnector} to communicate with the remote hosts.
      * @throws FileNotFoundException
      * when properties file was not found
      * @throws IOException
@@ -79,9 +84,9 @@ public class IpmiConnector {
     /**
      * Starts {@link IpmiConnector} and initiates the {@link ConnectionManager} at the given port and IP interface.
      * @param port
-     * - the port that will be used by {@link IpmiAsyncConnector} to communicate with the remote hosts.
+     * the port that will be used by {@link IpmiAsyncConnector} to communicate with the remote hosts.
      * @param address
-     * - the IP address that will be used by {@link IpmiAsyncConnector} to communicate with the remote hosts.
+     * the IP address that will be used by {@link IpmiAsyncConnector} to communicate with the remote hosts.
      * @throws FileNotFoundException
      * when properties file was not found
      * @throws IOException
@@ -101,7 +106,7 @@ public class IpmiConnector {
     /**
      * Creates connection to the remote host on default IPMI port.
      * @param address
-     * - {@link InetAddress} of the remote host
+     * {@link InetAddress} of the remote host
      * @return handle to the connection to the remote host
      * @throws IOException
      * when properties file was not found
@@ -115,9 +120,9 @@ public class IpmiConnector {
     /**
      * Creates connection to the remote host on specified port.
      * @param address
-     * - {@link InetAddress} of the remote host
+     * {@link InetAddress} of the remote host
      * @param port
-     * - remote UDP port
+     * remote UDP port
      * @return handle to the connection to the remote host
      * @throws IOException
      * when properties file was not found
@@ -132,7 +137,7 @@ public class IpmiConnector {
      * Creates connection to the remote host, with pre set {@link CipherSuite} and {@link PrivilegeLevel}, skipping the
      * getAvailableCipherSuites and getChannelAuthenticationCapabilities phases.
      * @param address
-     * - {@link InetAddress} of the remote host
+     * {@link InetAddress} of the remote host
      * @return handle to the connection to the remote host
      * @throws IOException
      * when properties file was not found
@@ -148,9 +153,9 @@ public class IpmiConnector {
      * Creates connection to the remote host, with pre set {@link CipherSuite} and {@link PrivilegeLevel}, skipping the
      * getAvailableCipherSuites and getChannelAuthenticationCapabilities phases.
      * @param address
-     * - {@link InetAddress} of the remote host
+     * {@link InetAddress} of the remote host
      * @param port
-     * - remote UDP port
+     * remote UDP port
      * @return handle to the connection to the remote host
      * @throws IOException
      * when properties file was not found
@@ -178,11 +183,11 @@ public class IpmiConnector {
     /**
      * Gets the authentication capabilities for the connection with the remote host.
      * @param connectionHandle
-     * - {@link ConnectionHandle} associated with the host
+     * {@link ConnectionHandle} associated with the host
      * @param cipherSuite
-     * - {@link CipherSuite} that will be used during the connection
+     * {@link CipherSuite} that will be used during the connection
      * @param requestedPrivilegeLevel
-     * - {@link PrivilegeLevel} that is requested for the session
+     * {@link PrivilegeLevel} that is requested for the session
      * @return - {@link GetChannelAuthenticationCapabilitiesResponseData}
      * @throws ConnectionException
      * when connection is in the state that does not allow to perform this operation.
@@ -199,13 +204,13 @@ public class IpmiConnector {
     /**
      * Establishes the session with the remote host.
      * @param connectionHandle
-     * - {@link ConnectionHandle} associated with the remote host.
+     * {@link ConnectionHandle} associated with the remote host.
      * @param username
-     * - the username
+     * the username
      * @param password
-     * - password matching the username
+     * password matching the username
      * @param bmcKey
-     * - the key that should be provided if the two-key authentication is enabled, null otherwise.
+     * the key that should be provided if the two-key authentication is enabled, null otherwise.
      *
      * @return object representing newly created {@link Session}
      *
@@ -237,7 +242,7 @@ public class IpmiConnector {
     /**
      * Closes the session with the remote host if it is currently in open state.
      * @param connectionHandle
-     * - {@link ConnectionHandle} associated with the remote host.
+     * {@link ConnectionHandle} associated with the remote host.
      * @throws ConnectionException
      * when connection is in the state that does not allow to perform this operation.
      * @throws Exception
@@ -250,9 +255,9 @@ public class IpmiConnector {
     /**
      * Sends the IPMI message to the remote host.
      * @param connectionHandle
-     * - {@link ConnectionHandle} associated with the remote host.
+     * {@link ConnectionHandle} associated with the remote host.
      * @param request
-     * - {@link PayloadCoder} containing the request to be sent
+     * {@link PayloadCoder} containing the request to be sent
      * @return {@link ResponseData} for the <b>request</b>
      * @throws ConnectionException
      * when connection is in the state that does not allow to perform this operation.
@@ -266,9 +271,9 @@ public class IpmiConnector {
     /**
      * Sends the IPMI message to the remote host and doesn't wait for any response.
      * @param connectionHandle
-     * - {@link ConnectionHandle} associated with the remote host.
+     * {@link ConnectionHandle} associated with the remote host.
      * @param request
-     * - {@link PayloadCoder} containing the request to be sent
+     * {@link PayloadCoder} containing the request to be sent
      * @throws ConnectionException
      * when connection is in the state that does not allow to perform this operation.
      * @throws Exception
@@ -282,11 +287,11 @@ public class IpmiConnector {
      * Re-sends message with given tag having given {@link PayloadType}, using passed {@link ConnectionHandle}.
      *
      * @param connectionHandle
-     *          - {@link ConnectionHandle} associated with the remote host.
+     *          {@link ConnectionHandle} associated with the remote host.
      * @param tag
-     *          - tag of the message to retry
+     *          tag of the message to retry
      * @param messagePayloadType
-     *             - {@link PayloadType} of the message that should be retried
+     *             {@link PayloadType} of the message that should be retried
      * @return {@link ResponseData} for the re-sent request or null if message could not be resent.
      * @throws Exception
      * when sending message to the managed system fails
@@ -409,9 +414,9 @@ public class IpmiConnector {
     /**
      * Changes the timeout value for connection with the given handle.
      * @param handle
-     * - {@link ConnectionHandle} associated with the remote host.
+     * {@link ConnectionHandle} associated with the remote host.
      * @param timeout
-     * - new timeout value in ms
+     * new timeout value in ms
      */
     public void setTimeout(ConnectionHandle handle, int timeout) {
         asyncConnector.setTimeout(handle, timeout);

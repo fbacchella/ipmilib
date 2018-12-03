@@ -42,17 +42,17 @@ public class GetSelEntry extends IpmiCommandCoder {
      * Initiates GetSelEntry for both encoding and decoding.
      *
      * @param version
-     *            - IPMI version of the command.
+     *            IPMI version of the command.
      * @param cipherSuite
-     *            - {@link CipherSuite} containing authentication,
+     *            {@link CipherSuite} containing authentication,
      *            confidentiality and integrity algorithms for this session.
      * @param authenticationType
-     *            - Type of authentication used. Must be RMCPPlus for IPMI v2.0.
+     *            Type of authentication used. Must be RMCPPlus for IPMI v2.0.
      * @param reservationId
-     *            - SEL reservation ID received via {@link ReserveSel} command
+     *            SEL reservation ID received via {@link ReserveSel} command
      *            or 0 if requesting for whole record
      * @param recordId
-     *            - ID of the record to get
+     *            ID of the record to get
      */
     public GetSelEntry(IpmiVersion version, CipherSuite cipherSuite,
             AuthenticationType authenticationType, int reservationId,

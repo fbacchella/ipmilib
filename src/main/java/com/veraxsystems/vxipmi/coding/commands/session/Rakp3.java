@@ -74,14 +74,14 @@ public class Rakp3 extends IpmiCommandCoder {
      * Authentication Type to RMCP+.
      *
      * @param cipherSuite
-     *            - {@link CipherSuite} containing authentication,
+     *            {@link CipherSuite} containing authentication,
      *            confidentiality and integrity algorithms for this session.
      *            Only authentication algorithm is used at this point of
      *            creating a session.
      * @param rakp1
-     *            - RAKP Message 1 sent earlier in the authentification process
+     *            RAKP Message 1 sent earlier in the authentification process
      * @param rakp1ResponseData
-     *            - RAKP Message 2 received earlier in the authentification
+     *            RAKP Message 2 received earlier in the authentification
      *            process
      *
      */
@@ -100,20 +100,20 @@ public class Rakp3 extends IpmiCommandCoder {
      * Authentication Type to RMCP+.
      *
      * @param statusCode
-     *            - Status of the previous message.
+     *            Status of the previous message.
      * @param managedSystemSessionId
-     *            - The Managed System�s Session ID for this session. Must be as
+     *            The Managed System�s Session ID for this session. Must be as
      *            returned by the Managed System in the Open Session Response
      *            message.
      * @param cipherSuite
-     *            - {@link CipherSuite} containing authentication,
+     *            {@link CipherSuite} containing authentication,
      *            confidentiality and integrity algorithms for this session.
      *            Only authentication algorithm is used at this point of
      *            creating a session.
      * @param rakp1
-     *            - RAKP Message 1 sent earlier in the authentification process
+     *            RAKP Message 1 sent earlier in the authentification process
      * @param rakp1ResponseData
-     *            - RAKP Message 2 received earlier in the authentification
+     *            RAKP Message 2 received earlier in the authentification
      *            process
      */
     public Rakp3(byte statusCode, int managedSystemSessionId,

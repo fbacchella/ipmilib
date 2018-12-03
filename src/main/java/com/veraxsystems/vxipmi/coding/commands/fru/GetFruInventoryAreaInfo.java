@@ -40,14 +40,14 @@ public class GetFruInventoryAreaInfo extends IpmiCommandCoder {
      * Initiates GetFruInventoryAreaInfo for both encoding and decoding.
      *
      * @param version
-     *            - IPMI version of the command.
+     *            IPMI version of the command.
      * @param cipherSuite
-     *            - {@link CipherSuite} containing authentication,
+     *            {@link CipherSuite} containing authentication,
      *            confidentiality and integrity algorithms for this session.
      * @param authenticationType
-     *            - Type of authentication used. Must be RMCPPlus for IPMI v2.0.
+     *            Type of authentication used. Must be RMCPPlus for IPMI v2.0.
      * @param fruId
-     *            - ID of the FRU to get info from. Must be less than 256.
+     *            ID of the FRU to get info from. Must be less than 256.
      */
     public GetFruInventoryAreaInfo(IpmiVersion version,
             CipherSuite cipherSuite, AuthenticationType authenticationType,

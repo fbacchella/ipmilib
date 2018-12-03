@@ -39,14 +39,14 @@ public class GetSensorReading extends IpmiCommandCoder {
      * Initiates class for both encoding and decoding.
      *
      * @param version
-     *            - IPMI version of the command.
+     *            IPMI version of the command.
      * @param cipherSuite
-     *            - {@link CipherSuite} containing authentication,
+     *            {@link CipherSuite} containing authentication,
      *            confidentiality and integrity algorithms for this session.
      * @param authenticationType
-     *            - Type of authentication used. Must be RMCPPlus for IPMI v2.0.
+     *            Type of authentication used. Must be RMCPPlus for IPMI v2.0.
      * @param sensorId
-     *            - ID of the sensor which reading is to be retrieved
+     *            ID of the sensor which reading is to be retrieved
      */
     public GetSensorReading(IpmiVersion version, CipherSuite cipherSuite,
             AuthenticationType authenticationType, int sensorId) {

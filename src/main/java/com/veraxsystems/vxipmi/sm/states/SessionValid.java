@@ -35,12 +35,13 @@ import com.veraxsystems.vxipmi.sm.events.Timeout;
 
 /**
  * {@link State} in which the session is valid and sending IPMI commands to the
- * remote machine is enabled. <li>Sends an IPMI v2.0 message on
- * {@link Sendv20Message} <li>Sends {@link GetChannelAuthenticationCapabilities}
- * message to keep the session form timing out on {@link SessionUpkeep} <li>
- * Transits to {@link Authcap} on {@link Timeout} <li>Sends {@link CloseSession}
- * and transits to {@link Authcap} on
- * {@link com.veraxsystems.vxipmi.sm.events.CloseSession}
+ * remote machine is enabled.
+ * <ul>
+ *   <li>Sends an IPMI v2.0 message on {@link Sendv20Message}</li>
+ *   <li>Sends {@link GetChannelAuthenticationCapabilities} message to keep the session form timing out on {@link SessionUpkeep}</li>
+ *   <li>Transits to {@link Authcap} on {@link Timeout}</li>
+ *   <li>Sends {@link CloseSession} and transits to {@link Authcap} on {@link com.veraxsystems.vxipmi.sm.events.CloseSession}</li>
+ * </ul>
  */
 public class SessionValid extends State {
 

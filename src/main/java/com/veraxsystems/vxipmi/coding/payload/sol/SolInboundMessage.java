@@ -12,12 +12,12 @@
 package com.veraxsystems.vxipmi.coding.payload.sol;
 
 /**
- * Implementation of {@link SolMessage} for BMC -> Remote Console message.
+ * Implementation of {@link SolMessage} for BMC -&gt; Remote Console message.
  */
 public class SolInboundMessage extends SolMessage {
 
     /**
-     * Status field in {@link SolMessage} BMC -> Remote Console payload.
+     * Status field in {@link SolMessage} BMC -&gt; Remote Console payload.
      */
     private final SolInboundStatusField statusField;
 

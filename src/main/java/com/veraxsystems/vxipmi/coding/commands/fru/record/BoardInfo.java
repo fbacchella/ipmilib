@@ -47,9 +47,9 @@ public class BoardInfo extends FruRecord {
      * Creates and populates record
      *
      * @param fruData
-     *            - raw data containing record
+     *            raw data containing record
      * @param offset
-     *            - offset to the record in the data
+     *            offset to the record in the data
      */
     public BoardInfo(final byte[] fruData, final int offset) {
         validateFruData(fruData[offset]);

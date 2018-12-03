@@ -34,8 +34,11 @@ import com.veraxsystems.vxipmi.sm.events.Timeout;
 /**
  * At this point of session challenge, RAKP Message 3 was sent,
  * {@link StateMachine} is waiting for RAKP Message 4.<br>
- * Transition to: <li> {@link Rakp3Complete} on {@link DefaultAck} <li>
- * {@link Authcap} on {@link Timeout}
+ * Transition to:
+ * <ul>
+ *   <li>{@link Rakp3Complete} on {@link DefaultAck}</li>
+ *   <li>{@link Authcap} on {@link Timeout}</li>
+ *  </ul>
  */
 public class Rakp3Waiting extends State {
 

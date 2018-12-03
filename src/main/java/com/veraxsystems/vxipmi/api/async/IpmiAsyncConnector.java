@@ -42,20 +42,21 @@ import java.util.List;
  * </p>
  * <p>
  * Creating connection consists of the following steps:
- * <li>Create {@link Connection} and get associated with it
+ * </p>
+ * <ul>
+ *      <li>Create {@link Connection} and get associated with it
  * {@link ConnectionHandle} via {@link #createConnection(InetAddress, int)}
- * <li>Get {@link CipherSuite}s that are available for the connection via
+ *      <li>Get {@link CipherSuite}s that are available for the connection via
  * {@link #getAvailableCipherSuites(ConnectionHandle)}
- * <li>Pick {@link CipherSuite} and {@link PrivilegeLevel} that will be used
+ *       <li>Pick {@link CipherSuite} and {@link PrivilegeLevel} that will be used
  * during session and get
  * {@link GetChannelAuthenticationCapabilitiesResponseData} to find out allowed
  * authentication options via
  * {@link #getChannelAuthenticationCapabilities(ConnectionHandle, CipherSuite, PrivilegeLevel)}
- * <li>Provide username, password and (if the BMC needs it) the BMC Kg key and
+ *      <li>Provide username, password and (if the BMC needs it) the BMC Kg key and
  * start session via
  * {@link #openSession(ConnectionHandle, String, String, byte[])}
- * </p>
- * <br>
+ * </ul>
  * <p>
  * To send message register for receiving answers via
  * {@link #registerListener(IpmiResponseListener)} and send message via
@@ -83,7 +84,7 @@ public class IpmiAsyncConnector implements ConnectionListener {
      * be used.
      *
      * @param port
-     *            - the port that will be used by {@link IpmiAsyncConnector} to
+     *            the port that will be used by {@link IpmiAsyncConnector} to
      *            communicate with the remote hosts.
      * @throws IOException
      *             when properties file was not found
@@ -101,10 +102,10 @@ public class IpmiAsyncConnector implements ConnectionListener {
      * {@link ConnectionManager} at the given port and IP interface.
      *
      * @param port
-     *            - the port that will be used by {@link IpmiAsyncConnector} to
+     *            the port that will be used by {@link IpmiAsyncConnector} to
      *            communicate with the remote hosts.
      * @param address
-     *            - the IP address that will be used by
+     *            the IP address that will be used by
      *            {@link IpmiAsyncConnector} to communicate with the remote
      *            hosts.
      * @throws IOException
@@ -126,7 +127,7 @@ public class IpmiAsyncConnector implements ConnectionListener {
      * Creates connection to the remote host.
      *
      * @param address
-     *            - {@link InetAddress} of the remote host
+     *            {@link InetAddress} of the remote host
      * @return handle to the connection to the remote host
      * @throws IOException
      *             when properties file was not found
@@ -143,8 +144,7 @@ public class IpmiAsyncConnector implements ConnectionListener {
     /**
      * Creates connection to the remote host, with pre set {@link CipherSuite} and {@link PrivilegeLevel}, skipping the
      * getAvailableCipherSuites and getChannelAuthenticationCapabilities phases.
-     * @param address
-     * - {@link InetAddress} of the remote host
+     * @param address {@link InetAddress} of the remote host
      * @return handle to the connection to the remote host
      * @throws IOException
      * when properties file was not found
@@ -199,12 +199,12 @@ public class IpmiAsyncConnector implements ConnectionListener {
      * host.
      *
      * @param connectionHandle
-     *            - {@link ConnectionHandle} associated with the host
+     *            {@link ConnectionHandle} associated with the host
      * @param cipherSuite
-     *            - {@link CipherSuite} that will be used during the connection
+     *            {@link CipherSuite} that will be used during the connection
      * @param requestedPrivilegeLevel
-     *            - {@link PrivilegeLevel} that is requested for the session
-     * @return - {@link GetChannelAuthenticationCapabilitiesResponseData}
+     *            {@link PrivilegeLevel} that is requested for the session
+     * @return {@link GetChannelAuthenticationCapabilitiesResponseData}
      * @throws ConnectionException
      *             when connection is in the state that does not allow to
      *             perform this operation.
@@ -239,13 +239,13 @@ public class IpmiAsyncConnector implements ConnectionListener {
      * Establishes the session with the remote host.
      *
      * @param connectionHandle
-     *            - {@link ConnectionHandle} associated with the remote host.
+     *            {@link ConnectionHandle} associated with the remote host.
      * @param username
-     *            - the username
+     *            the username
      * @param password
-     *            - password matching the username
+     *            password matching the username
      * @param bmcKey
-     *            - the key that should be provided if the two-key
+     *            the key that should be provided if the two-key
      *            authentication is enabled, null otherwise.
      * @throws ConnectionException
      *             when connection is in the state that does not allow to
@@ -341,11 +341,11 @@ public class IpmiAsyncConnector implements ConnectionListener {
      * Sends the IPMI message to the remote host.
      *
      * @param connectionHandle
-     *            - {@link ConnectionHandle} associated with the remote host.
+     *            {@link ConnectionHandle} associated with the remote host.
      * @param request
      *            - {@link PayloadCoder} containing the request to be sent
      * @param isOneWay
-     *               - tells whether this message is one way (needs response) or not.
+     *               tells whether this message is one way (needs response) or not.
      * @return ID of the message that will be also attached to the response to
      *         pair request with response if queue was not full and message was
      *         sent, -1 if sending of the message failed.
@@ -391,11 +391,11 @@ public class IpmiAsyncConnector implements ConnectionListener {
      * Attempts to retry sending a message.
      *
      * @param connectionHandle
-     *            - {@link ConnectionHandle} associated with the remote host.
+     *            {@link ConnectionHandle} associated with the remote host.
      * @param tag
-     *            - tag of the message to retry
+     *            tag of the message to retry
      * @param messagePayloadType
-     *             - {@link PayloadType} of the message that should be retried
+     *             {@link PayloadType} of the message that should be retried
      * @return new tag if message was retried, -1 if operation failed
      * @throws ConnectionException
      *             when connection isn't in state where sending commands is
@@ -422,7 +422,7 @@ public class IpmiAsyncConnector implements ConnectionListener {
      * received answers.
      *
      * @param listener
-     *            - the {@link IpmiResponseListener} to unregister
+     *            the {@link IpmiResponseListener} to unregister
      */
     public void unregisterListener(IpmiResponseListener listener) {
         synchronized (responseListeners) {

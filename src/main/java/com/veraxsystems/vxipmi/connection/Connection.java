@@ -116,14 +116,10 @@ public class Connection extends TimerTask implements MachineObserver {
      * Creates the connection.
      *
      * @param messenger
-     *            - {@link Messenger} associated with the proper
+     *            {@link Messenger} associated with the proper
      *            {@link Constants#IPMI_PORT}
      * @param handle
-     *            - id of the connection
-     * @throws IOException
-     *             - when properties file was not found
-     * @throws FileNotFoundException
-     *             - when properties file was not found
+     *            id of the connection
      */
     public Connection(Messenger messenger, int handle) {
         stateMachine = new StateMachine(messenger);
@@ -139,7 +135,7 @@ public class Connection extends TimerTask implements MachineObserver {
      * connection
      *
      * @param listener
-     *            - {@link ConnectionListener} to processResponse
+     *            {@link ConnectionListener} to processResponse
      */
     public void registerListener(ConnectionListener listener) {
         listeners.add(listener);
@@ -159,14 +155,14 @@ public class Connection extends TimerTask implements MachineObserver {
      * Starts the connection to the specified {@link InetAddress}
      *
      * @param address
-     *            - IP address of the managed system
+     *            IP address of the managed system
      * @param pingPeriod
-     *            - frequency of the no-op commands that will be sent to keep up
+     *            frequency of the no-op commands that will be sent to keep up
      *            the session
      * @throws IOException
-     *             - when properties file was not found
+     *             when properties file was not found
      * @throws FileNotFoundException
-     *             - when properties file was not found
+     *             when properties file was not found
      * @see #disconnect()
      */
     public void connect(InetAddress address, int port, int pingPeriod)
@@ -238,7 +234,7 @@ public class Connection extends TimerTask implements MachineObserver {
      * performed only immediately after {@link #connect(InetAddress, int, int)}.
      *
      * @param tag
-     *            - the integer from range 0-63 to match request with response
+     *            the integer from range 0-63 to match request with response
      *
      * @return list of the {@link CipherSuite}s supported by the managed system.
      * @throws ConnectionException
@@ -333,11 +329,11 @@ public class Connection extends TimerTask implements MachineObserver {
      * process. Must be performed after {@link #getAvailableCipherSuites(int)}
      *
      * @param tag
-     *            - the integer from range 0-63 to match request with response
+     *            the integer from range 0-63 to match request with response
      * @param cipherSuite
-     *            - {@link CipherSuite} requested for the session
+     *            {@link CipherSuite} requested for the session
      * @param requestedPrivilegeLevel
-     *            - {@link PrivilegeLevel} requested for the session
+     *            {@link PrivilegeLevel} requested for the session
      * @return {@link GetChannelAuthenticationCapabilitiesResponseData}
      * @throws ConnectionException
      *             when connection is in the state that does not allow to
@@ -386,18 +382,18 @@ public class Connection extends TimerTask implements MachineObserver {
      * or {@link #closeSession()}
      *
      * @param tag
-     *            - the integer from range 0-63 to match request with response
+     *            the integer from range 0-63 to match request with response
      * @param cipherSuite
-     *            - {@link CipherSuite} that will be used during the session
+     *            {@link CipherSuite} that will be used during the session
      * @param privilegeLevel
-     *            - requested {@link PrivilegeLevel} - most of the time it will
+     *            requested {@link PrivilegeLevel} - most of the time it will
      *            be {@link PrivilegeLevel#User}
      * @param username
-     *            - the username
+     *            the username
      * @param password
-     *            - the password matching the username
+     *            the password matching the username
      * @param bmcKey
-     *            - the key that should be provided if the two-key
+     *            the key that should be provided if the two-key
      *            authentication is enabled, null otherwise.
      * @return id of the new session
      * @throws ConnectionException
@@ -511,9 +507,9 @@ public class Connection extends TimerTask implements MachineObserver {
      * Attempts to send IPMI request to the managed system.
      *
      * @param payloadCoder
-     *            - {@link PayloadCoder} representing the request
+     *            {@link PayloadCoder} representing the request
      * @param isOneWay
-     *               - tells whether message is one way or not
+     *               tells whether message is one way or not
      * @return ID of the message that will be also attached to the response to
      *         pair request with response if queue was not full and message was
      *         sent, -1 if sending of the message failed.
@@ -539,9 +535,9 @@ public class Connection extends TimerTask implements MachineObserver {
      * Attempts to retry sending a message.
      *
      * @param tag
-     *            - tag of the message to retry
+     *            tag of the message to retry
      * @param messagePayloadType
-     *             - {@link PayloadType} of the message that should be retried
+     *             {@link PayloadType} of the message that should be retried
      * @return new tag if message was retried, -1 if operation failed
      * @throws ConnectionException
      *             when connection isn't in state where sending commands is

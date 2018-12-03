@@ -27,9 +27,12 @@ import com.veraxsystems.vxipmi.sm.events.StateMachineEvent;
 import com.veraxsystems.vxipmi.sm.events.Timeout;
 
 /**
- * Waiting for the {@link GetChannelAuthenticationCapabilities} response. <br>
- * Transition to: <li>{@link Ciphers} on {@link Timeout} <li>{@link Authcap} on
- * {@link AuthenticationCapabilitiesReceived}</li>.
+ * Waiting for the {@link GetChannelAuthenticationCapabilities} response.
+ * Transition to:
+ * <ul>
+ *    <li>{@link Ciphers} on {@link Timeout}</li>
+ *    <li>{@link Authcap} on {@link AuthenticationCapabilitiesReceived}.</li>
+ * </ul>
  */
 public class AuthcapWaiting extends State {
 

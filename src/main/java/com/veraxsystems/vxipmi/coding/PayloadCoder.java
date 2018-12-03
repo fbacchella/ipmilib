@@ -80,12 +80,12 @@ public abstract class PayloadCoder {
      * Sets session parameters.
      *
      * @param version
-     *            - IPMI version of the command.
+     *            IPMI version of the command.
      * @param cipherSuite
-     *            - {@link CipherSuite} containing authentication,
+     *            {@link CipherSuite} containing authentication,
      *            confidentiality and integrity algorithms for this session.
      * @param authenticationType
-     *            - Type of authentication used. Must be RMCPPlus for IPMI v2.0.
+     *            Type of authentication used. Must be RMCPPlus for IPMI v2.0.
      */
     public void setSessionParameters(IpmiVersion version,
                                      CipherSuite cipherSuite, AuthenticationType authenticationType) {
@@ -105,22 +105,22 @@ public abstract class PayloadCoder {
      * Prepares an IPMI request message containing class-specific payload.
      *
      * @param messageSequenceNumber
-     *            - A generated sequence number used for matching request and
+     *            A generated sequence number used for matching request and
      *            response. For all IPMI messages,
      *            messageSequenceNumber is used as a IPMI LAN Message sequence
      *            number and as an IPMI payload message tag.
      * @param sessionSequenceNumber
-     *          - If IPMI message is sent in a session, it is used as
+     *          If IPMI message is sent in a session, it is used as
      *            a Session Sequence Number
      * @param sessionId
-     *            - ID of the managed system's session message is being sent in.
+     *            ID of the managed system's session message is being sent in.
      *            For sessionless commands should b set to 0.
      * @return IPMI message
      * @throws NoSuchAlgorithmException
-     *             - when authentication, confidentiality or integrity algorithm
+     *             when authentication, confidentiality or integrity algorithm
      *             fails.
      * @throws InvalidKeyException
-     *             - when creating of the algorithm key fails
+     *             when creating of the algorithm key fails
      */
     public IpmiMessage encodePayload(int messageSequenceNumber, int sessionSequenceNumber, int sessionId) throws NoSuchAlgorithmException, InvalidKeyException {
         if (getIpmiVersion() == IpmiVersion.V15) {
@@ -178,13 +178,13 @@ public abstract class PayloadCoder {
      * {@link #encodePayload(int, int, int)}
      *
      * @param sequenceNumber
-     *            - sequenceNumber is used as an IPMI payload message tag
+     *            sequenceNumber is used as an IPMI payload message tag
      * @return IPMI payload
      * @throws NoSuchAlgorithmException
-     *             - when authentication, confidentiality or integrity algorithm
+     *             when authentication, confidentiality or integrity algorithm
      *             fails.
      * @throws InvalidKeyException
-     *             - when creating of the algorithm key fails
+     *             when creating of the algorithm key fails
      */
     protected abstract IpmiPayload preparePayload(int sequenceNumber) throws NoSuchAlgorithmException, InvalidKeyException;
 
@@ -192,7 +192,7 @@ public abstract class PayloadCoder {
      * Retrieves payload-specific response data from IPMI message
      *
      * @param message
-     *            - IPMI message
+     *            IPMI message
      * @return response data
      * @throws IllegalArgumentException
      *             when message is not a response for class-specific command or

@@ -50,7 +50,7 @@ public class MessageListener implements IpmiResponseListener {
      * Initiates the {@link MessageListener}
      *
      * @param handle
-     *            - {@link ConnectionHandle} associated with the
+     *            {@link ConnectionHandle} associated with the
      *            {@link Connection} {@link MessageListener} is expecting
      *            message from.
      */
@@ -66,7 +66,7 @@ public class MessageListener implements IpmiResponseListener {
      * as specified in {@link #MessageListener(ConnectionHandle)}).
      *
      * @param tag
-     *            - tag of the expected message
+     *            tag of the expected message
      * @return {@link ResponseData} for message.
      * @throws Exception
      *             when message delivery fails

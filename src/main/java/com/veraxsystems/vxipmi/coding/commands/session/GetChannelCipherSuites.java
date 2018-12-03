@@ -44,7 +44,7 @@ public class GetChannelCipherSuites extends IpmiCommandCoder {
      * Sets the channel number that will be put into IPMI command.
      *
      * @param channelNumber
-     *            - must be 0h-Bh or Eh-Fh <br>
+     *            must be 0h-Bh or Eh-Fh <br>
      *            Eh = retrieve information for channel this request was issued
      *            on
      * @throws IllegalArgumentException
@@ -84,11 +84,11 @@ public class GetChannelCipherSuites extends IpmiCommandCoder {
      * Initiates class for both encoding and decoding.
      *
      * @param channelNumber
-     *            - must be 0h-Bh or Eh-Fh <br>
+     *            must be 0h-Bh or Eh-Fh <br>
      *            Eh = retrieve information for channel this request was issued
      *            on
      * @param index
-     *            - (00h-3Fh). 0h selects the first set of 16 cipher suites, 1h
+     *            (00h-3Fh). 0h selects the first set of 16 cipher suites, 1h
      *            selects the next set of 16, and so on
      */
     public GetChannelCipherSuites(byte channelNumber, byte index) {

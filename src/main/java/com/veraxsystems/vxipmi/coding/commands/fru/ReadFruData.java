@@ -57,16 +57,16 @@ public class ReadFruData extends IpmiCommandCoder {
      * @see IpmiCommandCoder#setSessionParameters(IpmiVersion, CipherSuite,
      *      AuthenticationType)
      * @param fruId
-     *            - ID of the FRU to get info from. Must be less than 256. To
+     *            ID of the FRU to get info from. Must be less than 256. To
      *            get FRU ID use {@link GetSdr} to retrieve
      *            {@link FruDeviceLocatorRecord}.
      * @param unit
-     *            - {@link BaseUnit} indicating if the FRU device is accessed in
+     *            {@link BaseUnit} indicating if the FRU device is accessed in
      *            {@link BaseUnit#Bytes} or {@link BaseUnit#Words}
      * @param offset
-     *            - offset to read in units specified by unit
+     *            offset to read in units specified by unit
      * @param countToRead
-     *            - size of the area to read in unit. Cannot exceed 255;
+     *            size of the area to read in unit. Cannot exceed 255;
      */
     public ReadFruData(int fruId, BaseUnit unit, int offset, int countToRead) {
         super();
@@ -93,23 +93,23 @@ public class ReadFruData extends IpmiCommandCoder {
      * Initiates ReadFruData for both encoding and decoding.
      *
      * @param version
-     *            - IPMI version of the command.
+     *            IPMI version of the command.
      * @param cipherSuite
-     *            - {@link CipherSuite} containing authentication,
+     *            {@link CipherSuite} containing authentication,
      *            confidentiality and integrity algorithms for this session.
      * @param authenticationType
-     *            - Type of authentication used. Must be RMCPPlus for IPMI v2.0.
+     *            Type of authentication used. Must be RMCPPlus for IPMI v2.0.
      * @param fruId
-     *            - ID of the FRU to get info from. Must be less than 256. To
+     *            ID of the FRU to get info from. Must be less than 256. To
      *            get FRU ID use {@link GetSdr} to retrieve
      *            {@link FruDeviceLocatorRecord}.
      * @param unit
-     *            - {@link BaseUnit} indicating if the FRU device is accessed in
+     *            {@link BaseUnit} indicating if the FRU device is accessed in
      *            {@link BaseUnit#Bytes} or {@link BaseUnit#Words}
      * @param offset
-     *            - offset to read in units specified by unit
+     *            offset to read in units specified by unit
      * @param countToRead
-     *            - size of the area to read in unit. Cannot exceed 255;
+     *            size of the area to read in unit. Cannot exceed 255;
      */
     public ReadFruData(IpmiVersion version, CipherSuite cipherSuite,
             AuthenticationType authenticationType, int fruId, BaseUnit unit,

@@ -33,16 +33,16 @@ public final class Decoder {
      * message-specific response data.
      *
      * @param data
-     *            - raw RMCP packet to be decoded
+     *            raw RMCP packet to be decoded
      * @param protocolDecoder
-     *            - instance of {@link IpmiDecoder} class for decoding of the
+     *            instance of {@link IpmiDecoder} class for decoding of the
      *            IPMI session header and (if present) IPMI LAN packet. If IPMI
      *            LAN packet is present, {@link Protocolv15Decoder} or
      *            {@link Protocolv20Decoder} should be used (depending on IPMI
      *            protocol version used). Otherwise,
      *            {@link PlainCommandv20Decoder} should be used.
      * @param payloadCoder
-     *            - instance of {@link PayloadCoder} class used for wrapping
+     *            instance of {@link PayloadCoder} class used for wrapping
      *            payload into message-dependent {@link ResponseData} object.
      * @return {@link ResponseData}
      * @throws IPMIException
@@ -51,7 +51,7 @@ public final class Decoder {
      * @throws IllegalArgumentException
      *             when data is corrupted
      * @throws NoSuchAlgorithmException
-     *             - when authentication, confidentiality or integrity algorithm
+     *             when authentication, confidentiality or integrity algorithm
      *             fails.
      * @throws InvalidKeyException
      *             when creating of the authentication algorithm key fails

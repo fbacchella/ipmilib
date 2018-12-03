@@ -83,7 +83,7 @@ public class OpenSession extends IpmiCommandCoder {
      * authentication type to RMCP+.
      *
      * @param cipherSuite
-     *            - {@link CipherSuite} containing authentication,
+     *            {@link CipherSuite} containing authentication,
      *            confidentiality and integrity algorithms for this session.
      *            Cipher Suite might (and probably will be, because at this
      *            point of session creation SIK is not yet known) be not
@@ -104,12 +104,12 @@ public class OpenSession extends IpmiCommandCoder {
      * @see IpmiVersion
      *
      * @param sessionID
-     *            - Session ID selected by the remote console.
+     *            Session ID selected by the remote console.
      * @param privilegeLevel
-     *            - Requested privilege level for the session. Can be
+     *            Requested privilege level for the session. Can be
      *            {@link PrivilegeLevel#MaximumAvailable}.
      * @param cipherSuite
-     *            - {@link CipherSuite} containing authentication,
+     *            {@link CipherSuite} containing authentication,
      *            confidentiality and integrity algorithms for this session.
      *            Cipher Suite might (and probably will be, because at this
      *            point of session creation SIK is not yet known) be not

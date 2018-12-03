@@ -29,13 +29,13 @@ public class SetSessionPrivilegeLevel extends IpmiCommandCoder {
     /**
      * Initiates {@link SetSessionPrivilegeLevel} for encoding and decoding
      * @param version
-     * - IPMI version of the command.
+     * IPMI version of the command.
      * @param cipherSuite
-     * - {@link CipherSuite} containing authentication, confidentiality and integrity algorithms for this session.
+     * {@link CipherSuite} containing authentication, confidentiality and integrity algorithms for this session.
      * @param authenticationType
-     * - Type of authentication used. Must be RMCPPlus for IPMI v2.0.
+     * Type of authentication used. Must be RMCPPlus for IPMI v2.0.
      * @param privilegeLevel
-     * - Requested {@link PrivilegeLevel} to acquire. Can not be higher than level declared during starting session.
+     * Requested {@link PrivilegeLevel} to acquire. Can not be higher than level declared during starting session.
      */
     public SetSessionPrivilegeLevel(IpmiVersion version, CipherSuite cipherSuite,
             AuthenticationType authenticationType, PrivilegeLevel privilegeLevel) {

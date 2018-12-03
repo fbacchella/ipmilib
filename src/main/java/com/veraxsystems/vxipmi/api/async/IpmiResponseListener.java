@@ -24,9 +24,11 @@ public interface IpmiResponseListener {
      * Notifies listener of action that occurred.
      *
      * @param response
-     *            - {@link IpmiResponse} being notified <li>
-     *            {@link IpmiResponseData} if answer for request arrived, <li>
-     *            {@link IpmiError} if delivery failed.
+     * <ul>
+     *   <li> {@link IpmiResponse} being notified </li>
+     *   <li>{@link IpmiResponseData} if answer for request arrived, </li>
+     *   <li>{@link IpmiError} if delivery failed.</li>
+     * </ul>
      */
     void notify(IpmiResponse response);
 }

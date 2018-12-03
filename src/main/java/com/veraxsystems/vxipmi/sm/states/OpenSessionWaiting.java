@@ -30,9 +30,11 @@ import com.veraxsystems.vxipmi.sm.events.StateMachineEvent;
 import com.veraxsystems.vxipmi.sm.events.Timeout;
 
 /**
- * Waiting for the {@link OpenSession} response.<br>
- * <li>Transition to {@link OpenSessionComplete} on {@link DefaultAck} <li>
- * Transition to {@link Authcap} on {@link Timeout}
+ * Waiting for the {@link OpenSession} response.
+ * <ul>
+ *   <li>Transition to {@link OpenSessionComplete} on {@link DefaultAck}</li>
+ *   <li>Transition to {@link Authcap} on {@link Timeout}</li>
+ * </ul>
  */
 public class OpenSessionWaiting extends State {
 
