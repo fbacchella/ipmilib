@@ -11,335 +11,344 @@
  */
 package com.veraxsystems.vxipmi.connection.queue;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import com.veraxsystems.vxipmi.coding.PayloadCoder;
+import com.veraxsystems.vxipmi.connection.Connection;
+import com.veraxsystems.vxipmi.connection.ConnectionException;
+import org.apache.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.apache.log4j.Logger;
-
-import com.veraxsystems.vxipmi.coding.commands.IpmiCommandCoder;
-import com.veraxsystems.vxipmi.common.PropertiesManager;
-import com.veraxsystems.vxipmi.connection.Connection;
-import com.veraxsystems.vxipmi.connection.ConnectionException;
-
 /**
  * Queues messages to send and checks for timeouts.
  */
 public class MessageQueue extends TimerTask {
 
-	private List<QueueElement> queue;
-	private int timeout;
-	private Timer timer;
-	private Connection connection;
-	private int lastSequenceNumber;
-	private Object lastSequenceNumberLock = new Object();
+    private List<QueueElement> queue;
+    private int timeout;
+    private Timer timer;
+    private Connection connection;
+    private int lastSequenceNumber;
+    private Object lastSequenceNumberLock = new Object();
+    private int minSequenceNumber = 1;
+    private int sequenceNumberUpperBound = 64;
 
-	private static Logger logger = Logger.getLogger(MessageQueue.class);
+    private static Logger logger = Logger.getLogger(MessageQueue.class);
 
-	/**
-	 * Frequency of checking messages for timeouts in ms.
-	 */
-	private static int cleaningFrequency = 500;
+    /**
+     * Frequency of checking messages for timeouts in ms.
+     */
+    private static int cleaningFrequency = 500;
 
-	/**
-	 * Size of the queue determined by IPMI sliding window algorithm
-	 * specification. <br>
-	 * When queue size is 16, BMC drops some of the messages under heavy load.
-	 */
-	private static final int QUEUE_SIZE = 8;
+    /**
+     * Size of the queue determined by IPMI sliding window algorithm
+     * specification. <br>
+     * When queue size is 16, BMC drops some of the messages under heavy load.
+     */
+    private static final int QUEUE_SIZE = 8;
 
-	public int getTimeout() {
-		return timeout;
-	}
+    public int getTimeout() {
+        return timeout;
+    }
 
-	public void setTimeout(int timeout) {
-		this.timeout = timeout;
-	}
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
 
-    public MessageQueue(Connection connection, int timeout) throws FileNotFoundException, IOException {
-        if (cleaningFrequency == -1) {
-            cleaningFrequency = Integer.parseInt(PropertiesManager.getInstance().getProperty("cleaningFrequency"));
-        }
+    public MessageQueue(Connection connection, int timeout, int minSequenceNumber, int maxSequenceNumber) {
+        this.minSequenceNumber = minSequenceNumber;
+        sequenceNumberUpperBound = maxSequenceNumber + 1;
         reservedTags = new ArrayList<Integer>();
-        lastSequenceNumber = 0;
+        lastSequenceNumber = minSequenceNumber - 1;
         this.connection = connection;
         queue = new ArrayList<QueueElement>();
         setTimeout(timeout);
         timer = new Timer();
         timer.schedule(this, cleaningFrequency, cleaningFrequency);
-	}
+    }
 
-	/**
-	 * Stops the MessageQueue
-	 */
-	public void tearDown() {
-		timer.cancel();
-	}
+    private int incrementSequenceNumber(int currentSequenceNumber) {
+        int newSequenceNumber = (currentSequenceNumber + 1) % sequenceNumberUpperBound;
 
-	private List<Integer> reservedTags;
+        if (newSequenceNumber == 0) {
+            newSequenceNumber = minSequenceNumber;
+        }
 
-	/**
-	 * Check if the tag is reserved.
-	 */
-	private synchronized boolean isReserved(int tag) {
-		if (reservedTags.contains(tag)) {
-			return true;
-		}
-		return false;
-	}
+        return newSequenceNumber;
+    }
 
-	/**
-	 * Reserves given tag for the use of the invoker.
-	 * 
-	 * @param tag
-	 *            - tag to reserve
-	 * @return true if tag was reserved successfully, false otherwise
-	 */
-	private synchronized boolean reserveTag(int tag) {
-		if (isReserved(tag)) {
-			reservedTags.add(tag);
-			return true;
-		}
-		return false;
-	}
+    /**
+     * Stops the MessageQueue
+     */
+    public void tearDown() {
+        timer.cancel();
+    }
 
-	private synchronized void releaseTag(int tag) {
-		reservedTags.remove((Integer) tag);
-	}
+    private List<Integer> reservedTags;
 
-	/**
-	 * Adds request to the queue and generates the tag.
-	 * 
-	 * @return Session sequence number of the message if it was added to the
-	 *         queue, -1 otherwise. The tag used to identify message is equal to
-	 *         that value % 64.
-	 */
-	public int add(IpmiCommandCoder request) {
-		run();
-		boolean first = true;
-		synchronized (queue) {
-			synchronized (lastSequenceNumberLock) {
-				if (queue.size() < QUEUE_SIZE) {
-					int sequenceNumber = (lastSequenceNumber + 1)
-							% (Integer.MAX_VALUE / 4);
+    /**
+     * Check if the tag is reserved.
+     */
+    private synchronized boolean isReserved(int tag) {
+        return reservedTags.contains(tag);
+    }
 
-					if (sequenceNumber == 0) {
-						throw new ArithmeticException(
-								"Session sequence number overload. Reset session");
-					}
+    /**
+     * Reserves given tag for the use of the invoker.
+     *
+     * @param tag
+     *            - tag to reserve
+     * @return true if tag was reserved successfully, false otherwise
+     */
+    private synchronized boolean reserveTag(int tag) {
+        if (isReserved(tag)) {
+            reservedTags.add(tag);
+            return true;
+        }
+        return false;
+    }
 
-					while (isReserved(sequenceNumber % 64)) {
-						sequenceNumber = (sequenceNumber + 1)
-								% (Integer.MAX_VALUE / 4);
+    private synchronized void releaseTag(int tag) {
+        reservedTags.remove((Integer) tag);
+    }
 
-						if (!first) {
-							try {
-								Thread.sleep(1);
-							} catch (InterruptedException e) {
-								// TODO log
-							}
-						}
+    /**
+     * Adds request to the queue and generates the tag.
+     *
+     * @return Sequence number of the message if it was added to the
+     *         queue, -1 otherwise. The tag used to identify message is equal to
+     *         that value.
+     */
+    public int add(PayloadCoder request) {
+        run();
+        boolean first = true;
+        synchronized (queue) {
+            synchronized (lastSequenceNumberLock) {
+                if (queue.size() < QUEUE_SIZE) {
+                    int sequenceNumber = incrementSequenceNumber(lastSequenceNumber);
 
-						if (sequenceNumber == 0) {
-							throw new ArithmeticException(
-									"Session sequence number overload. Reset session");
-						}
-						first = false;
-					}
+                    while (isReserved(sequenceNumber)) {
+                        sequenceNumber = incrementSequenceNumber(sequenceNumber);
 
-					reserveTag(sequenceNumber % 64);
+                        if (!first) {
+                            try {
+                                lastSequenceNumberLock.wait(1);
+                            } catch (InterruptedException e) {
+                                // TODO log
+                            }
+                        }
 
-					lastSequenceNumber = sequenceNumber;
+                        if (sequenceNumber == lastSequenceNumber) {
+                            //we checked all available sequence numbers, so return -1 (no available sequence numbers)
+                            return -1;
+                        }
 
-					QueueElement element = new QueueElement(sequenceNumber,
-							request);
+                        first = false;
+                    }
 
-					queue.add(element);
-					return sequenceNumber;
-				}
-			}
-		}
-		return -1;
+                    reserveTag(sequenceNumber);
 
-	}
+                    lastSequenceNumber = sequenceNumber;
 
-	/**
-	 * Removes message with the given tag from the queue.
-	 */
-	public void remove(int tag) {
-		run();
-		synchronized (queue) {
-			int i = 0;
-			int index = -1;
-			for (QueueElement element : queue) {
-				if (element.getId() % 64 == tag) {
-					index = i;
-					break;
-				}
-				++i;
-			}
-			if (index == 0) {
-				queue.remove(0);
-				releaseTag(tag);
-				while (queue.size() > 0 && queue.get(0).getRequest() == null) {
-					int additionalTag = queue.get(0).getId() % 64;
-					queue.remove(0);
-					releaseTag(additionalTag);
-				}
-			} else if (index > 0) {
-				queue.get(index).setRequest(null);
-			}
+                    QueueElement element = new QueueElement(sequenceNumber, request);
 
-		}
-	}
+                    queue.add(element);
+                    return sequenceNumber;
+                }
+            }
+        }
+        return -1;
 
-	/**
-	 * Removes message from queue at given index.
-	 * 
-	 * @param index
-	 */
-	public void removeAt(int index) {
-		if (index >= queue.size()) {
-			throw new IndexOutOfBoundsException("Index out of bounds : "
-					+ index);
-		}
+    }
 
-		remove(queue.get(index).getId() % 64);
-	}
+    /**
+     * Removes message with the given tag from the queue.
+     */
+    public void remove(int tag) {
+        run();
+        synchronized (queue) {
+            int i = 0;
+            int index = -1;
+            for (QueueElement element : queue) {
+                if (element.getId() == tag) {
+                    index = i;
+                    break;
+                }
+                ++i;
+            }
+            if (index == 0) {
+                queue.remove(0);
+                releaseTag(tag);
+                while (!queue.isEmpty() && queue.get(0).getRequest() == null) {
+                    int additionalTag = queue.get(0).getId();
+                    queue.remove(0);
+                    releaseTag(additionalTag);
+                }
+            } else if (index > 0) {
+                queue.get(index).setRequest(null);
+            }
 
-	/**
-	 * Checks if queue contains message with the given sequence number.
-	 */
-	public boolean containsId(int sequenceNumber) {
-		synchronized (queue) {
+        }
+    }
 
-			for (QueueElement element : queue) {
-				if (element.getId() == sequenceNumber
-						&& element.getRequest() != null) {
-					return true;
-				}
-			}
+    /**
+     * Removes message from queue at given index.
+     *
+     * @param index
+     */
+    public void removeAt(int index) {
+        if (index >= queue.size()) {
+            throw new IndexOutOfBoundsException("Index out of bounds : "
+                    + index);
+        }
 
-		}
-		return false;
-	}
+        remove(queue.get(index).getId());
+    }
 
-	/**
-	 * Returns valid session sequence number that cannot be used as a tag though
-	 */
-	public int getSequenceNumber() {
-		synchronized (lastSequenceNumberLock) {
-			int sequenceNumber = (lastSequenceNumber + 1)
-					% (Integer.MAX_VALUE / 4);
+    /**
+     * Checks if queue contains message with the given sequence number.
+     */
+    public boolean containsId(int sequenceNumber) {
+        synchronized (queue) {
 
-			if (sequenceNumber == 0) {
-				throw new ArithmeticException(
-						"Session sequence number overload. Reset session");
-			}
-			lastSequenceNumber = sequenceNumber;
-			return sequenceNumber;
-		}
-	}
+            for (QueueElement element : queue) {
+                if (element.getId() == sequenceNumber
+                        && element.getRequest() != null) {
+                    return true;
+                }
+            }
 
-	/**
-	 * Returns message with the given sequence number from the queue or null if
-	 * no message with the given tag is currently in the queue.
-	 */
-	public IpmiCommandCoder getMessageFromQueue(int tag) {
-		synchronized (queue) {
-			for (QueueElement element : queue) {
-				if (element.getId() % 64 == tag && element.getRequest() != null) {
-					return element.getRequest();
-				}
-			}
-		}
-		return null;
-	}
+        }
+        return false;
+    }
 
-	/**
-	 * Returns index of the message with the given sequence number from the
-	 * queue or -1 if no message with the given tag is currently in the queue.
-	 */
-	public int getMessageIndexFromQueue(int tag) {
-		synchronized (queue) {
-			int i = 0;
-			for (QueueElement element : queue) {
-				if (element.getId() % 64 == tag && element.getRequest() != null) {
-					return i;
-				}
-				++i;
-			}
-		}
-		return -1;
-	}
+    /**
+     * Returns valid session sequence number that cannot be used as a tag though
+     */
+    public int getSequenceNumber() {
+        synchronized (lastSequenceNumberLock) {
+            int sequenceNumber = incrementSequenceNumber(lastSequenceNumber);
 
-	/**
-	 * Returns number of retries that were performed on message tagged with tag
-	 * or -1 if no such message can be found in the queue.
-	 */
-	@Deprecated
-	public int getMessageRetries(int tag) {
-		synchronized (queue) {
-			for (QueueElement element : queue) {
-				if (element.getId() % 64 == tag && element.getRequest() != null) {
-					return element.getRetries();
-				}
-			}
-		}
-		return -1;
-	}
+            lastSequenceNumber = sequenceNumber;
 
-	/**
-	 * Returns the ID of the {@link QueueElement} in the queue with the given
-	 * tag.
-	 * 
-	 * @param tag
-	 *            Tag of the message to find
-	 */
-	public int getMessageSequenceNumber(int tag) {
-		synchronized (queue) {
-			for (QueueElement element : queue) {
-				if (element.getId() % 64 == tag && element.getRequest() != null) {
-					return element.getId();
-				}
-			}
-		}
-		return -1;
-	}
+            return sequenceNumber;
+        }
+    }
 
-	/**
-	 * {@link TimerTask} runner - periodically checks queue for timed out
-	 * messages.
-	 */
-	@Override
-	public void run() {
-		if (queue != null) {
-			synchronized (queue) {
-				boolean process = true;
-				while (process && queue.size() > 0) {
-					Date now = new Date();
-					if (now.getTime() - queue.get(0).getTimestamp().getTime() > (long) timeout
-							|| queue.get(0).getRequest() == null) {
-						int tag = queue.get(0).getId() % 64;
-						boolean done = queue.get(0).getRequest() == null;
-						queue.remove(0);
-						logger.info("Removing message after timeout, tag: "
-								+ tag);
-						releaseTag(tag);
-						if (!done) {
-							connection.notifyListeners(connection.getHandle(),
-									tag, null, new ConnectionException(
-											"Message timed out"));
-						}
-					} else {
-						process = false;
-					}
-				}
-			}
-		}
-	}
+    /**
+     * Returns message with the given sequence number from the queue or null if
+     * no message with the given tag is currently in the queue.
+     */
+    public PayloadCoder getMessageFromQueue(int tag) {
+        synchronized (queue) {
+            for (QueueElement element : queue) {
+                if (element.getId() == tag && element.getRequest() != null) {
+                    return element.getRequest();
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns index of the message with the given sequence number from the
+     * queue or -1 if no message with the given tag is currently in the queue.
+     */
+    public int getMessageIndexFromQueue(int tag) {
+        synchronized (queue) {
+            int i = 0;
+            for (QueueElement element : queue) {
+                if (element.getId() == tag && element.getRequest() != null) {
+                    return i;
+                }
+                ++i;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Returns number of retries that were performed on message tagged with tag
+     * or -1 if no such message can be found in the queue.
+     *
+     * @deprecated retries are no longer supported on the message level
+     */
+    @Deprecated
+    public int getMessageRetries(int tag) {
+        synchronized (queue) {
+            for (QueueElement element : queue) {
+                if (element.getId() == tag && element.getRequest() != null) {
+                    return element.getRetries();
+                }
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Returns the ID of the {@link QueueElement} in the queue with the given
+     * tag.
+     *
+     * @param tag
+     *            Tag of the message to find
+     */
+    public int getMessageSequenceNumber(int tag) {
+        synchronized (queue) {
+            for (QueueElement element : queue) {
+                if (element.getId() == tag && element.getRequest() != null) {
+                    return element.getId();
+                }
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * {@link TimerTask} runner - periodically checks queue for timed out
+     * messages.
+     */
+    @Override
+    public void run() {
+        if (queue != null) {
+            synchronized (queue) {
+                boolean process = true;
+                while (process && !queue.isEmpty()) {
+                    QueueElement oldestQueueElement = queue.get(0);
+                    boolean done = oldestQueueElement.getRequest() == null;
+
+                    if (messageJustTimedOut(oldestQueueElement) || done) {
+                        processObsoleteMessage(oldestQueueElement, done);
+                    } else {
+                        process = false;
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean messageJustTimedOut(QueueElement oldestQueueElement) {
+        Date now = new Date();
+
+        return now.getTime() - oldestQueueElement.getTimestamp().getTime() > (long) timeout;
+    }
+
+    private void processObsoleteMessage(QueueElement message, boolean done) {
+        int tag = message.getId();
+        boolean previouslyTimedOut = message.isTimedOut();
+
+        if (previouslyTimedOut || done) {
+            queue.remove(0);
+            logger.info("Removing message after timeout, tag: " + tag);
+            releaseTag(tag);
+        } else {
+            message.makeTimedOut();
+            message.refreshTimestamp();
+            connection.notifyResponseListeners(connection.getHandle(), tag, null,
+                    new ConnectionException("Message timed out"));
+        }
+    }
+
 }

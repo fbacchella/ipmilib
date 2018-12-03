@@ -16,28 +16,28 @@ package com.veraxsystems.vxipmi.coding.security;
  */
 public class ConfidentialityNone extends ConfidentialityAlgorithm {
 
-	public ConfidentialityNone() {
-		super();
-	}
-	
-	@Override
-	public byte getCode() {
-		return SecurityConstants.CA_NONE;
-	}
+    public ConfidentialityNone() {
+        super();
+    }
 
-	@Override
-	public byte[] encrypt(byte[] data) {
-		return data;
-	}
+    @Override
+    public byte getCode() {
+        return SecurityConstants.CA_NONE;
+    }
 
-	@Override
-	public byte[] decrypt(byte[] data) {
-		return data;
-	}
-	
-	@Override
-	public int getConfidentialityOverheadSize(int payloadSize) {
-		return 0;
-	}
-	
+    @Override
+    public byte[] encrypt(byte[] data) {
+        return data;
+    }
+
+    @Override
+    public byte[] decrypt(byte[] data) {
+        return data;
+    }
+
+    @Override
+    public int getConfidentialityOverheadSize(int payloadSize) {
+        return 0;
+    }
+
 }

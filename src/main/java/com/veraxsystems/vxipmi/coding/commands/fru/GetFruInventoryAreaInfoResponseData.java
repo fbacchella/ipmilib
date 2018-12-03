@@ -17,24 +17,24 @@ import com.veraxsystems.vxipmi.coding.commands.ResponseData;
  * A wrapper for Get Fru Inventory Area Info response
  */
 public class GetFruInventoryAreaInfoResponseData implements ResponseData {
-	
-	private int fruInventoryAreaSize;
-	
-	private BaseUnit fruUnit;
 
-	public int getFruInventoryAreaSize() {
-		return fruInventoryAreaSize;
-	}
+    private int fruInventoryAreaSize;
 
-	public void setFruInventoryAreaSize(int fruInventoryAreaSize) {
-		this.fruInventoryAreaSize = fruInventoryAreaSize;
-	}
+    private BaseUnit fruUnit;
 
-	public BaseUnit getFruUnit() {
-		return fruUnit;
-	}
+    public int getFruInventoryAreaSize() {
+        return fruInventoryAreaSize;
+    }
 
-	public void setFruUnit(BaseUnit fruUnit) {
-		this.fruUnit = fruUnit;
-	}
+    public void setFruInventoryAreaSize(int fruInventoryAreaSize) {
+        this.fruInventoryAreaSize = fruInventoryAreaSize;
+    }
+
+    public BaseUnit getFruUnit() {
+        return fruUnit;
+    }
+
+    public void setFruUnit(BaseUnit fruUnit) {
+        this.fruUnit = fruUnit;
+    }
 }

@@ -11,62 +11,85 @@
  */
 package com.veraxsystems.vxipmi.connection.queue;
 
-import java.util.Date;
-
-import com.veraxsystems.vxipmi.coding.commands.IpmiCommandCoder;
+import com.veraxsystems.vxipmi.coding.PayloadCoder;
 import com.veraxsystems.vxipmi.coding.commands.ResponseData;
 
+import java.util.Date;
+
 public class QueueElement {
-	private int id;
-	@Deprecated
-	private int retries;
-	
-	private IpmiCommandCoder request;
-	private ResponseData response;
-	private Date timestamp;
+    private int id;
+    /**
+     * @deprecated retries on message level are deprecated
+     */
+    @Deprecated
+    private int retries;
+    private boolean timedOut;
 
-	public QueueElement(int id, IpmiCommandCoder request) {
-		this.id = id;
-		this.request = request;
-		timestamp = new Date();
-		retries = 0;
-	}
+    private PayloadCoder request;
+    private ResponseData response;
+    private Date timestamp;
 
-	public int getId() {
-		return id;
-	}
+    public QueueElement(int id, PayloadCoder request) {
+        this.id = id;
+        this.request = request;
+        timestamp = new Date();
+        retries = 0;
+        this.timedOut = false;
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
-	
-	@Deprecated
-	public int getRetries() {
-		return retries;
-	}
+    public int getId() {
+        return id;
+    }
 
-	@Deprecated
-	public void setRetries(int retries) {
-		this.retries = retries;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public IpmiCommandCoder getRequest() {
-		return request;
-	}
+    /**
+     * @deprecated retries on message level are deprecated
+     */
+    @Deprecated
+    public int getRetries() {
+        return retries;
+    }
 
-	public void setRequest(IpmiCommandCoder request) {
-		this.request = request;
-	}
+    /**
+     * @deprecated retries on message level are deprecated
+     */
+    @Deprecated
+    public void setRetries(int retries) {
+        this.retries = retries;
+    }
 
-	public ResponseData getResponse() {
-		return response;
-	}
+    public PayloadCoder getRequest() {
+        return request;
+    }
 
-	public void setResponse(ResponseData response) {
-		this.response = response;
-	}
-	
-	public Date getTimestamp() {
-		return timestamp;
-	}
+    public void setRequest(PayloadCoder request) {
+        this.request = request;
+    }
+
+    public ResponseData getResponse() {
+        return response;
+    }
+
+    public void setResponse(ResponseData response) {
+        this.response = response;
+    }
+
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public void refreshTimestamp() {
+        timestamp = new Date();
+    }
+
+    public boolean isTimedOut() {
+        return timedOut;
+    }
+
+    public void makeTimedOut() {
+        this.timedOut = true;
+    }
 }

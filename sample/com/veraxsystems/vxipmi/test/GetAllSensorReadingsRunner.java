@@ -144,9 +144,9 @@ public class GetAllSensorReadingsRunner {
                             // Get states asserted by the sensor
                             List<ReadingType> events = data2.getStatesAsserted(rec.getSensorType(),
                                     rec.getEventReadingType());
-                            String s = "";
+                            StringBuilder s = new StringBuilder();
                             for (int i = 0; i < events.size(); ++i) {
-                                s += events.get(i) + ", ";
+                                s.append(events.get(i)).append(", ");
                             }
                             System.out.println(s);
 
@@ -168,7 +168,7 @@ public class GetAllSensorReadingsRunner {
 
                 // If getting sensor data failed, we check if it already failed
                 // with this reservation ID.
-                if (lastReservationId == reservationId)
+                if (lastReservationId == reservationId || e.getCompletionCode() != CompletionCode.ReservationCanceled)
                     throw e;
                 lastReservationId = reservationId;
 
@@ -243,7 +243,6 @@ public class GetAllSensorReadingsRunner {
             nextRecId = data.getNextRecordId();
             return sensorDataToPopulate;
         } catch (IPMIException e) {
-            // System.out.println(e.getCompletionCode() + ": " + e.getMessage());
             // The following error codes mean that record is too large to be
             // sent in one chunk. This means we need to split the data in
             // smaller parts.

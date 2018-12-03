@@ -15,24 +15,20 @@ import com.veraxsystems.vxipmi.coding.payload.CompletionCode;
 
 public class IPMIException extends Exception {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private CompletionCode completionCode;
+    private final CompletionCode completionCode;
 
-	public IPMIException(CompletionCode completionCode) {
-		setCompletionCode(completionCode);
-	}
+    public IPMIException(CompletionCode completionCode) {
+        this.completionCode = completionCode;
+    }
 
-	private void setCompletionCode(CompletionCode completionCode) {
-		this.completionCode = completionCode;
-	}
+    public CompletionCode getCompletionCode() {
+        return completionCode;
+    }
 
-	public CompletionCode getCompletionCode() {
-		return completionCode;
-	}
-
-	@Override
-	public String getMessage() {
-		return completionCode.getMessage();
-	}
+    @Override
+    public String getMessage() {
+        return completionCode.getMessage();
+    }
 }

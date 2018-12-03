@@ -27,9 +27,9 @@ import com.veraxsystems.vxipmi.sm.states.State;
  */
 public class GetChannelCipherSuitesPending extends Default {
 
-	public GetChannelCipherSuitesPending(int sequenceNumber) {
-		super(CipherSuite.getEmpty(), sequenceNumber,
-				PrivilegeLevel.MaximumAvailable);
-	}
+    public GetChannelCipherSuitesPending(int sequenceNumber) {
+        super(CipherSuite.getEmpty(), sequenceNumber,
+                PrivilegeLevel.MaximumAvailable);
+    }
 
 }

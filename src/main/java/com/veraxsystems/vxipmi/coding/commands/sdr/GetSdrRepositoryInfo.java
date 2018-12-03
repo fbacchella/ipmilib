@@ -11,9 +11,6 @@
  */
 package com.veraxsystems.vxipmi.coding.commands.sdr;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
 import com.veraxsystems.vxipmi.coding.commands.CommandCodes;
 import com.veraxsystems.vxipmi.coding.commands.IpmiCommandCoder;
 import com.veraxsystems.vxipmi.coding.commands.IpmiVersion;
@@ -29,6 +26,9 @@ import com.veraxsystems.vxipmi.coding.protocol.IpmiMessage;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
 import com.veraxsystems.vxipmi.common.TypeConverter;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
 /**
  * A wrapper class for Get SDR Repository Info Command. <br>
  * This command returns the SDR command version for the SDR Repository. It also
@@ -36,92 +36,90 @@ import com.veraxsystems.vxipmi.common.TypeConverter;
  */
 public class GetSdrRepositoryInfo extends IpmiCommandCoder {
 
-	/**
-	 * Initiates GetSdrRepositoryInfo for both encoding and decoding.
-	 * 
-	 * @param version
-	 *            - IPMI version of the command.
-	 * @param cipherSuite
-	 *            - {@link CipherSuite} containing authentication,
-	 *            confidentiality and integrity algorithms for this session.
-	 * @param authenticationType
-	 *            - Type of authentication used. Must be RMCPPlus for IPMI v2.0.
-	 */
-	public GetSdrRepositoryInfo(IpmiVersion version, CipherSuite cipherSuite,
-			AuthenticationType authenticationType) {
-		super(version, cipherSuite, authenticationType);
-	}
+    /**
+     * Initiates GetSdrRepositoryInfo for both encoding and decoding.
+     *
+     * @param version
+     *            - IPMI version of the command.
+     * @param cipherSuite
+     *            - {@link CipherSuite} containing authentication,
+     *            confidentiality and integrity algorithms for this session.
+     * @param authenticationType
+     *            - Type of authentication used. Must be RMCPPlus for IPMI v2.0.
+     */
+    public GetSdrRepositoryInfo(IpmiVersion version, CipherSuite cipherSuite,
+            AuthenticationType authenticationType) {
+        super(version, cipherSuite, authenticationType);
+    }
 
-	@Override
-	public byte getCommandCode() {
-		return CommandCodes.GET_SDR_REPOSITORY_INFO;
-	}
+    @Override
+    public byte getCommandCode() {
+        return CommandCodes.GET_SDR_REPOSITORY_INFO;
+    }
 
-	@Override
-	public NetworkFunction getNetworkFunction() {
-		return NetworkFunction.StorageRequest;
-	}
+    @Override
+    public NetworkFunction getNetworkFunction() {
+        return NetworkFunction.StorageRequest;
+    }
 
-	@Override
-	protected IpmiPayload preparePayload(int sequenceNumber)
-			throws NoSuchAlgorithmException, InvalidKeyException {
-		return new IpmiLanRequest(getNetworkFunction(), getCommandCode(), null,
-				TypeConverter.intToByte(sequenceNumber % 64));
-	}
+    @Override
+    protected IpmiPayload preparePayload(int sequenceNumber)
+            throws NoSuchAlgorithmException, InvalidKeyException {
+        return new IpmiLanRequest(getNetworkFunction(), getCommandCode(), null,
+                TypeConverter.intToByte(sequenceNumber));
+    }
 
-	@Override
-	public ResponseData getResponseData(IpmiMessage message)
-			throws IllegalArgumentException, IPMIException,
-			NoSuchAlgorithmException, InvalidKeyException {
-		if (!isCommandResponse(message)) {
-			throw new IllegalArgumentException(
-					"This is not a response for Get SDR Repository Info command");
-		}
-		if (!(message.getPayload() instanceof IpmiLanResponse)) {
-			throw new IllegalArgumentException("Invalid response payload");
-		}
-		if (((IpmiLanResponse) message.getPayload()).getCompletionCode() != CompletionCode.Ok) {
-			throw new IPMIException(
-					((IpmiLanResponse) message.getPayload())
-							.getCompletionCode());
-		}
+    @Override
+    public ResponseData getResponseData(IpmiMessage message) throws IPMIException, NoSuchAlgorithmException, InvalidKeyException {
+        if (!isCommandResponse(message)) {
+            throw new IllegalArgumentException(
+                    "This is not a response for Get SDR Repository Info command");
+        }
+        if (!(message.getPayload() instanceof IpmiLanResponse)) {
+            throw new IllegalArgumentException("Invalid response payload");
+        }
+        if (((IpmiLanResponse) message.getPayload()).getCompletionCode() != CompletionCode.Ok) {
+            throw new IPMIException(
+                    ((IpmiLanResponse) message.getPayload())
+                            .getCompletionCode());
+        }
 
-		byte[] raw = message.getPayload().getIpmiCommandData();
+        byte[] raw = message.getPayload().getIpmiCommandData();
 
-		if (raw == null || raw.length != 14) {
-			throw new IllegalArgumentException(
-					"Invalid response payload length");
-		}
+        if (raw == null || raw.length != 14) {
+            throw new IllegalArgumentException(
+                    "Invalid response payload length");
+        }
 
-		GetSdrRepositoryInfoResponseData responseData = new GetSdrRepositoryInfoResponseData();
+        GetSdrRepositoryInfoResponseData responseData = new GetSdrRepositoryInfoResponseData();
 
-		responseData.setSdrVersion(TypeConverter
-				.littleEndianBcdByteToInt(raw[0]));
+        responseData.setSdrVersion(TypeConverter
+                .littleEndianBcdByteToInt(raw[0]));
 
-		byte[] buffer = new byte[4];
+        byte[] buffer = new byte[4];
 
-		buffer[0] = raw[1];
-		buffer[1] = raw[2];
-		buffer[2] = 0;
-		buffer[3] = 0;
+        buffer[0] = raw[1];
+        buffer[1] = raw[2];
+        buffer[2] = 0;
+        buffer[3] = 0;
 
-		responseData.setRecordCount(TypeConverter
-				.littleEndianByteArrayToInt(buffer));
+        responseData.setRecordCount(TypeConverter
+                .littleEndianByteArrayToInt(buffer));
 
-		System.arraycopy(raw, 5, buffer, 0, 4);
+        System.arraycopy(raw, 5, buffer, 0, 4);
 
-		responseData.setAddTimestamp(TypeConverter
-				.littleEndianByteArrayToInt(buffer));
+        responseData.setAddTimestamp(TypeConverter
+                .littleEndianByteArrayToInt(buffer));
 
-		System.arraycopy(raw, 9, buffer, 0, 4);
+        System.arraycopy(raw, 9, buffer, 0, 4);
 
-		responseData.setDelTimestamp(TypeConverter
-				.littleEndianByteArrayToInt(buffer));
+        responseData.setDelTimestamp(TypeConverter
+                .littleEndianByteArrayToInt(buffer));
 
-		responseData
-				.setReserveSupported((TypeConverter.byteToInt(raw[13]) & 0x2) != 0);
+        responseData
+                .setReserveSupported((TypeConverter.byteToInt(raw[13]) & 0x2) != 0);
 
-		return responseData;
-	}
+        return responseData;
+    }
 
 }

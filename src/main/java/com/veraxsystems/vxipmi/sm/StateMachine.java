@@ -33,145 +33,153 @@ import com.veraxsystems.vxipmi.transport.UdpMessage;
  */
 public class StateMachine implements UdpListener {
 
-	private List<MachineObserver> observers;
+    private List<MachineObserver> observers;
 
-	private State current;
+    private State current;
 
-	private Messenger messenger;
-	private InetAddress remoteMachineAddress;
+    private Messenger messenger;
+    private InetAddress remoteMachineAddress;
+    private int remoteMachinePort;
 
-	private boolean initialized;
+    private boolean initialized;
 
-	public State getCurrent() {
-		return current;
-	}
+    public State getCurrent() {
+        return current;
+    }
 
-	public void setCurrent(State current) {
-		this.current = current;
-		current.onEnter(this);
-	}
+    public void setCurrent(State current) {
+        this.current = current;
+        current.onEnter(this);
+    }
 
-	/**
-	 * Initializes the State Machine
-	 * 
-	 * @param messenger
-	 *            - {@link Messenger} connected to the
-	 *            {@link Constants#IPMI_PORT}
-	 */
-	public StateMachine(Messenger messenger) {
-		this.messenger = messenger;
-		observers = new ArrayList<MachineObserver>();
-		initialized = false;
-	}
+    /**
+     * Initializes the State Machine
+     *
+     * @param messenger
+     *            - {@link Messenger} connected to the
+     *            {@link Constants#IPMI_PORT}
+     */
+    public StateMachine(Messenger messenger) {
+        this.messenger = messenger;
+        observers = new ArrayList<MachineObserver>();
+        initialized = false;
+    }
 
-	/**
-	 * Sends message via {@link #messenger} to the managed system.
-	 * 
-	 * @param message
-	 *            - the encoded message
-	 * @throws IOException
-	 *             - when sending of the message fails
-	 */
-	public void sendMessage(byte[] message) throws IOException {
-		UdpMessage udpMessage = new UdpMessage();
-		udpMessage.setAddress(getRemoteMachineAddress());
-		udpMessage.setPort(Constants.IPMI_PORT);
-		udpMessage.setMessage(message);
-		messenger.send(udpMessage);
-	}
+    /**
+     * Sends message via {@link #messenger} to the managed system.
+     *
+     * @param message
+     *            - the encoded message
+     * @throws IOException
+     *             - when sending of the message fails
+     */
+    public void sendMessage(byte[] message) throws IOException {
+        UdpMessage udpMessage = new UdpMessage();
+        udpMessage.setAddress(getRemoteMachineAddress());
+        udpMessage.setPort(getRemoteMachinePort());
+        udpMessage.setMessage(message);
+        messenger.send(udpMessage);
+    }
 
-	public InetAddress getRemoteMachineAddress() {
-		return remoteMachineAddress;
-	}
+    public InetAddress getRemoteMachineAddress() {
+        return remoteMachineAddress;
+    }
 
-	/**
-	 * Sends a notification of an action to all {@link MachineObserver}s
-	 * 
-	 * @param action
-	 *            - a {@link StateMachineAction} to perform
-	 */
-	public void doExternalAction(StateMachineAction action) {
-		for (MachineObserver observer : observers) {
-			if (observer != null) {
-				observer.notify(action);
-			}
-		}
-	}
+    public int getRemoteMachinePort() {
+        return remoteMachinePort;
+    }
 
-	/**
-	 * Sets the State Machine in the initial state.
-	 * 
-	 * @param address
-	 *            - IP address of the remote machine.
-	 * @see #stop()
-	 */
-	public void start(InetAddress address) {
-		messenger.register(this);
-		remoteMachineAddress = address;
-		setCurrent(new Uninitialized());
-		initialized = true;
-	}
+    /**
+     * Sends a notification of an action to all {@link MachineObserver}s
+     *
+     * @param action
+     *            - a {@link StateMachineAction} to perform
+     */
+    public void doExternalAction(StateMachineAction action) {
+        for (MachineObserver observer : observers) {
+            if (observer != null) {
+                observer.notify(action);
+            }
+        }
+    }
 
-	/**
-	 * Cleans up the machine resources.
-	 * 
-	 * @see #start(InetAddress)
-	 */
-	public void stop() {
-		messenger.unregister(this);
-		initialized = false;
-	}
+    /**
+     * Sets the State Machine in the initial state.
+     *
+     * @param address
+     *            - IP address of the remote machine.
+     * @param port
+     *             - UDP remoteMachinePort of the remote machine
+     * @see #stop()
+     */
+    public void start(InetAddress address, int port) {
+        messenger.register(this);
+        remoteMachineAddress = address;
+        this.remoteMachinePort = port;
+        setCurrent(new Uninitialized());
+        initialized = true;
+    }
 
-	/**
-	 * @return true if {@link StateMachine} is initialized, false otherwise.
-	 * @see #start(InetAddress)
-	 * @see #stop()
-	 */
-	public boolean isActive() {
-		return initialized;
-	}
+    /**
+     * Cleans up the machine resources.
+     *
+     * @see #start(InetAddress, int)
+     */
+    public void stop() {
+        messenger.unregister(this);
+        initialized = false;
+    }
 
-	/**
-	 * Performs a {@link State} transition according to the event and
-	 * {@link #current} state
-	 * 
-	 * @param event
-	 *            - {@link StateMachineEvent} invoking the transition
-	 * @throws NullPointerException
-	 *             - when machine was not yet started
-	 * @see #start(InetAddress)
-	 */
-	public void doTransition(StateMachineEvent event) {
-		if (!initialized) {
-			throw new NullPointerException("State machine not started");
-		}
-		current.doTransition(this, event);
-	}
+    /**
+     * @return true if {@link StateMachine} is initialized, false otherwise.
+     * @see #start(InetAddress, int)
+     * @see #stop()
+     */
+    public boolean isActive() {
+        return initialized;
+    }
 
-	@Override
-	public void notifyMessage(UdpMessage message) {
-		if (message.getAddress().equals(getRemoteMachineAddress())) {
-			current.doAction(this, RmcpDecoder.decode(message.getMessage()));
-		}
-	}
+    /**
+     * Performs a {@link State} transition according to the event and
+     * {@link #current} state
+     *
+     * @param event
+     *            - {@link StateMachineEvent} invoking the transition
+     * @throws NullPointerException
+     *             - when machine was not yet started
+     * @see #start(InetAddress, int)
+     */
+    public void doTransition(StateMachineEvent event) {
+        if (!initialized) {
+            throw new NullPointerException("State machine not started");
+        }
+        current.doTransition(this, event);
+    }
 
-	/**
-	 * Registers the listener in the {@link StateMachine} so it will be notified
-	 * of the {@link StateMachineAction}s performed via
-	 * {@link #doExternalAction(StateMachineAction)}
-	 * 
-	 * @param observer
-	 *            - {@link MachineObserver} to register
-	 */
-	public void register(MachineObserver observer) {
-		observers.add(observer);
-	}
+    @Override
+    public void notifyMessage(UdpMessage message) {
+        if (message.getAddress().equals(getRemoteMachineAddress()) && message.getPort() == getRemoteMachinePort()) {
+            current.doAction(this, RmcpDecoder.decode(message.getMessage()));
+        }
+    }
 
-	/**
-	 * @return true if {@link StateMachine} is at the point when it acquires
-	 *         session and will send sessionless messages
-	 */
-	public boolean isSessionChallenging() {
-		return !initialized || getCurrent().getClass() == SessionValid.class;
-	}
+    /**
+     * Registers the listener in the {@link StateMachine} so it will be notified
+     * of the {@link StateMachineAction}s performed via
+     * {@link #doExternalAction(StateMachineAction)}
+     *
+     * @param observer
+     *            - {@link MachineObserver} to register
+     */
+    public void register(MachineObserver observer) {
+        observers.add(observer);
+    }
+
+    /**
+     * @return true if {@link StateMachine} is at the point when it acquires
+     *         session and will send sessionless messages
+     */
+    public boolean isSessionChallenging() {
+        return !initialized || getCurrent().getClass() == SessionValid.class;
+    }
 }

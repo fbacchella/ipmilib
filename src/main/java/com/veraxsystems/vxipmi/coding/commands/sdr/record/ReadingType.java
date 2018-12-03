@@ -906,11 +906,9 @@ public enum ReadingType {
             return UnknownOEMEvent;
         }
 
-        if (eventReadingType == 0x6f && sensorType.getCode() <= 0x4) {
-            offset = 0;
-        }
+        int actualOffset = (eventReadingType == 0x6f && sensorType.getCode() <= 0x4) ? 0 : offset;
 
-        int value = (eventReadingType << 8) | offset;
+        int value = (eventReadingType << 8) | actualOffset;
 
         if (eventReadingType == 0x6f) { // sensor-specific reading type
             value |= sensorType.getCode() << 16;

@@ -19,49 +19,49 @@ import com.veraxsystems.vxipmi.coding.commands.ResponseData;
  * Wrapper for Get SEL Info response
  */
 public class GetSelInfoResponseData implements ResponseData {
-	private int selVersion;
-	
-	private int entriesCount;
-	
-	/**
-	 * Most recent addition timestamp.
-	 */
-	private Date additionTimestamp;
-	
-	/**
-	 * Most recent erase timestamp.
-	 */
-	private Date eraseTimestamp;
+    private int selVersion;
 
-	public int getSelVersion() {
-		return selVersion;
-	}
+    private int entriesCount;
 
-	public void setSelVersion(int selVersion) {
-		this.selVersion = selVersion;
-	}
+    /**
+     * Most recent addition timestamp.
+     */
+    private Date additionTimestamp;
 
-	public int getEntriesCount() {
-		return entriesCount;
-	}
+    /**
+     * Most recent erase timestamp.
+     */
+    private Date eraseTimestamp;
 
-	public void setEntriesCount(int entriesCount) {
-		this.entriesCount = entriesCount;
-	}
+    public int getSelVersion() {
+        return selVersion;
+    }
 
-	public Date getAdditionTimestamp() {
-		return additionTimestamp;
-	}
+    public void setSelVersion(int selVersion) {
+        this.selVersion = selVersion;
+    }
 
-	public void setAdditionTimestamp(Date additionTimestamp) {
-		this.additionTimestamp = additionTimestamp;
-	}
+    public int getEntriesCount() {
+        return entriesCount;
+    }
 
-	public Date getEraseTimestamp() {
-		return eraseTimestamp;
-	}
+    public void setEntriesCount(int entriesCount) {
+        this.entriesCount = entriesCount;
+    }
 
-	public void setEraseTimestamp(Date eraseTimestamp) {
-		this.eraseTimestamp = eraseTimestamp;
-	}
+    public Date getAdditionTimestamp() {
+        return additionTimestamp;
+    }
+
+    public void setAdditionTimestamp(Date additionTimestamp) {
+        this.additionTimestamp = additionTimestamp;
+    }
+
+    public Date getEraseTimestamp() {
+        return eraseTimestamp;
+    }
+
+    public void setEraseTimestamp(Date eraseTimestamp) {
+        this.eraseTimestamp = eraseTimestamp;
+    }
 }

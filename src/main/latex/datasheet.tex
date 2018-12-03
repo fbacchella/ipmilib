@@ -1,0 +1,161 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc} 
+\usepackage{graphics}
+\usepackage{float}
+\usepackage{relsize}
+\usepackage{indentfirst} 
+\usepackage{amsmath}
+
+\usepackage{multirow}
+\usepackage{listings} 
+
+\usepackage{fancyhdr, graphicx}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead[L]{}
+\fancyhead[R]{
+\includegraphics[width=4cm]{logo.jpg}
+}
+\pagestyle{plain}
+\title{Verax IPMI library datasheet}
+\date{\today}
+
+\begin{document}
+\maketitle
+\thispagestyle{fancy}
+\tableofcontents
+\clearpage
+
+\section{Basic information}
+
+
+\begin{tabular}{|l|l|}
+\hline 
+JVM Threads & For each connection, incoming messages\\
+			& are handled in  separate JVM Thread\\
+\hline
+IPMI messages per second & Bound by target server response speed\\
+						 & and network throughput\\
+\hline 
+Maximum number of connections per instance & $2^{31} - 1$\\
+\hline
+IPMI protocol versions supported & v2.0\\
+\hline
+Interfaces supported & LAN - RMCP+\\
+\hline
+Sliding window support & Yes\\
+\hline
+Synchronous API & Yes\\
+\hline
+Asynchronous API & Yes\\
+\hline
+\end{tabular}
+
+\section{Supported IPMI commands}
+
+\begin{description}
+  \item[Chassis commands] ~
+  \begin{itemize}
+    \item Chassis Control
+	\item Get Chassis Status    
+  \end{itemize}
+  \item[FRU commands] ~
+  \begin{itemize}
+    \item Get FRU inventory area info
+	\item Read FRU data    
+  \end{itemize}
+  \item[SDR commands] ~
+  \begin{itemize}
+    \item Get SDR repository info
+	\item Get SDR
+	\item Get sensor reading
+	\item Reserve SDR repository    
+  \end{itemize}
+  \item[SEL commands] ~
+  \begin{itemize}
+    \item Get SEL info
+	\item Get SEL entry
+	\item Reserve SEL    
+  \end{itemize}
+  \item[Session commands] ~
+  \begin{itemize}
+    \item Get channel cipher suites
+	\item Get channel authentication capabilities
+	\item Open session
+	\item RAKP1-4
+	\item Close session    
+  \end{itemize}
+\end{description}
+
+The architecture of the library enables implemening custom commands.
+
+\section{Security}
+
+\subsection{Supported authentication algorithms}
+
+RAKP HMAC-SHA1, architecture of the library enables implementing custom
+authentication algorithms.
+
+\subsection{Suppoted confidentiality algorithms}
+
+AES-CBC-128, architecture of the library enables implementing custom
+confidentiality algorithms.
+\subsection{Supported integrity algorithms}
+
+HMAC-SHA1-96, architecture of the library enables implementing custom integrity
+algorithms.
+
+\section{Supported IPMI sensors}
+
+The Verax IPMI library supports the following types of IPMI sensors:
+
+\begin{itemize}
+  \item Temperature
+  \item Voltage
+  \item Current
+  \item Fan
+  \item Physical Security (Chassis Intrusion)
+  \item Platform Security Violation Attempt
+  \item Processor
+  \item Power supply
+  \item Power unit
+  \item Cooling device
+  \item Memory
+  \item Disk Drive Bay
+  \item POST Memory Resize
+  \item System Firmware Progress
+  \item Event Logging Disabled
+  \item Watchdog 1
+  \item System Event
+  \item Critical Interrupt
+  \item Button / Switch
+  \item Module / Board
+  \item Microcontroller / Coprocessor
+  \item Add-in Card
+  \item Chassis
+  \item Chip set
+  \item Other FRU
+  \item Cable / Interconnect
+  \item Terminator
+  \item System Boot / Restart Initiated
+  \item Boot Error
+  \item OS Boot
+  \item OS Stop / Shutdown
+  \item Slot / Connector
+  \item System ACPI Power State
+  \item Watchdog 2
+  \item Platform Alert
+  \item Entity Presence
+  \item Monitor ASIC / IC
+  \item LAN
+  \item Management subsystem health
+  \item Battery
+  \item Session Audit
+  \item Version Change
+  \item FRU State
+  
+\end{itemize}
+
+\end{document}

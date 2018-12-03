@@ -23,64 +23,66 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class AuthenticationRakpHmacSha1 extends AuthenticationAlgorithm {
 
-	private Mac mac;
-	
-	/**
-	 * Initiates RAKP-HMAC-SHA1 authentication algorithm.
-	 * @throws NoSuchAlgorithmException
-	 *             - when initiation of the algorithm fails
-	 */
-	public AuthenticationRakpHmacSha1() throws NoSuchAlgorithmException {
-		mac = Mac.getInstance("HmacSHA1");
-	}
-	
-	@Override
-	public byte getCode() {
-		return SecurityConstants.AA_RAKP_HMAC_SHA1;
-	}
+    private static final String ALGORITHM_NAME = "HmacSHA1";
 
-	@Override
-	public boolean checkKeyExchangeAuthenticationCode(byte[] data, byte[] key,
-			String password) throws NoSuchAlgorithmException,
-			InvalidKeyException {
-		byte[] check = getKeyExchangeAuthenticationCode(data, password);
-		return Arrays.equals(check, key);
-	}
+    private Mac mac;
 
-	@Override
-	public byte[] getKeyExchangeAuthenticationCode(byte[] data,
-		String password)
-			throws NoSuchAlgorithmException, InvalidKeyException {
-		
-		byte[] key = password.getBytes();
-				
-		SecretKeySpec sKey = new SecretKeySpec(key, "HmacSHA1");
-		mac.init(sKey);
-		
-		return mac.doFinal(data);
-	}
+    /**
+     * Initiates RAKP-HMAC-SHA1 authentication algorithm.
+     * @throws NoSuchAlgorithmException
+     *             - when initiation of the algorithm fails
+     */
+    public AuthenticationRakpHmacSha1() throws NoSuchAlgorithmException {
+        mac = Mac.getInstance(ALGORITHM_NAME);
+    }
 
-	@Override
-	public boolean doIntegrityCheck(byte[] data, byte[] reference, byte[] sik) throws InvalidKeyException, NoSuchAlgorithmException {
+    @Override
+    public byte getCode() {
+        return SecurityConstants.AA_RAKP_HMAC_SHA1;
+    }
 
-		SecretKeySpec sKey = new SecretKeySpec(sik, "HmacSHA1");
-		mac.init(sKey);
-		
-		byte[] result = new byte[getIntegrityCheckBaseLength()];
-		
-		System.arraycopy(mac.doFinal(data), 0, result, 0, getIntegrityCheckBaseLength());
-		
-		return Arrays.equals(result, reference);
-	}
+    @Override
+    public boolean checkKeyExchangeAuthenticationCode(byte[] data, byte[] key,
+            String password) throws NoSuchAlgorithmException,
+            InvalidKeyException {
+        byte[] check = getKeyExchangeAuthenticationCode(data, password);
+        return Arrays.equals(check, key);
+    }
 
-	@Override
-	public int getKeyLength() {
-		return 20;
-	}
+    @Override
+    public byte[] getKeyExchangeAuthenticationCode(byte[] data,
+        String password)
+            throws NoSuchAlgorithmException, InvalidKeyException {
 
-	@Override
-	public int getIntegrityCheckBaseLength() {
-		return 12;
-	}
+        byte[] key = password.getBytes();
+
+        SecretKeySpec sKey = new SecretKeySpec(key, ALGORITHM_NAME);
+        mac.init(sKey);
+
+        return mac.doFinal(data);
+    }
+
+    @Override
+    public boolean doIntegrityCheck(byte[] data, byte[] reference, byte[] sik) throws InvalidKeyException, NoSuchAlgorithmException {
+
+        SecretKeySpec sKey = new SecretKeySpec(sik, ALGORITHM_NAME);
+        mac.init(sKey);
+
+        byte[] result = new byte[getIntegrityCheckBaseLength()];
+
+        System.arraycopy(mac.doFinal(data), 0, result, 0, getIntegrityCheckBaseLength());
+
+        return Arrays.equals(result, reference);
+    }
+
+    @Override
+    public int getKeyLength() {
+        return 20;
+    }
+
+    @Override
+    public int getIntegrityCheckBaseLength() {
+        return 12;
+    }
 
 }

@@ -15,17 +15,17 @@ package com.veraxsystems.vxipmi.coding.commands.chassis;
  * Chassis power restore policy.
  */
 public enum PowerRestorePolicy {
-	/**
-	 * Chassis stays powered off after AC/mains returns
-	 */
-	PoweredOff,
-	/**
-	 * After AC returns, power is restored to the state that was in effect when
-	 * AC/mains was lost
-	 */
-	PowerRestored,
-	/**
-	 * Chassis always powers up after AC/mains returns
-	 */
-	PoweredUp,
+    /**
+     * Chassis stays powered off after AC/mains returns
+     */
+    PoweredOff,
+    /**
+     * After AC returns, power is restored to the state that was in effect when
+     * AC/mains was lost
+     */
+    PowerRestored,
+    /**
+     * Chassis always powers up after AC/mains returns
+     */
+    PoweredUp,
 }

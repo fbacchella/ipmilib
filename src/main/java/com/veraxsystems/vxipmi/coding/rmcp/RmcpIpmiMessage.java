@@ -19,8 +19,7 @@ public class RmcpIpmiMessage extends RmcpMessage {
      * Prepares a ready to send ASF IPMI message.
      * @param ipmiMessage - IPMI message encoded as a byte array.
      */
-    public RmcpIpmiMessage(byte[] ipmiMessage) throws IllegalArgumentException {
-        super();
+    public RmcpIpmiMessage(byte[] ipmiMessage) {
         setVersion(RmcpVersion.RMCP1_0);
         setSequenceNumber(0xff);
         setClassOfMessage(RmcpClassOfMessage.Ipmi);

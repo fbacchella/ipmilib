@@ -17,17 +17,17 @@ import com.veraxsystems.vxipmi.api.async.ConnectionHandle;
  * Class that wraps exception that was cause of not receiving message.
  */
 public class IpmiError extends IpmiResponse {
-	private Exception exception;
+    private Exception exception;
 
-	/**
-	 * @return {@link Exception} that caused message delivery to fail.
-	 */
-	public Exception getException() {
-		return exception;
-	}
+    /**
+     * @return {@link Exception} that caused message delivery to fail.
+     */
+    public Exception getException() {
+        return exception;
+    }
 
-	public IpmiError(Exception exception, int tag, ConnectionHandle handle) {
-		super(tag, handle);
-		this.exception = exception;
-	}
+    public IpmiError(Exception exception, int tag, ConnectionHandle handle) {
+        super(tag, handle);
+        this.exception = exception;
+    }
 }

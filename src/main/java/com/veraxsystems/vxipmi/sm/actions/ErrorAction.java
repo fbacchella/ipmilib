@@ -15,14 +15,14 @@ package com.veraxsystems.vxipmi.sm.actions;
  * Action representing an exception handed to the machine owner.
  */
 public class ErrorAction extends StateMachineAction {
-	
-	private Exception exception;
-	
-	public ErrorAction(Exception e) {
-		exception = e;
-	}
-	
-	public Exception getException() {
-		return exception;
-	}
+
+    private Exception exception;
+
+    public ErrorAction(Exception e) {
+        exception = e;
+    }
+
+    public Exception getException() {
+        return exception;
+    }
 }

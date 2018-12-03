@@ -11,7 +11,7 @@
  */
 package com.veraxsystems.vxipmi.sm.events;
 
-import com.veraxsystems.vxipmi.coding.commands.IpmiCommandCoder;
+import com.veraxsystems.vxipmi.coding.PayloadCoder;
 import com.veraxsystems.vxipmi.sm.StateMachine;
 import com.veraxsystems.vxipmi.sm.states.SessionValid;
 import com.veraxsystems.vxipmi.sm.states.State;
@@ -23,38 +23,67 @@ import com.veraxsystems.vxipmi.sm.states.State;
  * @see StateMachine
  */
 public class Sendv20Message extends StateMachineEvent {
-	private IpmiCommandCoder message;
-	private int sessionId;
-	private int sequenceNumber;
+    private PayloadCoder message;
+    private int sessionId;
+    private int messageSequenceNumber;
+    private int sessionSequenceNumber;
 
-	/**
-	 * Prepares an event for {@link StateMachine} that will perform sending an
-	 * IPMI command in v2.0 format. Only possible in {@link SessionValid}
-	 * {@link State}
-	 * 
-	 * @param ipmiCommandCoder
-	 *            - The command to send.
-	 * @param sessionId
-	 *            - managed system session ID
-	 * @param sequenceNumber
-	 *            - generated sequence number for the message to send
-	 */
-	public Sendv20Message(IpmiCommandCoder ipmiCommandCoder, int sessionId,
-			int sequenceNumber) {
-		message = ipmiCommandCoder;
-		this.sequenceNumber = sequenceNumber;
-		this.sessionId = sessionId;
-	}
+    /**
+     * Prepares an event for {@link StateMachine} that will perform sending an
+     * IPMI command in v2.0 format. Only possible in {@link SessionValid}
+     * {@link State}
+     *
+     * @param payloadCoder
+     *            - The payload to send.
+     * @param sessionId
+     *            - managed system session ID
+     * @param messageSequenceNumber
+     *            - generated sequence number for the message to send
+     */
+    public Sendv20Message(PayloadCoder payloadCoder, int sessionId,
+                          int messageSequenceNumber, int sessionSequenceNumber) {
+        message = payloadCoder;
+        this.sessionId = sessionId;
+        this.messageSequenceNumber = messageSequenceNumber;
+        this.sessionSequenceNumber = sessionSequenceNumber;
+    }
 
-	public int getSessionId() {
-		return sessionId;
-	}
+    public int getSessionId() {
+        return sessionId;
+    }
 
-	public int getSequenceNumber() {
-		return sequenceNumber;
-	}
+    public int getMessageSequenceNumber() {
+        return messageSequenceNumber;
+    }
 
-	public IpmiCommandCoder getCommandCoder() {
-		return message;
-	}
+    public int getSessionSequenceNumber() {
+        return sessionSequenceNumber;
+    }
+
+    public PayloadCoder getPayloadCoder() {
+        return message;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Sendv20Message that = (Sendv20Message) o;
+
+        if (sessionId != that.sessionId) return false;
+        if (messageSequenceNumber != that.messageSequenceNumber) return false;
+        if (sessionSequenceNumber != that.sessionSequenceNumber) return false;
+
+        return message != null ? message.equals(that.message) : that.message == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = message != null ? message.hashCode() : 0;
+        result = 31 * result + sessionId;
+        result = 31 * result + messageSequenceNumber;
+        result = 31 * result + sessionSequenceNumber;
+        return result;
+    }
 }

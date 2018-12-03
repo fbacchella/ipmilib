@@ -19,17 +19,17 @@ import com.veraxsystems.vxipmi.coding.commands.ResponseData;
  */
 public class ResponseAction extends StateMachineAction {
 
-	public ResponseAction(ResponseData ipmiResponseData) {
-		setIpmiResponseData(ipmiResponseData);
-	}
+    public ResponseAction(ResponseData ipmiResponseData) {
+        setIpmiResponseData(ipmiResponseData);
+    }
 
-	private ResponseData ipmiResponseData;
+    private ResponseData ipmiResponseData;
 
-	public void setIpmiResponseData(ResponseData ipmiResponseData) {
-		this.ipmiResponseData = ipmiResponseData;
-	}
+    public void setIpmiResponseData(ResponseData ipmiResponseData) {
+        this.ipmiResponseData = ipmiResponseData;
+    }
 
-	public ResponseData getIpmiResponseData() {
-		return ipmiResponseData;
-	}
+    public ResponseData getIpmiResponseData() {
+        return ipmiResponseData;
+    }
 }

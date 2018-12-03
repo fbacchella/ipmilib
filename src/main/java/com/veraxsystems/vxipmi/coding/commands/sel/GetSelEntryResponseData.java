@@ -18,29 +18,29 @@ import com.veraxsystems.vxipmi.coding.commands.ResponseData;
  */
 public class GetSelEntryResponseData implements ResponseData {
 
-	/**
-	 * ID of the next record in the repository.
-	 */
-	private int nextRecordId;
-	
-	/**
-	 * Sensor record data
-	 */
-	private SelRecord selRecord;
+    /**
+     * ID of the next record in the repository.
+     */
+    private int nextRecordId;
 
-	public void setNextRecordId(int nextRecordId) {
-		this.nextRecordId = nextRecordId;
-	}
+    /**
+     * Sensor record data
+     */
+    private SelRecord selRecord;
 
-	public int getNextRecordId() {
-		return nextRecordId;
-	}
+    public void setNextRecordId(int nextRecordId) {
+        this.nextRecordId = nextRecordId;
+    }
 
-	public void setSelRecord(SelRecord selRecord) {
-		this.selRecord = selRecord;
-	}
+    public int getNextRecordId() {
+        return nextRecordId;
+    }
 
-	public SelRecord getSelRecord() {
-		return selRecord;
-	}
+    public void setSelRecord(SelRecord selRecord) {
+        this.selRecord = selRecord;
+    }
+
+    public SelRecord getSelRecord() {
+        return selRecord;
+    }
 }

@@ -18,51 +18,51 @@ import com.veraxsystems.vxipmi.common.TypeConverter;
  */
 public class RmcpMessage {
     private RmcpVersion version;
-	private byte sequenceNumber;
-	private RmcpClassOfMessage classOfMessage;
-	private byte[] data;
-	
-	public RmcpMessage() {
-	    setSequenceNumber(0xff);
-	}
+    private byte sequenceNumber;
+    private RmcpClassOfMessage classOfMessage;
+    private byte[] data;
 
-	public void setVersion(RmcpVersion version) {
-		this.version = version;
-	}
+    public RmcpMessage() {
+        setSequenceNumber(0xff);
+    }
 
-	public RmcpVersion getVersion() {
-		return version;
-	}
+    public void setVersion(RmcpVersion version) {
+        this.version = version;
+    }
 
-	/**
-	 * Set RMCP sequence number. Must be 0-254 if ACK is desired, 255 if no ACK is desired.
-	 * @param sequenceNumber
-	 */
-	public void setSequenceNumber(int sequenceNumber) {
-		this.sequenceNumber = TypeConverter.intToByte(sequenceNumber);
-	}
+    public RmcpVersion getVersion() {
+        return version;
+    }
 
-	public byte getSequenceNumber() {
-		return sequenceNumber;
-	}
-	
-	public int getIntSequenceNumber() {
+    /**
+     * Set RMCP sequence number. Must be 0-254 if ACK is desired, 255 if no ACK is desired.
+     * @param sequenceNumber
+     */
+    public void setSequenceNumber(int sequenceNumber) {
+        this.sequenceNumber = TypeConverter.intToByte(sequenceNumber);
+    }
+
+    public byte getSequenceNumber() {
+        return sequenceNumber;
+    }
+
+    public int getIntSequenceNumber() {
         return TypeConverter.byteToInt(sequenceNumber);
     }
 
-	public void setClassOfMessage(RmcpClassOfMessage classOfMessage) {
-		this.classOfMessage = classOfMessage;
-	}
+    public void setClassOfMessage(RmcpClassOfMessage classOfMessage) {
+        this.classOfMessage = classOfMessage;
+    }
 
-	public RmcpClassOfMessage getClassOfMessage() {
-		return classOfMessage;
-	}
+    public RmcpClassOfMessage getClassOfMessage() {
+        return classOfMessage;
+    }
 
-	public void setData(byte[] data) {
-		this.data = data;
-	}
+    public void setData(byte[] data) {
+        this.data = data;
+    }
 
-	public byte[] getData() {
-		return data;
-	}
+    public byte[] getData() {
+        return data;
+    }
 }

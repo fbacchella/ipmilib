@@ -7,7 +7,7 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
-public class PropertiesManager {
+public final class PropertiesManager {
 
     private static PropertiesManager instance;
 
@@ -31,11 +31,11 @@ public class PropertiesManager {
 
     private void loadProperties(String name) {
         try {
-            Properties properties = new Properties();
-            properties.load(getClass().getResourceAsStream(name));
+            Properties props = new Properties();
+            props.load(getClass().getResourceAsStream(name));
 
-            for (Object key : properties.keySet()) {
-                this.properties.put(key.toString(), properties.getProperty(key.toString()));
+            for (Object key : props.keySet()) {
+                this.properties.put(key.toString(), props.getProperty(key.toString()));
             }
 
         } catch (IOException e) {

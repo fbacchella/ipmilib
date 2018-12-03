@@ -15,13 +15,13 @@ package com.veraxsystems.vxipmi.sm.actions;
  * Returns the Session Integrity Key calculated after receiving RAKP Message 2.
  */
 public class GetSikAction extends StateMachineAction {
-	private byte[] sik;
-	
-	public GetSikAction(byte[] sik) {
-		this.sik = sik;
-	}
-	
-	public byte[] getSik() {
-		return sik;
-	}
+    private byte[] sik;
+
+    public GetSikAction(byte[] sik) {
+        this.sik = sik;
+    }
+
+    public byte[] getSik() {
+        return sik;
+    }
 }

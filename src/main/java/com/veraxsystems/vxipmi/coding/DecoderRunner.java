@@ -11,19 +11,6 @@
  */
 package com.veraxsystems.vxipmi.coding;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
-
 import com.veraxsystems.vxipmi.coding.commands.IpmiVersion;
 import com.veraxsystems.vxipmi.coding.commands.PrivilegeLevel;
 import com.veraxsystems.vxipmi.coding.commands.chassis.GetChassisStatus;
@@ -47,9 +34,9 @@ import com.veraxsystems.vxipmi.coding.commands.sdr.ReserveSdrRepository;
 import com.veraxsystems.vxipmi.coding.commands.sdr.ReserveSdrRepositoryResponseData;
 import com.veraxsystems.vxipmi.coding.commands.sdr.record.CompactSensorRecord;
 import com.veraxsystems.vxipmi.coding.commands.sdr.record.FruDeviceLocatorRecord;
-import com.veraxsystems.vxipmi.coding.commands.sdr.record.ReadingType;
 import com.veraxsystems.vxipmi.coding.commands.sdr.record.FullSensorRecord;
 import com.veraxsystems.vxipmi.coding.commands.sdr.record.RateUnit;
+import com.veraxsystems.vxipmi.coding.commands.sdr.record.ReadingType;
 import com.veraxsystems.vxipmi.coding.commands.sdr.record.SensorRecord;
 import com.veraxsystems.vxipmi.coding.commands.sel.GetSelEntry;
 import com.veraxsystems.vxipmi.coding.commands.sel.GetSelEntryResponseData;
@@ -69,7 +56,6 @@ import com.veraxsystems.vxipmi.coding.commands.session.Rakp1;
 import com.veraxsystems.vxipmi.coding.commands.session.Rakp1ResponseData;
 import com.veraxsystems.vxipmi.coding.commands.session.Rakp3;
 import com.veraxsystems.vxipmi.coding.commands.session.Rakp3ResponseData;
-import com.veraxsystems.vxipmi.coding.payload.lan.IPMIException;
 import com.veraxsystems.vxipmi.coding.protocol.AuthenticationType;
 import com.veraxsystems.vxipmi.coding.protocol.decoder.PlainCommandv20Decoder;
 import com.veraxsystems.vxipmi.coding.protocol.decoder.Protocolv15Decoder;
@@ -79,1075 +65,995 @@ import com.veraxsystems.vxipmi.coding.protocol.encoder.Protocolv20Encoder;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
 import com.veraxsystems.vxipmi.coding.security.SecurityConstants;
 import com.veraxsystems.vxipmi.common.TypeConverter;
+import org.apache.log4j.Logger;
 
 import javax.crypto.NoSuchPaddingException;
-
-import org.apache.log4j.Logger;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Test driver for Encoder/Decoder
  */
 public class DecoderRunner extends Thread {
 
-	private DatagramSocket socket;
+    private DatagramSocket socket;
 
-	private static int managedSeqNum;
-	private static boolean lock;
+    private static int managedSeqNum;
+    private static boolean lock;
 
-	private static Rakp1 r1;
-	private static Rakp1ResponseData r1rd;
-	private static CipherSuite cs = new CipherSuite((byte) 0,
-			SecurityConstants.AA_RAKP_HMAC_SHA1, (byte) 0, (byte) 0);
-	
-	private static Logger logger = Logger.getLogger(DecoderRunner.class);
+    private static Rakp1 r1;
+    private static Rakp1ResponseData r1rd;
+    private static CipherSuite cs = new CipherSuite((byte) 0,
+            SecurityConstants.AA_RAKP_HMAC_SHA1, (byte) 0, (byte) 0);
 
-	private static int cssrcv = 16;
+    private static Logger logger = Logger.getLogger(DecoderRunner.class);
 
-	private static int reservation;
+    private static int cssrcv = 16;
 
-	private static int nextRecId = 0;
+    private static int reservation;
 
-	private static byte[] cssrec;
+    private static int nextRecId = 0;
 
-	private static List<ReadFruDataResponseData> rd;
-	
-	private static int fruId = 0;
-	
-	private static int fruSize = 528;
-	
-	public static void main(String[] args) throws IOException,
-			InterruptedException, NoSuchAlgorithmException,
-			InvalidKeyException, IllegalArgumentException {
+    private static byte[] cssrec;
 
-		logger.info(DateFormat.getInstance().format(
-				new Date(new Date().getTime())));
-		
-		//StateMachineTest stateMachineTest = new StateMachineTest();
-		
-		//stateMachineTest.testSessionUpkeep();
+    private static int fruId = 0;
 
-		lock = true;
+    private static int fruSize = 528;
 
-		DecoderRunner dr = new DecoderRunner();
+    public static void main(String[] args) throws IOException, InterruptedException, NoSuchAlgorithmException, InvalidKeyException {
 
-		dr.socket = new DatagramSocket(6666);
+        logger.info(DateFormat.getInstance().format(
+                new Date(new Date().getTime())));
 
-		dr.start();
+        lock = true;
 
-		Properties properties = new Properties();
-		properties.load(new FileInputStream("src/test/resources/test.properties"));
-		
-		Thread.sleep(100);
+        DecoderRunner dr = new DecoderRunner();
 
-		InetAddress ad = InetAddress.getByName((String)properties.get("testIp"));
-		// InetAddress ad = InetAddress.getByName("192.168.100.190");
-		// byte[] outmsg = RmcpEncoder.encode(new RmcpPingMessage((byte) 1));
+        dr.socket = new DatagramSocket(6666);
 
-		byte index = 0;
+        dr.start();
 
-		while (cssrcv >= 16) {
+        Properties properties = new Properties();
+        properties.load(new FileInputStream("src/test/resources/test.properties"));
 
-			Thread.sleep(300);
+        Thread.sleep(100);
 
-			lock = true;
+        InetAddress ad = InetAddress.getByName((String)properties.get("testIp"));
 
-			byte[] outmsg = Encoder.encode(new Protocolv20Encoder(),
-					new GetChannelCipherSuites(TypeConverter.intToByte(0xE),
-							index), 0, 0);
+        byte index = 0;
 
-			++index;
-			DatagramPacket packet = new DatagramPacket(outmsg, outmsg.length,
-					ad, 0x26F);
+        while (cssrcv >= 16) {
 
-			dr.socket.send(packet);
+            Thread.sleep(300);
 
-			while (lock) {
-				Thread.sleep(1);
-			}
-		}
+            lock = true;
 
-		List<CipherSuite> csl = CipherSuite.getCipherSuites(cssrec);
+            byte[] outmsg = Encoder.encode(new Protocolv20Encoder(),
+                    new GetChannelCipherSuites(TypeConverter.intToByte(0xE),
+                            index), 0, 0,0);
 
-		for (CipherSuite c : csl) {
-			try {
-				logger.info(c.getId() + ": "
-						+ c.getAuthenticationAlgorithm().getCode() + " "
-						+ c.getIntegrityAlgorithm().getCode() + " "
-						+ c.getConfidentialityAlgorithm().getCode());
-			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-			}
-		}
+            ++index;
+            DatagramPacket packet = new DatagramPacket(outmsg, outmsg.length,
+                    ad, 0x26F);
 
-		cs = csl.get(2);
+            dr.socket.send(packet);
 
-		Thread.sleep(300);
+            while (lock) {
+                Thread.sleep(1);
+            }
+        }
 
-		byte[] outmsg = Encoder
-				.encode(new Protocolv15Encoder(),
-						new GetChannelAuthenticationCapabilities(IpmiVersion.V15,
-								IpmiVersion.V20, cs, PrivilegeLevel.User,
-								TypeConverter.intToByte(14)), 0, 0);
+        List<CipherSuite> csl = CipherSuite.getCipherSuites(cssrec);
 
-		DatagramPacket packet = new DatagramPacket(outmsg, outmsg.length, ad,
-				0x26F);
+        for (CipherSuite c : csl) {
+            try {
+                logger.info(c.getId() + ": "
+                        + c.getAuthenticationAlgorithm().getCode() + " "
+                        + c.getIntegrityAlgorithm().getCode() + " "
+                        + c.getConfidentialityAlgorithm().getCode());
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
+        }
 
-		dr.socket.send(packet);
+        cs = csl.get(2);
 
-		Thread.sleep(150);
+        Thread.sleep(300);
 
-		outmsg = Encoder.encode(new Protocolv20Encoder(), new OpenSession(44,
-				PrivilegeLevel.MaximumAvailable, cs), 0, 0);
+        byte[] outmsg = Encoder
+                .encode(new Protocolv15Encoder(),
+                        new GetChannelAuthenticationCapabilities(IpmiVersion.V15,
+                                IpmiVersion.V20, cs, PrivilegeLevel.User,
+                                TypeConverter.intToByte(14)), 0, 0, 0);
 
-		packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
+        DatagramPacket packet = new DatagramPacket(outmsg, outmsg.length, ad,
+                0x26F);
 
-		dr.socket.send(packet);
+        dr.socket.send(packet);
 
-		Thread.sleep(300);
+        Thread.sleep(150);
 
-		while (lock) {
-			Thread.sleep(1);
-		}
+        outmsg = Encoder.encode(new Protocolv20Encoder(), new OpenSession(44,
+                PrivilegeLevel.MaximumAvailable, cs), 0, 0, 0);
 
-		lock = true;
+        packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
 
-				
-		r1 = new Rakp1(managedSeqNum, PrivilegeLevel.User, (String)properties.get("username"), (String)properties.get("password"),
-				null, cs);
+        dr.socket.send(packet);
 
-		outmsg = Encoder.encode(new Protocolv20Encoder(), r1, 1, 0);
+        Thread.sleep(300);
 
-		packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
+        while (lock) {
+            Thread.sleep(1);
+        }
 
-		dr.socket.send(packet);
+        lock = true;
 
-		Thread.sleep(150);
-		
-		while (lock) {
-			Thread.sleep(1);
-		}
 
-		try {
-			cs.initializeAlgorithms(r1.calculateSik(r1rd));
-		} catch (NoSuchPaddingException e) {
-			logger.error(e.getMessage(), e);
-		}
+        r1 = new Rakp1(managedSeqNum, PrivilegeLevel.User, (String)properties.get("username"), (String)properties.get("password"),
+                null, cs);
 
-		outmsg = Encoder.encode(new Protocolv20Encoder(), new Rakp3((byte) 0,
-				managedSeqNum, cs, r1, r1rd), 1, 0);
+        outmsg = Encoder.encode(new Protocolv20Encoder(), r1, 1, 1,0);
 
-		packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
+        packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
 
-		dr.socket.send(packet);
+        dr.socket.send(packet);
 
-		Thread.sleep(150);
+        Thread.sleep(150);
 
-		outmsg = Encoder.encode(new Protocolv20Encoder(), new GetChassisStatus(
-				IpmiVersion.V20, cs, AuthenticationType.RMCPPlus), 1, r1
-				.getManagedSystemSessionId());
+        while (lock) {
+            Thread.sleep(1);
+        }
 
-		packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
+        try {
+            cs.initializeAlgorithms(r1.calculateSik(r1rd));
+        } catch (NoSuchPaddingException e) {
+            logger.error(e.getMessage(), e);
+        }
 
-		dr.socket.send(packet);
+        outmsg = Encoder.encode(new Protocolv20Encoder(), new Rakp3((byte) 0,
+                managedSeqNum, cs, r1, r1rd), 1, 1, 0);
 
-		Thread.sleep(300);
+        packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
 
-		outmsg = Encoder.encode(new Protocolv20Encoder(),
-				new GetSdrRepositoryInfo(IpmiVersion.V20, cs,
-						AuthenticationType.RMCPPlus), 2, r1
-						.getManagedSystemSessionId());
+        dr.socket.send(packet);
 
-		packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
+        Thread.sleep(150);
 
-		dr.socket.send(packet);
-		Thread.sleep(300);
+        outmsg = Encoder.encode(new Protocolv20Encoder(), new GetChassisStatus(
+                IpmiVersion.V20, cs, AuthenticationType.RMCPPlus), 1, 1, r1
+                .getManagedSystemSessionId());
 
-		outmsg = Encoder.encode(new Protocolv20Encoder(),
-				new ReserveSdrRepository(IpmiVersion.V20, cs,
-						AuthenticationType.RMCPPlus), 3, r1
-						.getManagedSystemSessionId());
+        packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
 
-		packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
+        dr.socket.send(packet);
 
-		dr.socket.send(packet);
+        Thread.sleep(300);
 
-		int seq = 4;
+        outmsg = Encoder.encode(new Protocolv20Encoder(),
+                new GetSdrRepositoryInfo(IpmiVersion.V20, cs,
+                        AuthenticationType.RMCPPlus), 2, 2, r1
+                        .getManagedSystemSessionId());
 
-		lock = true;
+        packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
 
-		while (lock) {
-			Thread.sleep(1);
-		}
+        dr.socket.send(packet);
+        Thread.sleep(300);
 
-		while (nextRecId < 65535) {
+        outmsg = Encoder.encode(new Protocolv20Encoder(),
+                new ReserveSdrRepository(IpmiVersion.V20, cs,
+                        AuthenticationType.RMCPPlus), 3, 3, r1
+                        .getManagedSystemSessionId());
 
-			Thread.sleep(200);
+        packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
 
-			logger.info(">>Sending request for record " + nextRecId);
+        dr.socket.send(packet);
 
-			outmsg = Encoder.encode(new Protocolv20Encoder(), new GetSdr(
-					IpmiVersion.V20, cs, AuthenticationType.RMCPPlus,
-					reservation, nextRecId), seq++, r1
-					.getManagedSystemSessionId());
+        int seq = 4;
 
-			packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
+        lock = true;
 
-			dr.socket.send(packet);
-			lock = true;
+        while (lock) {
+            Thread.sleep(1);
+        }
 
-			while (lock) {
-				Thread.sleep(1);
-			}
+        while (nextRecId < 65535) {
 
-			if (nextRecId > 0) {
-				logger.info(">>Sending request for reading " + nextRecId);
+            Thread.sleep(200);
 
-				outmsg = Encoder.encode(new Protocolv20Encoder(),
-						new GetSensorReading(IpmiVersion.V20, cs,
-								AuthenticationType.RMCPPlus, nextRecId), seq++,
-						r1.getManagedSystemSessionId());
+            logger.info(">>Sending request for record " + nextRecId);
 
-				packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
+            int sequence = seq++;
 
-				dr.socket.send(packet);
+            outmsg = Encoder.encode(new Protocolv20Encoder(), new GetSdr(
+                    IpmiVersion.V20, cs, AuthenticationType.RMCPPlus,
+                    reservation, nextRecId), sequence, sequence, r1
+                    .getManagedSystemSessionId());
 
-				lock = true;
+            packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
 
-				while (lock && nextRecId < 65535) {
-					Thread.sleep(1);
-				}
-			}
+            dr.socket.send(packet);
+            lock = true;
 
-		}
+            while (lock) {
+                Thread.sleep(1);
+            }
 
-		 nextRecId = 0;
+            if (nextRecId > 0) {
+                logger.info(">>Sending request for reading " + nextRecId);
 
-		Thread.sleep(300);
+                sequence = seq++;
 
-		logger.info(">>Sending GetSelInfo");
+                outmsg = Encoder.encode(new Protocolv20Encoder(),
+                        new GetSensorReading(IpmiVersion.V20, cs,
+                                AuthenticationType.RMCPPlus, nextRecId), sequence, sequence,
+                        r1.getManagedSystemSessionId());
 
-		outmsg = Encoder.encode(new Protocolv20Encoder(), new GetSelInfo(
-				IpmiVersion.V20, cs, AuthenticationType.RMCPPlus), seq++, r1
-				.getManagedSystemSessionId());
+                packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
 
-		packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
+                dr.socket.send(packet);
 
-		dr.socket.send(packet);
+                lock = true;
 
-		Thread.sleep(300);
+                while (lock && nextRecId < 65535) {
+                    Thread.sleep(1);
+                }
+            }
 
-		logger.info(">>Sending Reserve SEL");
+        }
 
-		outmsg = Encoder.encode(new Protocolv20Encoder(), new ReserveSel(
-				IpmiVersion.V20, cs, AuthenticationType.RMCPPlus), seq++, r1
-				.getManagedSystemSessionId());
+         nextRecId = 0;
 
-		packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
+        Thread.sleep(300);
 
-		dr.socket.send(packet);
+        logger.info(">>Sending GetSelInfo");
 
-		lock = true;
+        int sequence = seq++;
 
-		while (lock) {
-			Thread.sleep(1);
-		}
+        outmsg = Encoder.encode(new Protocolv20Encoder(), new GetSelInfo(
+                IpmiVersion.V20, cs, AuthenticationType.RMCPPlus), sequence, sequence, r1
+                .getManagedSystemSessionId());
 
-		while (nextRecId < 65535) {
+        packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
 
-			Thread.sleep(200);
+        dr.socket.send(packet);
 
-			logger.info(">>Sending request for SEL record " + nextRecId);
+        Thread.sleep(300);
 
-			outmsg = Encoder.encode(new Protocolv20Encoder(), new GetSelEntry(
-					IpmiVersion.V20, cs, AuthenticationType.RMCPPlus,
-					reservation, nextRecId), seq++, r1
-					.getManagedSystemSessionId());
+        logger.info(">>Sending Reserve SEL");
 
-			packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
+        sequence = seq++;
 
-			dr.socket.send(packet);
-			lock = true;
+        outmsg = Encoder.encode(new Protocolv20Encoder(), new ReserveSel(
+                IpmiVersion.V20, cs, AuthenticationType.RMCPPlus), sequence, sequence, r1
+                .getManagedSystemSessionId());
 
-			while (lock) {
-				Thread.sleep(1);
-			}
-		}
+        packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
 
-		Thread.sleep(300);
+        dr.socket.send(packet);
 
-		logger.info(">>Sending GetFruInventoryAreaInfo");
-		
-		outmsg = Encoder.encode(new Protocolv20Encoder(),
-				new GetFruInventoryAreaInfo(IpmiVersion.V20, cs,
-						AuthenticationType.RMCPPlus, fruId), seq++, r1
-						.getManagedSystemSessionId());
+        lock = true;
 
-		packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
+        while (lock) {
+            Thread.sleep(1);
+        }
 
-		dr.socket.send(packet);
-		
-		for(int i = 0; i < fruSize; i += 100) {
+        while (nextRecId < 65535) {
 
+            Thread.sleep(200);
 
-			Thread.sleep(300);
+            logger.info(">>Sending request for SEL record " + nextRecId);
 
-			logger.info(">>Sending ReadFruData");
-			
-			int cnt = 100;
-			if(i + cnt > fruSize) {
-				cnt = fruSize % 100;
-			}
+            sequence = seq++;
 
-			outmsg = Encoder.encode(new Protocolv20Encoder(),
-					new ReadFruData(IpmiVersion.V20, cs,
-							AuthenticationType.RMCPPlus, fruId, BaseUnit.Bytes, i, cnt), seq++, r1
-							.getManagedSystemSessionId());
+            outmsg = Encoder.encode(new Protocolv20Encoder(), new GetSelEntry(
+                    IpmiVersion.V20, cs, AuthenticationType.RMCPPlus,
+                    reservation, nextRecId), sequence, sequence, r1
+                    .getManagedSystemSessionId());
 
-			packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
+            packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
 
-			dr.socket.send(packet);
+            dr.socket.send(packet);
+            lock = true;
 
-		}
+            while (lock) {
+                Thread.sleep(1);
+            }
+        }
 
-		Thread.sleep(300);
+        Thread.sleep(300);
 
-		outmsg = Encoder.encode(
-				new Protocolv20Encoder(),
-				new CloseSession(IpmiVersion.V20, cs,
-						AuthenticationType.RMCPPlus, r1
-								.getManagedSystemSessionId()), seq++, r1
-						.getManagedSystemSessionId());
+        logger.info(">>Sending GetFruInventoryAreaInfo");
 
-		packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
+        sequence = seq++;
 
-		dr.socket.send(packet);
+        outmsg = Encoder.encode(new Protocolv20Encoder(),
+                new GetFruInventoryAreaInfo(IpmiVersion.V20, cs,
+                        AuthenticationType.RMCPPlus, fruId), sequence, sequence, r1
+                        .getManagedSystemSessionId());
 
-		Thread.sleep(1000);
+        packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
 
-		dr.socket.close();
+        dr.socket.send(packet);
 
-	}
+        for(int i = 0; i < fruSize; i += 100) {
 
-	@Override
-	public void run() {
 
-		super.run();
+            Thread.sleep(300);
 
-		cssrec = new byte[0];
+            logger.info(">>Sending ReadFruData");
 
-		byte[] buffer = null;
+            int cnt = 100;
+            if(i + cnt > fruSize) {
+                cnt = fruSize % 100;
+            }
 
-		while (cssrcv >= 16) {
-			DatagramPacket resp = new DatagramPacket(new byte[256], 256);
+            sequence = seq++;
 
-			try {
-				socket.receive(resp);
-				buffer = new byte[resp.getLength()];
-				System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
-			} catch (IOException e) {
-				logger.error(e.getMessage(), e);
-			}
+            outmsg = Encoder.encode(new Protocolv20Encoder(),
+                    new ReadFruData(IpmiVersion.V20, cs,
+                            AuthenticationType.RMCPPlus, fruId, BaseUnit.Bytes, i, cnt), sequence, sequence, r1
+                            .getManagedSystemSessionId());
 
-			GetChannelCipherSuitesResponseData data = null;
+            packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
 
-			try {
-				data = (GetChannelCipherSuitesResponseData) Decoder.decode(
-						buffer, new Protocolv20Decoder(CipherSuite.getEmpty()),
-						new GetChannelCipherSuites());
-			} catch (IllegalArgumentException e1) {
-				logger.error(e1.getMessage(), e1);
-			} catch (IPMIException e1) {
-				logger.error(e1.getMessage(), e1);
-			} catch (NoSuchAlgorithmException e) {
-				logger.error(e.getMessage(), e);
-			} catch (InvalidKeyException e) {
-				logger.error(e.getMessage(), e);
-			}
+            dr.socket.send(packet);
 
-			if (data.getCipherSuiteData() != null) {
-				cssrcv = data.getCipherSuiteData().length;
+        }
 
-				logger.info(data.getCipherSuiteData().length);
+        Thread.sleep(300);
 
-				byte[] temp = new byte[cssrec.length + cssrcv];
+        sequence = seq + 1;
 
-				System.arraycopy(cssrec, 0, temp, 0, cssrec.length);
-				System.arraycopy(data.getCipherSuiteData(), 0, temp,
-						cssrec.length, cssrcv);
-				cssrec = temp;
+        outmsg = Encoder.encode(
+                new Protocolv20Encoder(),
+                new CloseSession(IpmiVersion.V20, cs,
+                        AuthenticationType.RMCPPlus, r1
+                                .getManagedSystemSessionId()), sequence, sequence, r1
+                        .getManagedSystemSessionId());
 
-			} else {
-				cssrcv = 0;
-				logger.info(0);
-			}
+        packet = new DatagramPacket(outmsg, outmsg.length, ad, 0x26F);
 
-			lock = false;
-		}
+        dr.socket.send(packet);
 
-		DatagramPacket resp = new DatagramPacket(new byte[256], 256);
+        Thread.sleep(1000);
 
-		try {
-			socket.receive(resp);
-			buffer = new byte[resp.getLength()];
-			System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
+        dr.socket.close();
 
-		GetChannelAuthenticationCapabilitiesResponseData data = null;
+    }
 
-		try {
-			data = (GetChannelAuthenticationCapabilitiesResponseData) Decoder
-					.decode(buffer, new Protocolv15Decoder(),
-							new GetChannelAuthenticationCapabilities(
-									IpmiVersion.V15, IpmiVersion.V20, cs));
-		} catch (IllegalArgumentException e1) {
-			logger.error(e1.getMessage(), e1);
-		} catch (IPMIException e1) {
-			logger.error(e1.getMessage(), e1);
-		} catch (NoSuchAlgorithmException e) {
-			logger.error(e.getMessage(), e);
-		} catch (InvalidKeyException e) {
-			logger.error(e.getMessage(), e);
-		}
+    @Override
+    public void run() {
 
-		logger.info("---------------------------------------------");
+        super.run();
 
-		logger.info(data.getChannelNumber());
-		logger.info(data.isIpmiv20Support());
-		logger.info(data.getAuthenticationTypes().toString());
-		logger.info(data.isKgEnabled());
-		logger.info(data.isPerMessageAuthenticationEnabled());
-		logger.info(data.isUserLevelAuthenticationEnabled());
-		logger.info(data.isNonNullUsernamesEnabled());
-		logger.info(data.isNullUsernamesEnabled());
-		logger.info(data.isAnonymusLoginEnabled());
-		logger.info(data.getOemId());
-		logger.info(data.getOemData());
+        cssrec = new byte[0];
 
-		logger.info("##############################################");
+        byte[] buffer = null;
 
-		resp = new DatagramPacket(new byte[256], 256);
+        while (cssrcv >= 16) {
+            DatagramPacket resp = new DatagramPacket(new byte[256], 256);
 
-		try {
-			socket.receive(resp);
-			buffer = new byte[resp.getLength()];
-			System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
-			logger.info(">>>> " + resp.getLength());
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
+            try {
+                socket.receive(resp);
+                buffer = new byte[resp.getLength()];
+                System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+            }
 
-		OpenSessionResponseData data2 = null;
+            GetChannelCipherSuitesResponseData data = null;
 
-		try {
-			data2 = (OpenSessionResponseData) Decoder.decode(buffer,
-					new PlainCommandv20Decoder(CipherSuite.getEmpty()),
-					new OpenSession(CipherSuite.getEmpty()));
-		} catch (IllegalArgumentException e) {
-			logger.error(e.getMessage(), e);
-		} catch (IPMIException e) {
-			logger.error(e.getMessage(), e);
-		} catch (NoSuchAlgorithmException e) {
-			logger.error(e.getMessage(), e);
-		} catch (InvalidKeyException e) {
-			logger.error(e.getMessage(), e);
-		}
+            try {
+                data = (GetChannelCipherSuitesResponseData) Decoder.decode(
+                        buffer, new Protocolv20Decoder(CipherSuite.getEmpty()),
+                        new GetChannelCipherSuites());
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
 
-		logger.info(data2.getMessageTag());
-		logger.info(data2.getStatusCode());
-		logger.info(data2.getPrivilegeLevel());
-		logger.info(data2.getRemoteConsoleSessionId());
-		logger.info(data2.getManagedSystemSessionId());
-		logger.info(data2.getAuthenticationAlgorithm());
-		logger.info(data2.getConfidentialityAlgorithm());
-		logger.info(data2.getIntegrityAlgorithm());
+            if (data != null && data.getCipherSuiteData() != null) {
+                cssrcv = data.getCipherSuiteData().length;
 
-		managedSeqNum = data2.getManagedSystemSessionId();
-		lock = false;
+                logger.info(data.getCipherSuiteData().length);
 
-		logger.info("---------------------------------------------");
+                byte[] temp = new byte[cssrec.length + cssrcv];
 
-		resp = new DatagramPacket(new byte[256], 256);
+                System.arraycopy(cssrec, 0, temp, 0, cssrec.length);
+                System.arraycopy(data.getCipherSuiteData(), 0, temp,
+                        cssrec.length, cssrcv);
+                cssrec = temp;
 
-		try {
-			socket.receive(resp);
-			buffer = new byte[resp.getLength()];
-			System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
+            } else {
+                cssrcv = 0;
+                logger.info(0);
+            }
 
-		Rakp1ResponseData data3 = null;
+            lock = false;
+        }
 
-		try {
-			data3 = (Rakp1ResponseData) Decoder.decode(buffer,
-					new PlainCommandv20Decoder(CipherSuite.getEmpty()), r1);
-		} catch (IllegalArgumentException e) {
-			logger.error(e.getMessage(), e);
-		} catch (IPMIException e) {
-			logger.error(e.getMessage(), e);
-		} catch (NoSuchAlgorithmException e) {
-			logger.error(e.getMessage(), e);
-		} catch (InvalidKeyException e) {
-			logger.error(e.getMessage(), e);
-		}
+        DatagramPacket resp = new DatagramPacket(new byte[256], 256);
 
-		r1rd = data3;
+        try {
+            socket.receive(resp);
+            buffer = new byte[resp.getLength()];
+            System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
 
-		logger.info(data3.getMessageTag());
-		logger.info(data3.getStatusCode());
-		logger.info(data3.getRemoteConsoleSessionId());
-		logger.info(data3.getManagedSystemGuid());
+        GetChannelAuthenticationCapabilitiesResponseData data = null;
 
-		logger.info("---------------------------------------------");
-		lock = false;
+        try {
+            data = (GetChannelAuthenticationCapabilitiesResponseData) Decoder
+                    .decode(buffer, new Protocolv15Decoder(),
+                            new GetChannelAuthenticationCapabilities(
+                                    IpmiVersion.V15, IpmiVersion.V20, cs));
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
 
-		resp = new DatagramPacket(new byte[256], 256);
+        logger.info("---------------------------------------------");
 
-		try {
-			socket.receive(resp);
-			buffer = new byte[resp.getLength()];
-			System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
+        logger.info(data.getChannelNumber());
+        logger.info(data.isIpmiv20Support());
+        logger.info(data.getAuthenticationTypes().toString());
+        logger.info(data.isKgEnabled());
+        logger.info(data.isPerMessageAuthenticationEnabled());
+        logger.info(data.isUserLevelAuthenticationEnabled());
+        logger.info(data.isNonNullUsernamesEnabled());
+        logger.info(data.isNullUsernamesEnabled());
+        logger.info(data.isAnonymusLoginEnabled());
+        logger.info(data.getOemId());
+        logger.info(data.getOemData());
 
-		Rakp3ResponseData data4 = null;
+        logger.info("##############################################");
 
-		try {
-			data4 = (Rakp3ResponseData) Decoder.decode(buffer,
-					new PlainCommandv20Decoder(CipherSuite.getEmpty()),
-					new Rakp3(cs, r1, r1rd));
-		} catch (IllegalArgumentException e) {
-			logger.error(e.getMessage(), e);
-		} catch (IPMIException e) {
-			logger.error(e.getMessage(), e);
-		} catch (NoSuchAlgorithmException e) {
-			logger.error(e.getMessage(), e);
-		} catch (InvalidKeyException e) {
-			logger.error(e.getMessage(), e);
-		}
+        resp = new DatagramPacket(new byte[256], 256);
 
-		logger.info(data4.getMessageTag());
-		logger.info(data4.getStatusCode());
-		logger.info(data4.getConsoleSessionId());
+        try {
+            socket.receive(resp);
+            buffer = new byte[resp.getLength()];
+            System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
+            logger.info(">>>> " + resp.getLength());
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
 
-		logger.info("---------------------------------------------");
+        OpenSessionResponseData data2 = null;
 
-		resp = new DatagramPacket(new byte[256], 256);
+        try {
+            data2 = (OpenSessionResponseData) Decoder.decode(buffer,
+                    new PlainCommandv20Decoder(CipherSuite.getEmpty()),
+                    new OpenSession(CipherSuite.getEmpty()));
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
 
-		try {
-			socket.receive(resp);
-			buffer = new byte[resp.getLength()];
-			System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
+        logger.info(data2.getMessageTag());
+        logger.info(data2.getStatusCode());
+        logger.info(data2.getPrivilegeLevel());
+        logger.info(data2.getRemoteConsoleSessionId());
+        logger.info(data2.getManagedSystemSessionId());
+        logger.info(data2.getAuthenticationAlgorithm());
+        logger.info(data2.getConfidentialityAlgorithm());
+        logger.info(data2.getIntegrityAlgorithm());
 
-		GetChassisStatusResponseData data5 = null;
+        managedSeqNum = data2.getManagedSystemSessionId();
+        lock = false;
 
-		try {
-			data5 = (GetChassisStatusResponseData) Decoder.decode(buffer,
-					new Protocolv20Decoder(cs), new GetChassisStatus(
-							IpmiVersion.V20, cs, AuthenticationType.RMCPPlus));
-		} catch (IllegalArgumentException e) {
-			logger.error(e.getMessage(), e);
-		} catch (IPMIException e) {
-			logger.error(e.getMessage(), e);
-		} catch (NoSuchAlgorithmException e) {
-			logger.error(e.getMessage(), e);
-		} catch (InvalidKeyException e) {
-			logger.error(e.getMessage(), e);
-		}
+        logger.info("---------------------------------------------");
 
-		logger.info(data5.getPowerRestorePolicy());
-		logger.info(data5.isPowerControlFault());
-		logger.info(data5.isPowerFault());
-		logger.info(data5.isInterlock());
-		logger.info(data5.isPowerOverload());
-		logger.info(data5.isPowerOn());
+        resp = new DatagramPacket(new byte[256], 256);
 
-		logger.info("________");
+        try {
+            socket.receive(resp);
+            buffer = new byte[resp.getLength()];
+            System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
 
-		logger.info(data5.wasIpmiPowerOn());
-		logger.info(data5.wasPowerFault());
-		logger.info(data5.wasInterlock());
-		logger.info(data5.wasPowerOverload());
+        Rakp1ResponseData data3 = null;
 
-		logger.info("________");
+        try {
+            data3 = (Rakp1ResponseData) Decoder.decode(buffer,
+                    new PlainCommandv20Decoder(CipherSuite.getEmpty()), r1);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
 
-		logger.info(data5.isChassisIdentifyCommandSupported());
-		if (data5.isChassisIdentifyCommandSupported()) {
-			logger.info(data5.getChassisIdentifyState());
-		}
-		logger.info(data5.coolingFaultDetected());
-		logger.info(data5.driveFaultDetected());
-		logger.info(data5.isFrontPanelLockoutActive());
-		logger.info(data5.isChassisIntrusionActive());
+        r1rd = data3;
 
-		logger.info("________");
+        logger.info(data3.getMessageTag());
+        logger.info(data3.getStatusCode());
+        logger.info(data3.getRemoteConsoleSessionId());
+        logger.info(data3.getManagedSystemGuid());
 
-		logger.info(data5.isFrontPanelButtonCapabilitiesSet());
+        logger.info("---------------------------------------------");
+        lock = false;
 
-		if (data5.isFrontPanelButtonCapabilitiesSet()) {
-			try {
-				logger.info(data5.isStandbyButtonDisableAllowed());
-				logger.info(data5
-						.isDiagnosticInterruptButtonDisableAllowed());
-				logger.info(data5.isResetButtonDisableAllowed());
-				logger.info(data5.isPowerOffButtonDisableAllowed());
-				logger.info(data5.isStandbyButtonDisabled());
-				logger.info(data5.isDiagnosticInterruptButtonDisabled());
-				logger.info(data5.isResetButtonDisabled());
-				logger.info(data5.isPowerOffButtonDisabled());
-			} catch (IllegalAccessException e) {
-				logger.error(e.getMessage(), e);
-			}
+        resp = new DatagramPacket(new byte[256], 256);
 
-		}
+        try {
+            socket.receive(resp);
+            buffer = new byte[resp.getLength()];
+            System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
 
-		logger.info("---------------------------------------------");
+        Rakp3ResponseData data4 = null;
 
-		resp = new DatagramPacket(new byte[256], 256);
+        try {
+            data4 = (Rakp3ResponseData) Decoder.decode(buffer,
+                    new PlainCommandv20Decoder(CipherSuite.getEmpty()),
+                    new Rakp3(cs, r1, r1rd));
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
 
-		try {
-			socket.receive(resp);
-			buffer = new byte[resp.getLength()];
-			System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
+        logger.info(data4.getMessageTag());
+        logger.info(data4.getStatusCode());
+        logger.info(data4.getConsoleSessionId());
 
-		GetSdrRepositoryInfoResponseData data6 = null;
+        logger.info("---------------------------------------------");
 
-		try {
-			data6 = (GetSdrRepositoryInfoResponseData) Decoder.decode(buffer,
-					new Protocolv20Decoder(cs), new GetSdrRepositoryInfo(
-							IpmiVersion.V20, cs, AuthenticationType.RMCPPlus));
-		} catch (IllegalArgumentException e) {
-			logger.error(e.getMessage(), e);
-		} catch (IPMIException e) {
-			logger.error(e.getMessage(), e);
-		} catch (NoSuchAlgorithmException e) {
-			logger.error(e.getMessage(), e);
-		} catch (InvalidKeyException e) {
-			logger.error(e.getMessage(), e);
-		}
+        resp = new DatagramPacket(new byte[256], 256);
 
-		logger.info(data6.getSdrVersion());
-		logger.info(data6.getRecordCount());
-		logger.info(data6.getAddTimestamp());
-		logger.info(data6.getDelTimestamp());
-		logger.info(data6.isReserveSupported());
-
-		logger.info("---------------------------------------------");
-
-		resp = new DatagramPacket(new byte[256], 256);
-
-		try {
-			socket.receive(resp);
-			buffer = new byte[resp.getLength()];
-			System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
-
-		ReserveSdrRepositoryResponseData data7 = null;
-
-		try {
-			data7 = (ReserveSdrRepositoryResponseData) Decoder.decode(buffer,
-					new Protocolv20Decoder(cs), new ReserveSdrRepository(
-							IpmiVersion.V20, cs, AuthenticationType.RMCPPlus));
-		} catch (IllegalArgumentException e) {
-			logger.error(e.getMessage(), e);
-		} catch (IPMIException e) {
-			logger.error(e.getMessage(), e);
-		} catch (NoSuchAlgorithmException e) {
-			logger.error(e.getMessage(), e);
-		} catch (InvalidKeyException e) {
-			logger.error(e.getMessage(), e);
-		}
-
-		logger.info(data7.getReservationId());
-
-		reservation = data7.getReservationId();
-
-		logger.info("<<Received ReserveSdrRepo response");
-
-		lock = false;
-
-		logger.info("---------------------------------------------");
-
-		while (nextRecId < 65535) {
-
-			resp = new DatagramPacket(new byte[256], 256);
-
-			try {
-				socket.receive(resp);
-				buffer = new byte[resp.getLength()];
-				System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
-			} catch (IOException e) {
-				logger.error(e.getMessage(), e);
-			}
-			GetSdrResponseData data8 = null;
-
-			try {
-				data8 = (GetSdrResponseData) Decoder.decode(buffer,
-						new Protocolv20Decoder(cs), new GetSdr(IpmiVersion.V20,
-								cs, AuthenticationType.RMCPPlus, 0, 0));
-			} catch (IllegalArgumentException e) {
-				logger.error(e.getMessage(), e);
-			} catch (IPMIException e) {
-				logger.info(e.getMessage());
-				logger.error(e.getMessage(), e);
-			} catch (NoSuchAlgorithmException e) {
-				logger.error(e.getMessage(), e);
-			} catch (InvalidKeyException e) {
-				logger.error(e.getMessage(), e);
-			}
-
-			// logger.info(data8.getNextRecordId());
-			SensorRecord record = SensorRecord.populateSensorRecord(data8.getSensorRecordData());
-			logger.info(record.toString());
-
-			// nextRecId = record.getId();
-
-			if (record instanceof FullSensorRecord) {
-				nextRecId = TypeConverter.byteToInt(((FullSensorRecord) record).getSensorNumber());
-			} else if (record instanceof CompactSensorRecord) {
-				nextRecId = TypeConverter
-						.byteToInt(((CompactSensorRecord) record).getSensorNumber());
-			} else {
-				nextRecId = -1;
-			}
-
-			logger.info("<<Reading Id " + nextRecId);
-
-			if (record instanceof FullSensorRecord) {
-				FullSensorRecord rec = (FullSensorRecord) record;
-				logger.info("*" + rec.getName());
-				logger.info("Reading type: " + rec.getEventReadingType());
-				logger.info("Lower critical threshold: "
-						+ rec.getLowerCriticalThreshold());
-				logger.info("Upper critical threshold: "
-						+ rec.getUpperCriticalThreshold());
-				logger.info("Tolerance: +/- "
-						+ rec.getTolerance()
-						+ " "
-						+ rec.getSensorBaseUnit().toString()
-						+ (rec.getRateUnit() != RateUnit.None ? " per "
-								+ rec.getRateUnit() : ""));
-				logger.info("Resolution: "
-						+ rec.getSensorResolution()
-						+ " "
-						+ rec.getSensorBaseUnit().toString()
-						+ (rec.getRateUnit() != RateUnit.None ? " per "
-								+ rec.getRateUnit() : ""));
-			}
-			if (record instanceof CompactSensorRecord) {
-				CompactSensorRecord rec = (CompactSensorRecord) record;
-				logger.info("*" + rec.getName());
-				logger.info("Reading type: " + rec.getEventReadingType());
-				logger.info("Sensor type: " + rec.getSensorType());
-			}
-			if (record instanceof FruDeviceLocatorRecord) {
-				FruDeviceLocatorRecord rec = (FruDeviceLocatorRecord) record;
-				logger.info(rec.getName());
-				logger.info(rec.getDeviceType());
-				logger.info("FRU entity ID: " + rec.getFruEntityId());
-				logger.info("FRU access address: " + rec.getDeviceAccessAddress());
-				logger.info("FRU device ID: " + rec.getDeviceId());
-				logger.info("FRU logical: " + rec.isLogical());
-			}
-
-			lock = false;
-			if (nextRecId > 0) {
-				resp = new DatagramPacket(new byte[256], 256);
-
-				try {
-					socket.receive(resp);
-					buffer = new byte[resp.getLength()];
-					System.arraycopy(resp.getData(), 0, buffer, 0,
-							buffer.length);
-				} catch (IOException e) {
-					logger.error(e.getMessage(), e);
-				}
-				GetSensorReadingResponseData data9 = null;
-
-				try {
-					data9 = (GetSensorReadingResponseData) Decoder.decode(
-							buffer, new Protocolv20Decoder(cs),
-							new GetSensorReading(IpmiVersion.V20, cs, AuthenticationType.RMCPPlus, 0));
-
-					if (record instanceof FullSensorRecord) {
-						FullSensorRecord rec = (FullSensorRecord) record;
-						logger.info(data9.getSensorReading(rec)
-								+ " "
-								+ rec.getSensorBaseUnit().toString()
-								+ (rec.getRateUnit() != RateUnit.None ? " per "
-										+ rec.getRateUnit() : ""));
-					}
-					if (record instanceof CompactSensorRecord) {
-						CompactSensorRecord rec = (CompactSensorRecord) record;
-						// logger.info(rec.getEventReadingType());
-						List<ReadingType> events = data9.getStatesAsserted(
-								rec.getSensorType(), rec.getEventReadingType());
-						String s = "";
-						for (int i = 0; i < events.size(); ++i) {
-							s += events.get(i) + ", ";
-						}
-						logger.info(s);
-
-					}
-				} catch (IllegalArgumentException e) {
-					logger.error(e.getMessage(), e);
-				} catch (IPMIException e) {
-					logger.info(e.getMessage());
-					logger.error(e.getMessage(), e);
-				} catch (NoSuchAlgorithmException e) {
-					logger.error(e.getMessage(), e);
-				} catch (InvalidKeyException e) {
-					logger.error(e.getMessage(), e);
-				}
-			}
-
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				logger.error(e.getMessage(), e);
-			}
-
-			nextRecId = data8.getNextRecordId();
-
-			logger.info("---------------------------------------------");
-
-			lock = false;
-		}
-
-		resp = new DatagramPacket(new byte[256], 256);
-
-		try {
-			socket.receive(resp);
-			buffer = new byte[resp.getLength()];
-			System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
-
-		GetSelInfoResponseData data10 = null;
-
-		try {
-			data10 = (GetSelInfoResponseData) Decoder.decode(buffer,
-					new Protocolv20Decoder(cs), new GetSelInfo(IpmiVersion.V20,
-							cs, AuthenticationType.RMCPPlus));
-		} catch (IllegalArgumentException e) {
-			logger.error(e.getMessage(), e);
-		} catch (IPMIException e) {
-			logger.error(e.getMessage(), e);
-		} catch (NoSuchAlgorithmException e) {
-			logger.error(e.getMessage(), e);
-		} catch (InvalidKeyException e) {
-			logger.error(e.getMessage(), e);
-		}
-
-		logger.info(data10.getSelVersion());
-		logger.info(data10.getEntriesCount());
-		logger.info(DateFormat.getInstance().format(
-				data10.getAdditionTimestamp()));
-		logger.info(DateFormat.getInstance().format(
-				data10.getEraseTimestamp()));
-
-		logger.info("---------------------------------------------");
-
-		resp = new DatagramPacket(new byte[256], 256);
-
-		try {
-			socket.receive(resp);
-			buffer = new byte[resp.getLength()];
-			System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
-
-		ReserveSelResponseData data11 = null;
-
-		try {
-			data11 = (ReserveSelResponseData) Decoder.decode(buffer,
-					new Protocolv20Decoder(cs), new ReserveSel(IpmiVersion.V20,
-							cs, AuthenticationType.RMCPPlus));
-		} catch (IllegalArgumentException e) {
-			logger.error(e.getMessage(), e);
-		} catch (IPMIException e) {
-			logger.error(e.getMessage(), e);
-		} catch (NoSuchAlgorithmException e) {
-			logger.error(e.getMessage(), e);
-		} catch (InvalidKeyException e) {
-			logger.error(e.getMessage(), e);
-		}
-
-		logger.info(data11.getReservationId());
-
-		reservation = data11.getReservationId();
-		reservation = 0;
-
-		lock = false;
-
-		logger.info("---------------------------------------------");
-
-		while (nextRecId < 65535) {
-
-			resp = new DatagramPacket(new byte[256], 256);
-
-			try {
-				socket.receive(resp);
-				buffer = new byte[resp.getLength()];
-				System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
-			} catch (IOException e) {
-				logger.error(e.getMessage(), e);
-			}
-			GetSelEntryResponseData data12 = null;
-
-			try {
-				data12 = (GetSelEntryResponseData) Decoder.decode(buffer,
-						new Protocolv20Decoder(cs), new GetSelEntry(
-								IpmiVersion.V20, cs, AuthenticationType.RMCPPlus, 0, 0));
-			} catch (IllegalArgumentException e) {
-				logger.error(e.getMessage(), e);
-			} catch (IPMIException e) {
-				logger.info(e.getMessage());
-				logger.error(e.getMessage(), e);
-			} catch (NoSuchAlgorithmException e) {
-				logger.error(e.getMessage(), e);
-			} catch (InvalidKeyException e) {
-				logger.error(e.getMessage(), e);
-			}
-
-			logger.info(data12.getSelRecord().toString());
-
-			SelRecord rec = data12.getSelRecord();
-
-			logger.info("Sensor: " + rec.getSensorType());
-			logger.info(rec.getTimestamp());
-			logger.info(rec.getEventDirection());
-			logger.info(rec.getEvent());
-
-			nextRecId = data12.getNextRecordId();
-
-			lock = false;
-
-			logger.info("---------------------------------------------");
-		}
-
-		resp = new DatagramPacket(new byte[256], 256);
-
-		try {
-			socket.receive(resp);
-			buffer = new byte[resp.getLength()];
-			System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
-
-		GetFruInventoryAreaInfoResponseData data13 = null;
-
-		try {
-			data13 = (GetFruInventoryAreaInfoResponseData) Decoder.decode(
-					buffer, new Protocolv20Decoder(cs),
-					new GetFruInventoryAreaInfo(IpmiVersion.V20, cs, AuthenticationType.RMCPPlus, 0));
-		} catch (IllegalArgumentException e) {
-			logger.error(e.getMessage(), e);
-		} catch (IPMIException e) {
-			logger.error(e.getMessage(), e);
-		} catch (NoSuchAlgorithmException e) {
-			logger.error(e.getMessage(), e);
-		} catch (InvalidKeyException e) {
-			logger.error(e.getMessage(), e);
-		}
-
-		logger.info("FRU inventory area size: "
-				+ data13.getFruInventoryAreaSize());
-
-		logger.info("FRU Unit: " + data13.getFruUnit());
-
-		logger.info("---------------------------------------------");
-		
-		rd = new ArrayList<ReadFruDataResponseData>();
-		
-		for(int i = 0; i < fruSize; i +=100) {
-			resp = new DatagramPacket(new byte[256], 256);
-
-			try {
-				socket.receive(resp);
-				buffer = new byte[resp.getLength()];
-				System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
-			} catch (IOException e) {
-				logger.error(e.getMessage(), e);
-			}
-
-			ReadFruDataResponseData data14 = null;
-
-			try {
-				data14 = (ReadFruDataResponseData) Decoder.decode(buffer,
-						new Protocolv20Decoder(cs), new ReadFruData(IpmiVersion.V20,
-								cs, AuthenticationType.RMCPPlus, 0, BaseUnit.Bytes, 0, 0));
-			} catch (IllegalArgumentException e) {
-				logger.error(e.getMessage(), e);
-			} catch (IPMIException e) {
-				logger.error(e.getMessage(), e);
-			} catch (NoSuchAlgorithmException e) {
-				logger.error(e.getMessage(), e);
-			} catch (InvalidKeyException e) {
-				logger.error(e.getMessage(), e);
-			}
-			
-			rd.add(data14);
-
-			logger.info(data14.getFruData().length);
-
-			logger.info("---------------------------------------------");
-
-		}
-			
-			List<FruRecord> records = ReadFruData.decodeFruData(rd);
-			
-			for(FruRecord r : records) {
-				if(r instanceof ChassisInfo) {
-					ChassisInfo chassisInfo = (ChassisInfo) r;
-					logger.info("Chassis info:");
-					logger.info("Chassis type: " + chassisInfo.getChassisType());
-					logger.info("Chassis part number: " + chassisInfo.getChassisPartNumber());
-					logger.info("Chassis serial number: " + chassisInfo.getChassisSerialNumber());
-					for(String info : chassisInfo.getCustomChassisInfo()) {
-						logger.info("Custom chassis info: " + info);
-					}
-					logger.info("---------------------------------------------");
-				} else if(r instanceof BoardInfo) {
-					BoardInfo boardInfo = (BoardInfo) r;
-					logger.info("Board info:");
-					logger.info("Board MFG date: " + boardInfo.getMfgDate().toString());
-					logger.info("Board manufacturer: " + boardInfo.getBoardManufacturer());
-					logger.info("Board product name: " + boardInfo.getBoardProductName());
-					logger.info("Board part number: " + boardInfo.getBoardPartNumber());
-					logger.info("Board serial number: " + boardInfo.getBoardSerialNumber());
-					for(String info : boardInfo.getCustomBoardInfo()) {
-						logger.info("Custom board info: " + info);
-					}
-					logger.info("---------------------------------------------");
-				} else if(r instanceof ProductInfo) {
-					ProductInfo productInfo = (ProductInfo) r;
-					logger.info("Product info:");
-					logger.info("Product manufacturer: " + productInfo.getManufacturerName());
-					logger.info("Product product name: " + productInfo.getProductName());
-					logger.info("Product part number: " + productInfo.getProductModelNumber());
-					logger.info("Product version: " + productInfo.getProductVersion());
-					logger.info("Product serial number: " + productInfo.getProductSerialNumber());
-					logger.info("Product asset tag: " + productInfo.getAssetTag());
-					for(String info : productInfo.getCustomProductInfo()) {
-						logger.info("Custom board info: " + info);
-					}
-					logger.info("---------------------------------------------");
-				}
-			}
-	}
+        try {
+            socket.receive(resp);
+            buffer = new byte[resp.getLength()];
+            System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        GetChassisStatusResponseData data5 = null;
+
+        try {
+            data5 = (GetChassisStatusResponseData) Decoder.decode(buffer,
+                    new Protocolv20Decoder(cs), new GetChassisStatus(
+                            IpmiVersion.V20, cs, AuthenticationType.RMCPPlus));
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        logger.info(data5.getPowerRestorePolicy());
+        logger.info(data5.isPowerControlFault());
+        logger.info(data5.isPowerFault());
+        logger.info(data5.isInterlock());
+        logger.info(data5.isPowerOverload());
+        logger.info(data5.isPowerOn());
+
+        logger.info("________");
+
+        logger.info(data5.wasIpmiPowerOn());
+        logger.info(data5.wasPowerFault());
+        logger.info(data5.wasInterlock());
+        logger.info(data5.wasPowerOverload());
+
+        logger.info("________");
+
+        logger.info(data5.isChassisIdentifyCommandSupported());
+        if (data5.isChassisIdentifyCommandSupported()) {
+            logger.info(data5.getChassisIdentifyState());
+        }
+        logger.info(data5.coolingFaultDetected());
+        logger.info(data5.driveFaultDetected());
+        logger.info(data5.isFrontPanelLockoutActive());
+        logger.info(data5.isChassisIntrusionActive());
+
+        logger.info("________");
+
+        logger.info(data5.isFrontPanelButtonCapabilitiesSet());
+
+        if (data5.isFrontPanelButtonCapabilitiesSet()) {
+            try {
+                logger.info(data5.isStandbyButtonDisableAllowed());
+                logger.info(data5
+                        .isDiagnosticInterruptButtonDisableAllowed());
+                logger.info(data5.isResetButtonDisableAllowed());
+                logger.info(data5.isPowerOffButtonDisableAllowed());
+                logger.info(data5.isStandbyButtonDisabled());
+                logger.info(data5.isDiagnosticInterruptButtonDisabled());
+                logger.info(data5.isResetButtonDisabled());
+                logger.info(data5.isPowerOffButtonDisabled());
+            } catch (IllegalAccessException e) {
+                logger.error(e.getMessage(), e);
+            }
+
+        }
+
+        logger.info("---------------------------------------------");
+
+        resp = new DatagramPacket(new byte[256], 256);
+
+        try {
+            socket.receive(resp);
+            buffer = new byte[resp.getLength()];
+            System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        GetSdrRepositoryInfoResponseData data6 = null;
+
+        try {
+            data6 = (GetSdrRepositoryInfoResponseData) Decoder.decode(buffer,
+                    new Protocolv20Decoder(cs), new GetSdrRepositoryInfo(
+                            IpmiVersion.V20, cs, AuthenticationType.RMCPPlus));
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        logger.info(data6.getSdrVersion());
+        logger.info(data6.getRecordCount());
+        logger.info(data6.getAddTimestamp());
+        logger.info(data6.getDelTimestamp());
+        logger.info(data6.isReserveSupported());
+
+        logger.info("---------------------------------------------");
+
+        resp = new DatagramPacket(new byte[256], 256);
+
+        try {
+            socket.receive(resp);
+            buffer = new byte[resp.getLength()];
+            System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        ReserveSdrRepositoryResponseData data7 = null;
+
+        try {
+            data7 = (ReserveSdrRepositoryResponseData) Decoder.decode(buffer,
+                    new Protocolv20Decoder(cs), new ReserveSdrRepository(
+                            IpmiVersion.V20, cs, AuthenticationType.RMCPPlus));
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        logger.info(data7.getReservationId());
+
+        reservation = data7.getReservationId();
+
+        logger.info("<<Received ReserveSdrRepo response");
+
+        lock = false;
+
+        logger.info("---------------------------------------------");
+
+        while (nextRecId < 65535) {
+
+            resp = new DatagramPacket(new byte[256], 256);
+
+            try {
+                socket.receive(resp);
+                buffer = new byte[resp.getLength()];
+                System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+            }
+            GetSdrResponseData data8 = null;
+
+            try {
+                data8 = (GetSdrResponseData) Decoder.decode(buffer,
+                        new Protocolv20Decoder(cs), new GetSdr(IpmiVersion.V20,
+                                cs, AuthenticationType.RMCPPlus, 0, 0));
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
+
+            SensorRecord record = SensorRecord.populateSensorRecord(data8.getSensorRecordData());
+            logger.info(record.toString());
+
+            if (record instanceof FullSensorRecord) {
+                nextRecId = TypeConverter.byteToInt(((FullSensorRecord) record).getSensorNumber());
+            } else if (record instanceof CompactSensorRecord) {
+                nextRecId = TypeConverter
+                        .byteToInt(((CompactSensorRecord) record).getSensorNumber());
+            } else {
+                nextRecId = -1;
+            }
+
+            logger.info("<<Reading Id " + nextRecId);
+
+            if (record instanceof FullSensorRecord) {
+                FullSensorRecord rec = (FullSensorRecord) record;
+                logger.info("*" + rec.getName());
+                logger.info("Reading type: " + rec.getEventReadingType());
+                logger.info("Lower critical threshold: "
+                        + rec.getLowerCriticalThreshold());
+                logger.info("Upper critical threshold: "
+                        + rec.getUpperCriticalThreshold());
+                logger.info("Tolerance: +/- "
+                        + rec.getTolerance()
+                        + " "
+                        + rec.getSensorBaseUnit().toString()
+                        + (rec.getRateUnit() != RateUnit.None ? " per "
+                                + rec.getRateUnit() : ""));
+                logger.info("Resolution: "
+                        + rec.getSensorResolution()
+                        + " "
+                        + rec.getSensorBaseUnit().toString()
+                        + (rec.getRateUnit() != RateUnit.None ? " per "
+                                + rec.getRateUnit() : ""));
+            }
+            if (record instanceof CompactSensorRecord) {
+                CompactSensorRecord rec = (CompactSensorRecord) record;
+                logger.info("*" + rec.getName());
+                logger.info("Reading type: " + rec.getEventReadingType());
+                logger.info("Sensor type: " + rec.getSensorType());
+            }
+            if (record instanceof FruDeviceLocatorRecord) {
+                FruDeviceLocatorRecord rec = (FruDeviceLocatorRecord) record;
+                logger.info(rec.getName());
+                logger.info(rec.getDeviceType());
+                logger.info("FRU entity ID: " + rec.getFruEntityId());
+                logger.info("FRU access address: " + rec.getDeviceAccessAddress());
+                logger.info("FRU device ID: " + rec.getDeviceId());
+                logger.info("FRU logical: " + rec.isLogical());
+            }
+
+            lock = false;
+            if (nextRecId > 0) {
+                resp = new DatagramPacket(new byte[256], 256);
+
+                try {
+                    socket.receive(resp);
+                    buffer = new byte[resp.getLength()];
+                    System.arraycopy(resp.getData(), 0, buffer, 0,
+                            buffer.length);
+                } catch (IOException e) {
+                    logger.error(e.getMessage(), e);
+                }
+                GetSensorReadingResponseData data9 = null;
+
+                try {
+                    data9 = (GetSensorReadingResponseData) Decoder.decode(
+                            buffer, new Protocolv20Decoder(cs),
+                            new GetSensorReading(IpmiVersion.V20, cs, AuthenticationType.RMCPPlus, 0));
+
+                    if (record instanceof FullSensorRecord) {
+                        FullSensorRecord rec = (FullSensorRecord) record;
+                        logger.info(data9.getSensorReading(rec)
+                                + " "
+                                + rec.getSensorBaseUnit().toString()
+                                + (rec.getRateUnit() != RateUnit.None ? " per "
+                                        + rec.getRateUnit() : ""));
+                    }
+                    if (record instanceof CompactSensorRecord) {
+                        CompactSensorRecord rec = (CompactSensorRecord) record;
+                        List<ReadingType> events = data9.getStatesAsserted(
+                                rec.getSensorType(), rec.getEventReadingType());
+                        StringBuilder s = new StringBuilder();
+                        for (int i = 0; i < events.size(); ++i) {
+                            s.append(events.get(i)).append(", ");
+                        }
+                        logger.info(s.toString());
+
+                    }
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                logger.error(e.getMessage(), e);
+            }
+
+            nextRecId = data8.getNextRecordId();
+
+            logger.info("---------------------------------------------");
+
+            lock = false;
+        }
+
+        resp = new DatagramPacket(new byte[256], 256);
+
+        try {
+            socket.receive(resp);
+            buffer = new byte[resp.getLength()];
+            System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        GetSelInfoResponseData data10 = null;
+
+        try {
+            data10 = (GetSelInfoResponseData) Decoder.decode(buffer,
+                    new Protocolv20Decoder(cs), new GetSelInfo(IpmiVersion.V20,
+                            cs, AuthenticationType.RMCPPlus));
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        logger.info(data10.getSelVersion());
+        logger.info(data10.getEntriesCount());
+        logger.info(DateFormat.getInstance().format(
+                data10.getAdditionTimestamp()));
+        logger.info(DateFormat.getInstance().format(
+                data10.getEraseTimestamp()));
+
+        logger.info("---------------------------------------------");
+
+        resp = new DatagramPacket(new byte[256], 256);
+
+        try {
+            socket.receive(resp);
+            buffer = new byte[resp.getLength()];
+            System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        ReserveSelResponseData data11 = null;
+
+        try {
+            data11 = (ReserveSelResponseData) Decoder.decode(buffer,
+                    new Protocolv20Decoder(cs), new ReserveSel(IpmiVersion.V20,
+                            cs, AuthenticationType.RMCPPlus));
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        logger.info(data11.getReservationId());
+
+        reservation = data11.getReservationId();
+        reservation = 0;
+
+        lock = false;
+
+        logger.info("---------------------------------------------");
+
+        while (nextRecId < 65535) {
+
+            resp = new DatagramPacket(new byte[256], 256);
+
+            try {
+                socket.receive(resp);
+                buffer = new byte[resp.getLength()];
+                System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+            }
+            GetSelEntryResponseData data12 = null;
+
+            try {
+                data12 = (GetSelEntryResponseData) Decoder.decode(buffer,
+                        new Protocolv20Decoder(cs), new GetSelEntry(
+                                IpmiVersion.V20, cs, AuthenticationType.RMCPPlus, 0, 0));
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
+
+            logger.info(data12.getSelRecord().toString());
+
+            SelRecord rec = data12.getSelRecord();
+
+            logger.info("Sensor: " + rec.getSensorType());
+            logger.info(rec.getTimestamp());
+            logger.info(rec.getEventDirection());
+            logger.info(rec.getEvent());
+
+            nextRecId = data12.getNextRecordId();
+
+            lock = false;
+
+            logger.info("---------------------------------------------");
+        }
+
+        resp = new DatagramPacket(new byte[256], 256);
+
+        try {
+            socket.receive(resp);
+            buffer = new byte[resp.getLength()];
+            System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        GetFruInventoryAreaInfoResponseData data13 = null;
+
+        try {
+            data13 = (GetFruInventoryAreaInfoResponseData) Decoder.decode(
+                    buffer, new Protocolv20Decoder(cs),
+                    new GetFruInventoryAreaInfo(IpmiVersion.V20, cs, AuthenticationType.RMCPPlus, 0));
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        logger.info("FRU inventory area size: "
+                + data13.getFruInventoryAreaSize());
+
+        logger.info("FRU Unit: " + data13.getFruUnit());
+
+        logger.info("---------------------------------------------");
+
+        List<ReadFruDataResponseData> rd = new ArrayList<ReadFruDataResponseData>();
+
+        for(int i = 0; i < fruSize; i +=100) {
+            resp = new DatagramPacket(new byte[256], 256);
+
+            try {
+                socket.receive(resp);
+                buffer = new byte[resp.getLength()];
+                System.arraycopy(resp.getData(), 0, buffer, 0, buffer.length);
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+            }
+
+            ReadFruDataResponseData data14 = null;
+
+            try {
+                data14 = (ReadFruDataResponseData) Decoder.decode(buffer,
+                        new Protocolv20Decoder(cs), new ReadFruData(IpmiVersion.V20,
+                                cs, AuthenticationType.RMCPPlus, 0, BaseUnit.Bytes, 0, 0));
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
+
+            rd.add(data14);
+
+            logger.info(data14.getFruData().length);
+
+            logger.info("---------------------------------------------");
+
+        }
+
+            List<FruRecord> records = ReadFruData.decodeFruData(rd);
+
+            for(FruRecord r : records) {
+                if(r instanceof ChassisInfo) {
+                    ChassisInfo chassisInfo = (ChassisInfo) r;
+                    logger.info("Chassis info:");
+                    logger.info("Chassis type: " + chassisInfo.getChassisType());
+                    logger.info("Chassis part number: " + chassisInfo.getChassisPartNumber());
+                    logger.info("Chassis serial number: " + chassisInfo.getChassisSerialNumber());
+                    for(String info : chassisInfo.getCustomChassisInfo()) {
+                        logger.info("Custom chassis info: " + info);
+                    }
+                    logger.info("---------------------------------------------");
+                } else if(r instanceof BoardInfo) {
+                    BoardInfo boardInfo = (BoardInfo) r;
+                    logger.info("Board info:");
+                    logger.info("Board MFG date: " + boardInfo.getMfgDate().toString());
+                    logger.info("Board manufacturer: " + boardInfo.getBoardManufacturer());
+                    logger.info("Board product name: " + boardInfo.getBoardProductName());
+                    logger.info("Board part number: " + boardInfo.getBoardPartNumber());
+                    logger.info("Board serial number: " + boardInfo.getBoardSerialNumber());
+                    for(String info : boardInfo.getCustomBoardInfo()) {
+                        logger.info("Custom board info: " + info);
+                    }
+                    logger.info("---------------------------------------------");
+                } else if(r instanceof ProductInfo) {
+                    ProductInfo productInfo = (ProductInfo) r;
+                    logger.info("Product info:");
+                    logger.info("Product manufacturer: " + productInfo.getManufacturerName());
+                    logger.info("Product product name: " + productInfo.getProductName());
+                    logger.info("Product part number: " + productInfo.getProductModelNumber());
+                    logger.info("Product version: " + productInfo.getProductVersion());
+                    logger.info("Product serial number: " + productInfo.getProductSerialNumber());
+                    logger.info("Product asset tag: " + productInfo.getAssetTag());
+                    for(String info : productInfo.getCustomProductInfo()) {
+                        logger.info("Custom board info: " + info);
+                    }
+                    logger.info("---------------------------------------------");
+                }
+            }
+    }
 }

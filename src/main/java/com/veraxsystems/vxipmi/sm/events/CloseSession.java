@@ -23,28 +23,34 @@ import com.veraxsystems.vxipmi.sm.states.State;
  * transit to {@link Authcap} {@link State} the session.
  */
 public class CloseSession extends StateMachineEvent {
-	private int sessionId;
-	private int sequenceNumber;
+    private int sessionId;
+    private int messageSequenceNumber;
+    private int sessionSequenceNumber;
 
-	/**
-	 * Prepares {@link CloseSession}
-	 * 
-	 * @param sessionId
-	 *            - managed system session ID
-	 * 
-	 * @param sequenceNumber
-	 *            - generated sequence number for the message to send
-	 */
-	public CloseSession(int sessionId, int sequenceNumber) {
-		this.sequenceNumber = sequenceNumber;
-		this.sessionId = sessionId;
-	}
+    /**
+     * Prepares {@link CloseSession}
+     *
+     * @param sessionId
+     *            - managed system session ID
+     *
+     * @param messageSequenceNumber
+     *            - generated sequence number for the message to send
+     */
+    public CloseSession(int sessionId, int messageSequenceNumber, int sessionSequenceNumber) {
+        this.messageSequenceNumber = messageSequenceNumber;
+        this.sessionSequenceNumber = sessionSequenceNumber;
+        this.sessionId = sessionId;
+    }
 
-	public int getSessionId() {
-		return sessionId;
-	}
+    public int getSessionId() {
+        return sessionId;
+    }
 
-	public int getSequenceNumber() {
-		return sequenceNumber;
-	}
+    public int getMessageSequenceNumber() {
+        return messageSequenceNumber;
+    }
+
+    public int getSessionSequenceNumber() {
+        return sessionSequenceNumber;
+    }
 }

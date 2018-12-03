@@ -18,19 +18,19 @@ package com.veraxsystems.vxipmi.coding.commands.fru.record;
  */
 public class ExtendedCompatibilityInfo extends BaseCompatibilityInfo {
 
-	/**
-	 * Creates and populates record
-	 * 
-	 * @param fruData
-	 *            - raw data containing record
-	 * @param offset
-	 *            - offset to the record in the data
-	 * @param length
-	 *            - length of the record
-	 */
-	public ExtendedCompatibilityInfo(byte[] fruData, int offset, int length) {
-		super(fruData, offset, length);
-		// TODO: Test when server containing such records will be available
-	}
+    /**
+     * Creates and populates record
+     *
+     * @param fruData
+     *            - raw data containing record
+     * @param offset
+     *            - offset to the record in the data
+     * @param length
+     *            - length of the record
+     */
+    public ExtendedCompatibilityInfo(byte[] fruData, int offset, int length) {
+        super(fruData, offset, length);
+        // TODO: Test when server containing such records will be available
+    }
 
 }

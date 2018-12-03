@@ -19,11 +19,11 @@ import com.veraxsystems.vxipmi.sm.actions.StateMachineAction;
  * @see StateMachine#register(MachineObserver)
  */
 public interface MachineObserver {
-	/**
-	 * Notifies observer of action performed by the State Machine.
-	 * 
-	 * @param action
-	 *            - action performed
-	 */
-	void notify(StateMachineAction action);
+    /**
+     * Notifies observer of action performed by the State Machine.
+     *
+     * @param action
+     *            - action performed
+     */
+    void notify(StateMachineAction action);
 }

@@ -20,5 +20,5 @@ import com.veraxsystems.vxipmi.sm.states.State;
  * @see StateMachine
  */
 public class DefaultAck extends StateMachineEvent {
-	
+
 }

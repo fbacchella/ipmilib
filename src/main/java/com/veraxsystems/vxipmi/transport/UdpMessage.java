@@ -17,57 +17,57 @@ import java.net.InetAddress;
  * Container for UDP message.
  */
 public class UdpMessage {
-	/**
-	 * Target port when sending message. Sender port when receiving
-	 * message.
-	 */
-	private int port;
-	
-	/**
-	 * Target address when sending message. Sender address when receiving
-	 * message.
-	 */
-	private InetAddress address;
+    /**
+     * Target port when sending message. Sender port when receiving
+     * message.
+     */
+    private int port;
 
-	private byte[] message;
+    /**
+     * Target address when sending message. Sender address when receiving
+     * message.
+     */
+    private InetAddress address;
 
-	/**
-	 * Target port when sending message. Sender port when receiving
-	 * message.
-	 */
-	public void setPort(int port) {
-		this.port = port;
-	}
+    private byte[] message;
 
-	/**
-	 * Target port when sending message. Sender port when receiving
-	 * message.
-	 */
-	public int getPort() {
-		return port;
-	}
+    /**
+     * Target port when sending message. Sender port when receiving
+     * message.
+     */
+    public void setPort(int port) {
+        this.port = port;
+    }
 
-	/**
-	 * Target address when sending message. Sender address when receiving
-	 * message.
-	 */
-	public InetAddress getAddress() {
-		return address;
-	}
+    /**
+     * Target port when sending message. Sender port when receiving
+     * message.
+     */
+    public int getPort() {
+        return port;
+    }
 
-	/**
-	 * Target address when sending message. Sender address when receiving
-	 * message.
-	 */
-	public void setAddress(InetAddress address) {
-		this.address = address;
-	}
+    /**
+     * Target address when sending message. Sender address when receiving
+     * message.
+     */
+    public InetAddress getAddress() {
+        return address;
+    }
 
-	public byte[] getMessage() {
-		return message;
-	}
+    /**
+     * Target address when sending message. Sender address when receiving
+     * message.
+     */
+    public void setAddress(InetAddress address) {
+        this.address = address;
+    }
 
-	public void setMessage(byte[] message) {
-		this.message = message;
-	}
+    public byte[] getMessage() {
+        return message;
+    }
+
+    public void setMessage(byte[] message) {
+        this.message = message;
+    }
 }

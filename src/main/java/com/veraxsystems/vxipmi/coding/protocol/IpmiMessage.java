@@ -72,7 +72,7 @@ public abstract class IpmiMessage {
      * @param payload
      */
     public void setPayload(IpmiPayload payload) {
-    	setPayloadLength(payload.getPayloadLength());
+        setPayloadLength(payload.getPayloadLength());
         this.payload = payload;
     }
 
@@ -91,12 +91,12 @@ public abstract class IpmiMessage {
         return payloadLength;
     }
 
-	public void setConfidentialityAlgorithm(ConfidentialityAlgorithm confidentialityAlgorithm) {
-		this.confidentialityAlgorithm = confidentialityAlgorithm;
-	}
+    public void setConfidentialityAlgorithm(ConfidentialityAlgorithm confidentialityAlgorithm) {
+        this.confidentialityAlgorithm = confidentialityAlgorithm;
+    }
 
-	public ConfidentialityAlgorithm getConfidentialityAlgorithm() {
-		return confidentialityAlgorithm;
-	}
+    public ConfidentialityAlgorithm getConfidentialityAlgorithm() {
+        return confidentialityAlgorithm;
+    }
 
 }

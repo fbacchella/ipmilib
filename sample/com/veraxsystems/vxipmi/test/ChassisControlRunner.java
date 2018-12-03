@@ -11,19 +11,19 @@
  */
 package com.veraxsystems.vxipmi.test;
 
-import java.net.InetAddress;
 import com.veraxsystems.vxipmi.api.async.ConnectionHandle;
 import com.veraxsystems.vxipmi.api.sync.IpmiConnector;
 import com.veraxsystems.vxipmi.coding.commands.IpmiVersion;
 import com.veraxsystems.vxipmi.coding.commands.PrivilegeLevel;
 import com.veraxsystems.vxipmi.coding.commands.chassis.ChassisControl;
-import com.veraxsystems.vxipmi.coding.commands.chassis.ChassisControlResponseData;
 import com.veraxsystems.vxipmi.coding.commands.chassis.GetChassisStatus;
 import com.veraxsystems.vxipmi.coding.commands.chassis.GetChassisStatusResponseData;
 import com.veraxsystems.vxipmi.coding.commands.chassis.PowerCommand;
 import com.veraxsystems.vxipmi.coding.commands.session.SetSessionPrivilegeLevel;
 import com.veraxsystems.vxipmi.coding.protocol.AuthenticationType;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
+
+import java.net.InetAddress;
 
 public class ChassisControlRunner {
 
@@ -85,7 +85,7 @@ public class ChassisControlRunner {
                     PowerCommand.PowerDown);
         }
 
-        ChassisControlResponseData data = (ChassisControlResponseData) connector.sendMessage(handle, chassisControl);
+        connector.sendMessage(handle, chassisControl);
 
         // Close the session
         connector.closeSession(handle);

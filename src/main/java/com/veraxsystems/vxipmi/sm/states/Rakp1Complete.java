@@ -28,51 +28,52 @@ import com.veraxsystems.vxipmi.sm.events.StateMachineEvent;
  */
 public class Rakp1Complete extends State {
 
-	private Rakp1 rakp1;
+    private Rakp1 rakp1;
 
-	/**
-	 * Initiates state.
-	 * 
-	 * @param rakp1
-	 *            - the {@link Rakp1} message that was sent earlier in the
-	 *            authentification process.
-	 */
-	public Rakp1Complete(Rakp1 rakp1) {
-		this.rakp1 = rakp1;
-	}
+    /**
+     * Initiates state.
+     *
+     * @param rakp1
+     *            - the {@link Rakp1} message that was sent earlier in the
+     *            authentification process.
+     */
+    public Rakp1Complete(Rakp1 rakp1) {
+        this.rakp1 = rakp1;
+    }
 
-	@Override
-	public void doTransition(StateMachine stateMachine,
-			StateMachineEvent machineEvent) {
-		if (machineEvent instanceof Rakp2Ack) {
-			Rakp2Ack event = (Rakp2Ack) machineEvent;
+    @Override
+    public void doTransition(StateMachine stateMachine,
+            StateMachineEvent machineEvent) {
+        if (machineEvent instanceof Rakp2Ack) {
+            Rakp2Ack event = (Rakp2Ack) machineEvent;
 
-			Rakp3 rakp3 = new Rakp3(event.getStatusCode(),
-					event.getManagedSystemSessionId(), event.getCipherSuite(),
-					rakp1, event.getRakp1ResponseData());
+            Rakp3 rakp3 = new Rakp3(event.getStatusCode(),
+                    event.getManagedSystemSessionId(), event.getCipherSuite(),
+                    rakp1, event.getRakp1ResponseData());
 
-			try {
-				stateMachine.setCurrent(new Rakp3Waiting(event
-						.getSequenceNumber(), rakp1, event
-						.getRakp1ResponseData(), event.getCipherSuite()));
-				stateMachine.sendMessage(Encoder.encode(
-						new Protocolv20Encoder(), rakp3,
-						event.getSequenceNumber(), 0));
-				stateMachine.doExternalAction(new GetSikAction(rakp1
-						.calculateSik(event.getRakp1ResponseData())));
-			} catch (Exception e) {
-				stateMachine.setCurrent(this);
-				stateMachine.doExternalAction(new ErrorAction(e));
-			}
-		} else {
-			stateMachine.doExternalAction(new ErrorAction(
-					new IllegalArgumentException("Invalid transition")));
-		}
+            try {
+                stateMachine.setCurrent(new Rakp3Waiting(event
+                        .getSequenceNumber(), rakp1, event
+                        .getRakp1ResponseData(), event.getCipherSuite()));
+                stateMachine.sendMessage(Encoder.encode(
+                        new Protocolv20Encoder(), rakp3,
+                        event.getSequenceNumber(), 0, 0));
+                stateMachine.doExternalAction(new GetSikAction(rakp1
+                        .calculateSik(event.getRakp1ResponseData())));
+            } catch (Exception e) {
+                stateMachine.setCurrent(this);
+                stateMachine.doExternalAction(new ErrorAction(e));
+            }
+        } else {
+            stateMachine.doExternalAction(new ErrorAction(
+                    new IllegalArgumentException("Invalid transition")));
+        }
 
-	}
+    }
 
-	@Override
-	public void doAction(StateMachine stateMachine, RmcpMessage message) {
-	}
+    @Override
+    public void doAction(StateMachine stateMachine, RmcpMessage message) {
+        // No action is needed
+    }
 
 }

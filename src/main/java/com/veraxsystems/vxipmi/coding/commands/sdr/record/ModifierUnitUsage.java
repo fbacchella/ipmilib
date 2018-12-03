@@ -12,41 +12,41 @@
 package com.veraxsystems.vxipmi.coding.commands.sdr.record;
 
 public enum ModifierUnitUsage {
-	
-	None(ModifierUnitUsage.NONE),
-	/**
-	 * Unit = Basic Unit / Modifier Unit
-	 */
-	Divide(ModifierUnitUsage.DIVIDE),
-	/**
-	 * Unit = Basic Unit * Modifier Unit
-	 */
-	Mulitply(ModifierUnitUsage.MULITPLY), ;
 
-	private static final int NONE = 0;
-	private static final int DIVIDE = 1;
-	private static final int MULITPLY = 2;
+    None(ModifierUnitUsage.NONE),
+    /**
+     * Unit = Basic Unit / Modifier Unit
+     */
+    Divide(ModifierUnitUsage.DIVIDE),
+    /**
+     * Unit = Basic Unit * Modifier Unit
+     */
+    Mulitply(ModifierUnitUsage.MULITPLY), ;
 
-	private int code;
+    private static final int NONE = 0;
+    private static final int DIVIDE = 1;
+    private static final int MULITPLY = 2;
 
-	ModifierUnitUsage(int code) {
-		this.code = code;
-	}
+    private int code;
 
-	public int getCode() {
-		return code;
-	}
+    ModifierUnitUsage(int code) {
+        this.code = code;
+    }
 
-	public static ModifierUnitUsage parseInt(int value) {
-		switch (value) {
-		case NONE:
-			return None;
-		case DIVIDE:
-			return Divide;
-		case MULITPLY:
-			return Mulitply;
-		default:
-			throw new IllegalArgumentException("Invalid value: " + value);
-		}
-	}
+    public int getCode() {
+        return code;
+    }
+
+    public static ModifierUnitUsage parseInt(int value) {
+        switch (value) {
+        case NONE:
+            return None;
+        case DIVIDE:
+            return Divide;
+        case MULITPLY:
+            return Mulitply;
+        default:
+            throw new IllegalArgumentException("Invalid value: " + value);
+        }
+    }
 }

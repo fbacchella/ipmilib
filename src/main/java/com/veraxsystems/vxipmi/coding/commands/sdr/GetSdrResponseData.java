@@ -19,34 +19,34 @@ import com.veraxsystems.vxipmi.coding.commands.sdr.record.SensorRecord;
  */
 public class GetSdrResponseData implements ResponseData {
 
-	/**
-	 * ID of the next record in the repository.
-	 */
-	private int nextRecordId;
+    /**
+     * ID of the next record in the repository.
+     */
+    private int nextRecordId;
 
-	/**
-	 * Sensor record data
-	 */
-	private byte[] sensorRecordData;
+    /**
+     * Sensor record data
+     */
+    private byte[] sensorRecordData;
 
-	public void setNextRecordId(int nextRecordId) {
-		this.nextRecordId = nextRecordId;
-	}
+    public void setNextRecordId(int nextRecordId) {
+        this.nextRecordId = nextRecordId;
+    }
 
-	public int getNextRecordId() {
-		return nextRecordId;
-	}
+    public int getNextRecordId() {
+        return nextRecordId;
+    }
 
-	public void setSensorRecordData(byte[] sensorRecordData) {
-		this.sensorRecordData = sensorRecordData;
-	}
+    public void setSensorRecordData(byte[] sensorRecordData) {
+        this.sensorRecordData = sensorRecordData;
+    }
 
-	/**
-	 * @return Unparsed sensor record data. Might contain only part of the
-	 *         record, depending on offset and size specified in the request. To
-	 *         parse data use {@link SensorRecord#populateSensorRecord(byte[])}.
-	 */
-	public byte[] getSensorRecordData() {
-		return sensorRecordData;
-	}
+    /**
+     * @return Unparsed sensor record data. Might contain only part of the
+     *         record, depending on offset and size specified in the request. To
+     *         parse data use {@link SensorRecord#populateSensorRecord(byte[])}.
+     */
+    public byte[] getSensorRecordData() {
+        return sensorRecordData;
+    }
 }

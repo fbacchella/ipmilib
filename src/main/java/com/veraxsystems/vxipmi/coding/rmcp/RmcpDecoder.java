@@ -18,9 +18,9 @@ import com.veraxsystems.vxipmi.common.TypeConverter;
  */
 public final class RmcpDecoder {
 
-	private RmcpDecoder() {
-	}
-	
+    private RmcpDecoder() {
+    }
+
     /**
      * Decodes the RMCP packet from raw data.
      * @param rawMessage
@@ -29,7 +29,7 @@ public final class RmcpDecoder {
      * @throws IllegalArgumentException
      * - occurs when message is too short or contains invalid data
      */
-    public static RmcpMessage decode(byte[] rawMessage) throws IllegalArgumentException {
+    public static RmcpMessage decode(byte[] rawMessage) {
         RmcpMessage message = new RmcpMessage();
 
         if (rawMessage.length < 4) {

@@ -16,18 +16,18 @@ package com.veraxsystems.vxipmi.coding.security;
  */
 public class IntegrityNone extends IntegrityAlgorithm {
 
-	public IntegrityNone() {
-		super();
-	}
+    public IntegrityNone() {
+        super();
+    }
 
-	@Override
-	public byte getCode() {
-		return SecurityConstants.IA_NONE;
-	}
+    @Override
+    public byte getCode() {
+        return SecurityConstants.IA_NONE;
+    }
 
-	@Override
-	public byte[] generateAuthCode(byte[] base) {
-		return null;
-	}
+    @Override
+    public byte[] generateAuthCode(byte[] base) {
+        return null;
+    }
 
 }

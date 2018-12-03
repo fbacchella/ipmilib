@@ -11,12 +11,6 @@
  */
 package com.veraxsystems.vxipmi.connection;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.veraxsystems.vxipmi.coding.commands.PrivilegeLevel;
 import com.veraxsystems.vxipmi.coding.commands.session.GetChannelAuthenticationCapabilitiesResponseData;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
@@ -25,62 +19,68 @@ import com.veraxsystems.vxipmi.transport.Messenger;
 import com.veraxsystems.vxipmi.transport.UdpListener;
 import com.veraxsystems.vxipmi.transport.UdpMessenger;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Manages multiple {@link Connection}s
  */
 public class ConnectionManager {
-	private Messenger messenger;
-	private List<Connection> connections;
-	private static Integer sessionId = 100;
-	private static Integer sessionlessTag = 0;
-	private static List<Integer> reservedTags = new ArrayList<Integer>();
+    private Messenger messenger;
+    private List<Connection> connections;
 
-	/**
-	 * Frequency of the no-op commands that will be sent to keep up the session
-	 */
-	private static int pingPeriod = -1;
+    private static final AtomicInteger sessionlessTag = new AtomicInteger(0);
+    private static List<Integer> reservedTags = new ArrayList<Integer>();
 
-	/**
-	 * Initiates the connection manager. Wildcard IP address will be used.
-	 * 
-	 * @param port
-	 *            - the port at which {@link UdpListener} will work
-	 * @throws IOException
-	 *             when properties file was not found
-	 */
-	public ConnectionManager(int port) throws IOException {
-		messenger = new UdpMessenger(port);
-		initialize();
-	}
+    /**
+     * Frequency of the no-op commands that will be sent to keep up the session
+     */
+    private static int pingPeriod = -1;
 
-	/**
-	 * Initiates the connection manager.
-	 * 
-	 * @param port
-	 *            - the port at which {@link UdpListener} will work
-	 * @param address
-	 *            - the IP interface {@link UdpListener} will bind to
-	 * @throws IOException
-	 *             when properties file was not found
-	 */
-	public ConnectionManager(int port, InetAddress address) throws IOException {
-		messenger = new UdpMessenger(port, address);
-		initialize();
-	}
+    /**
+     * Initiates the connection manager. Wildcard IP address will be used.
+     *
+     * @param port
+     *            - the port at which {@link UdpListener} will work
+     * @throws IOException
+     *             when properties file was not found
+     */
+    public ConnectionManager(int port) throws IOException {
+        messenger = new UdpMessenger(port);
+        initialize();
+    }
 
-	/**
-	 * Initiates the connection manager.
-	 * 
-	 * @param messenger
-	 *            - {@link Messenger} to be used in communication
-	 * @throws IOException
-	 */
-	public ConnectionManager(Messenger messenger) throws IOException {
-		this.messenger = messenger;
-		initialize();
-	}
+    /**
+     * Initiates the connection manager.
+     *
+     * @param port
+     *            - the port at which {@link UdpListener} will work
+     * @param address
+     *            - the IP interface {@link UdpListener} will bind to
+     * @throws IOException
+     *             when properties file was not found
+     */
+    public ConnectionManager(int port, InetAddress address) throws IOException {
+        messenger = new UdpMessenger(port, address);
+        initialize();
+    }
 
-    private void initialize() throws IOException {
+    /**
+     * Initiates the connection manager.
+     *
+     * @param messenger
+     *            - {@link Messenger} to be used in communication
+     * @throws IOException
+     */
+    public ConnectionManager(Messenger messenger) {
+        this.messenger = messenger;
+        initialize();
+    }
+
+    private void initialize() {
         connections = new ArrayList<Connection>();
         reservedTags = new ArrayList<Integer>();
         if (pingPeriod == -1) {
@@ -88,270 +88,298 @@ public class ConnectionManager {
         }
     }
 
-	/**
-	 * Closes all open connections and disconnects {@link UdpListener}.
-	 */
-	public void close() {
-		synchronized (connections) {
-			for (Connection connection : connections) {
-				if (connection != null && connection.isActive()) {
-					connection.disconnect();
-				}
-			}
-		}
-		messenger.closeConnection();
-	}
+    /**
+     * Closes all open connections and disconnects {@link UdpListener}.
+     */
+    public void close() {
+        synchronized (connections) {
+            for (Connection connection : connections) {
+                if (connection != null && connection.isActive()) {
+                    connection.disconnect();
+                }
+            }
+        }
+        messenger.closeConnection();
+    }
 
-	/**
-	 * The session ID generated by the {@link ConnectionManager}.
-	 * Auto-incremented.
-	 */
-	public static synchronized int generateSessionId() {
-		synchronized (sessionId) {
-			sessionId %= (Integer.MAX_VALUE / 4);
-			return sessionId++;
-		}
-	}
+    /**
+     * The tag for messages sent outside the session generated by the
+     * {@link ConnectionManager}. Auto-incremented.
+     */
+    public static int generateSessionlessTag() {
+        synchronized (sessionlessTag) {
+            boolean wait = true;
+            while (wait) {
+                sessionlessTag.incrementAndGet();
+                sessionlessTag.set(sessionlessTag.get() % 60);
+                synchronized (reservedTags) {
+                    if (!reservedTags.contains(sessionlessTag.get())) {
+                        wait = false;
+                    }
+                }
+                if (wait) {
+                    try {
+                        sessionlessTag.wait(1);
+                    } catch (InterruptedException e) {
+                        // TODO log
+                    }
+                }
+            }
+            synchronized (reservedTags) {
+                reservedTags.add(sessionlessTag.get());
+            }
+            return sessionlessTag.get();
+        }
+    }
 
-	/**
-	 * The tag for messages sent outside the session generated by the
-	 * {@link ConnectionManager}. Auto-incremented.
-	 */
-	public static synchronized int generateSessionlessTag() {
-		synchronized (sessionlessTag) {
-			boolean wait = true;
-			while (wait) {
-				++sessionlessTag;
-				sessionlessTag %= 60;
-				synchronized (reservedTags) {
-					if (!reservedTags.contains(sessionlessTag)) {
-						wait = false;
-					}
-				}
-				if (wait) {
-					try {
-						Thread.sleep(1);
-					} catch (InterruptedException e) {
-						// TODO log
-					}
-				}
-			}
-			synchronized (reservedTags) {
-				reservedTags.add(sessionlessTag);
-			}
-			return sessionlessTag;
-		}
-	}
+    /**
+     * Frees the sessionless tag for further use
+     *
+     * @param tag
+     *            - tag to free
+     */
+    public static void freeTag(int tag) {
+        synchronized (reservedTags) {
+            reservedTags.remove((Integer) tag);
+        }
+    }
 
-	/**
-	 * Frees the sessionless tag for further use
-	 * 
-	 * @param tag
-	 *            - tag to free
-	 */
-	public static void freeTag(int tag) {
-		synchronized (reservedTags) {
-			reservedTags.remove((Integer) tag);
-		}
-	}
+    /**
+     * Returns {@link Connection} identified by index.
+     *
+     * @param index
+     *            - index of the connection to return
+     */
+    public Connection getConnection(int index) {
+        return connections.get(index);
+    }
 
-	/**
-	 * Returns {@link Connection} identified by index.
-	 * 
-	 * @param index
-	 *            - index of the connection to return
-	 */
-	public Connection getConnection(int index) {
-		return connections.get(index);
-	}
+    /**
+     * Closes the connection with the given index.
+     */
+    public void closeConnection(int index) {
+        connections.get(index).disconnect();
+    }
 
-	/**
-	 * Closes the connection with the given index.
-	 */
-	public void closeConnection(int index) {
-		connections.get(index).disconnect();
-	}
+    /**
+     * Returns first {@link Connection} associated with the address
+     *
+     * @param address
+     *            - {@link InetAddress} of the remote host to get connection
+     *            with.
+     * @return First {@link Connection} to the address or null if none found
+     */
+    public Connection getConnection(InetAddress address, int port) {
+        synchronized (connections) {
+            for (Connection connection : connections) {
+                if (connection != null && connection.isActive()
+                        && connection.getRemoteMachineAddress() == address
+                        && connection.getRemoteMachinePort() == port) {
+                    return connection;
+                }
+            }
+        }
+        return null;
+    }
 
-	/**
-	 * Returns first {@link Connection} associated with the address
-	 * 
-	 * @param address
-	 *            - {@link InetAddress} of the remote host to get connection
-	 *            with.
-	 * @return First {@link Connection} to the address or null if none found
-	 */
-	public Connection getConnection(InetAddress address) {
-		synchronized (connections) {
-			for (Connection connection : connections) {
-				if (connection != null && connection.isActive()
-						&& connection.getRemoteMachineAddress() == address) {
-					return connection;
-				}
-			}
-		}
-		return null;
-	}
+    /**
+     * Creates and initiates {@link Connection} to the remote host.
+     * @param address
+     * - {@link InetAddress} of the remote host
+     * @param pingPeriod
+     * - frequency of the no-op commands that will be sent to keep up the session
+     * @param skipCiphers
+     * - determines if the getAvailableCipherSuites and getChannelAuthenticationCapabilities phases should be skipped
+     * @return index of the connection
+     * @throws IOException
+     * - when properties file was not found
+     */
+    public int createConnection(InetAddress address, int port, int pingPeriod, boolean skipCiphers) throws IOException {
+        Connection connection = new Connection(messenger, 0);
+        connection.connect(address, port, pingPeriod, skipCiphers);
 
-	/**
-	 * Creates and initiates {@link Connection} to the remote host.
-	 * 
-	 * @param address
-	 *            - {@link InetAddress} of the remote host
-	 * @param pingPeriod
-	 *            - frequency of the no-op commands that will be sent to keep up
-	 *            the session
-	 * @return index of the connection
-	 * @throws IOException
-	 *             - when properties file was not found
-	 * @throws FileNotFoundException
-	 *             - when properties file was not found
-	 */
-	public int createConnection(InetAddress address, int pingPeriod)
-			throws FileNotFoundException, IOException {
-		Connection connection = new Connection(messenger, 0);
-		connection.connect(address, pingPeriod);
+        synchronized (connections) {
+            connections.add(connection);
+            return connections.size() - 1;
+        }
+    }
 
-		synchronized (connections) {
-			connections.add(connection);
-			return connections.size() - 1;
-		}
-	}
+    /**
+     * Creates and initiates {@link Connection} to the remote host.
+     *
+     * @param address
+     *            - {@link InetAddress} of the remote host
+     * @param pingPeriod
+     *            - frequency of the no-op commands that will be sent to keep up
+     *            the session
+     * @return index of the connection
+     * @throws IOException
+     *             - when properties file was not found
+     */
+    public int createConnection(InetAddress address, int port, int pingPeriod) throws IOException {
+        Connection connection = new Connection(messenger, 0);
+        connection.connect(address, port, pingPeriod);
 
-	/**
-	 * Creates and initiates {@link Connection} to the remote host with the
-	 * default ping frequency.
-	 * 
-	 * @param address
-	 *            - {@link InetAddress} of the remote host
-	 * @return index of the connection
-	 * @throws IOException
-	 *             when properties file was not found
-	 * @throws FileNotFoundException
-	 *             when properties file was not found
-	 */
-	public int createConnection(InetAddress address)
-			throws FileNotFoundException, IOException {
+        synchronized (connections) {
+            connections.add(connection);
+            return connections.size() - 1;
+        }
+    }
 
-		synchronized (connections) {
-			Connection connection = new Connection(messenger,
-					connections.size());
-			connection.connect(address, pingPeriod);
-			connections.add(connection);
-			return connections.size() - 1;
-		}
-	}
+    /**
+     * Creates and initiates {@link Connection} to the remote host with the
+     * default ping frequency.
+     *
+     * @param address
+     *            - {@link InetAddress} of the remote host
+     * @return index of the connection
+     * @throws IOException
+     *             when properties file was not found
+     */
+    public int createConnection(InetAddress address, int port) throws IOException {
 
-	/**
-	 * Gets from the managed system supported {@link CipherSuite}s. Should be
-	 * performed only immediately after {@link #createConnection}.
-	 * 
-	 * @param connection
-	 *            - index of the connection to get available Cipher Suites from
-	 * 
-	 * @return list of the {@link CipherSuite}s supported by the managed system.
-	 * @throws ConnectionException
-	 *             when connection is in the state that does not allow to
-	 *             perform this operation.
-	 * @throws Exception
-	 *             when sending message to the managed system fails
-	 */
-	public List<CipherSuite> getAvailableCipherSuites(int connection)
-			throws Exception {
-		int tag = generateSessionlessTag();
-		List<CipherSuite> suites;
-		try {
-			suites = connections.get(connection).getAvailableCipherSuites(tag);
-		} catch (Exception e) {
-			freeTag(tag);
-			throw e;
-		}
-		freeTag(tag);
-		return suites;
-	}
+        synchronized (connections) {
+            Connection connection = new Connection(messenger,
+                    connections.size());
+            connection.connect(address, port, pingPeriod);
+            connections.add(connection);
+            return connections.size() - 1;
+        }
+    }
 
-	/**
-	 * Queries the managed system for the details of the authentification
-	 * process. Must be performed after {@link #getAvailableCipherSuites(int)}
-	 * 
-	 * @param connection
-	 *            - index of the connection to get Channel Authentication
-	 *            Capabilities from
-	 * @param cipherSuite
-	 *            - {@link CipherSuite} requested for the session
-	 * @param requestedPrivilegeLevel
-	 *            - {@link PrivilegeLevel} requested for the session
-	 * @return {@link GetChannelAuthenticationCapabilitiesResponseData}
-	 * @throws ConnectionException
-	 *             when connection is in the state that does not allow to
-	 *             perform this operation.
-	 * @throws Exception
-	 *             when sending message to the managed system fails
-	 */
-	public GetChannelAuthenticationCapabilitiesResponseData getChannelAuthenticationCapabilities(
-			int connection, CipherSuite cipherSuite,
-			PrivilegeLevel requestedPrivilegeLevel) throws Exception {
-		int tag = generateSessionlessTag();
-		GetChannelAuthenticationCapabilitiesResponseData responseData;
-		try {
-			responseData = connections.get(connection)
-					.getChannelAuthenticationCapabilities(tag, cipherSuite,
-							requestedPrivilegeLevel);
-		} catch (Exception e) {
-			freeTag(tag);
-			throw e;
-		}
-		freeTag(tag);
-		return responseData;
-	}
+    /**
+     * Creates and initiates {@link Connection} to the remote host with the default ping frequency.
+     * @param address
+     * - {@link InetAddress} of the remote host
+     * @param skipCiphers
+     * - determines if the getAvailableCipherSuites and getChannelAuthenticationCapabilities phases should be skipped
+     * @return index of the connection
+     * @throws IOException
+     * when properties file was not found
+     */
+    public int createConnection(InetAddress address, int port, boolean skipCiphers) throws IOException {
+        synchronized (connections) {
+            Connection connection = new Connection(messenger, connections.size());
+            connection.connect(address, port, pingPeriod, skipCiphers);
+            connections.add(connection);
+            return connections.size() - 1;
+        }
+    }
 
-	/**
-	 * Initiates the session with the managed system. Must be performed after
-	 * {@link #getChannelAuthenticationCapabilities(int, CipherSuite, PrivilegeLevel)}
-	 * 
-	 * @param connection
-	 *            - index of the connection that starts the session
-	 * @param cipherSuite
-	 *            - {@link CipherSuite} that will be used during the session
-	 * @param privilegeLevel
-	 *            - requested {@link PrivilegeLevel} - most of the time it will
-	 *            be {@link PrivilegeLevel#User}
-	 * @param username
-	 *            - the username
-	 * @param password
-	 *            - the password matching the username
-	 * @param bmcKey
-	 *            - the key that should be provided if the two-key
-	 *            authentication is enabled, null otherwise.
-	 * @throws ConnectionException
-	 *             when connection is in the state that does not allow to
-	 *             perform this operation.
-	 * @throws Exception
-	 *             when sending message to the managed system or initializing
-	 *             one of the cipherSuite's algorithms fails
-	 */
-	public void startSession(int connection, CipherSuite cipherSuite,
-			PrivilegeLevel privilegeLevel, String username, String password,
-			byte[] bmcKey) throws Exception {
-		int tag = generateSessionlessTag();
-		try {
-			connections.get(connection).startSession(tag, cipherSuite,
-					privilegeLevel, username, password, bmcKey);
-		} catch (Exception e) {
-			freeTag(tag);
-			throw e;
-		}
-		freeTag(tag);
-	}
+    /**
+     * Gets from the managed system supported {@link CipherSuite}s. Should be
+     * performed only immediately after {@link #createConnection}.
+     *
+     * @param connection
+     *            - index of the connection to get available Cipher Suites from
+     *
+     * @return list of the {@link CipherSuite}s supported by the managed system.
+     * @throws ConnectionException
+     *             when connection is in the state that does not allow to
+     *             perform this operation.
+     * @throws Exception
+     *             when sending message to the managed system fails
+     */
+    public List<CipherSuite> getAvailableCipherSuites(int connection)
+            throws Exception {
+        int tag = generateSessionlessTag();
+        List<CipherSuite> suites;
+        try {
+            suites = connections.get(connection).getAvailableCipherSuites(tag);
+        } catch (Exception e) {
+            freeTag(tag);
+            throw e;
+        }
+        freeTag(tag);
+        return suites;
+    }
 
-	/**
-	 * Registers the listener so it will receive notifications from connection
-	 * 
-	 * @param connection
-	 *            - index of the {@link Connection} to listen to
-	 * @param listener
-	 *            - {@link ConnectionListener} to notify
-	 */
-	public void registerListener(int connection, ConnectionListener listener) {
-		connections.get(connection).registerListener(listener);
-	}
+    /**
+     * Queries the managed system for the details of the authentification
+     * process. Must be performed after {@link #getAvailableCipherSuites(int)}
+     *
+     * @param connection
+     *            - index of the connection to get Channel Authentication
+     *            Capabilities from
+     * @param cipherSuite
+     *            - {@link CipherSuite} requested for the session
+     * @param requestedPrivilegeLevel
+     *            - {@link PrivilegeLevel} requested for the session
+     * @return {@link GetChannelAuthenticationCapabilitiesResponseData}
+     * @throws ConnectionException
+     *             when connection is in the state that does not allow to
+     *             perform this operation.
+     * @throws Exception
+     *             when sending message to the managed system fails
+     */
+    public GetChannelAuthenticationCapabilitiesResponseData getChannelAuthenticationCapabilities(
+            int connection, CipherSuite cipherSuite,
+            PrivilegeLevel requestedPrivilegeLevel) throws Exception {
+        int tag = generateSessionlessTag();
+        GetChannelAuthenticationCapabilitiesResponseData responseData;
+        try {
+            responseData = connections.get(connection)
+                    .getChannelAuthenticationCapabilities(tag, cipherSuite,
+                            requestedPrivilegeLevel);
+        } catch (Exception e) {
+            freeTag(tag);
+            throw e;
+        }
+        freeTag(tag);
+        return responseData;
+    }
+
+    /**
+     * Initiates the session with the managed system. Must be performed after
+     * {@link #getChannelAuthenticationCapabilities(int, CipherSuite, PrivilegeLevel)}
+     *
+     * @param connection
+     *            - index of the connection that starts the session
+     * @param cipherSuite
+     *            - {@link CipherSuite} that will be used during the session
+     * @param privilegeLevel
+     *            - requested {@link PrivilegeLevel} - most of the time it will
+     *            be {@link PrivilegeLevel#User}
+     * @param username
+     *            - the username
+     * @param password
+     *            - the password matching the username
+     * @param bmcKey
+     *            - the key that should be provided if the two-key
+     *            authentication is enabled, null otherwise.
+     * @throws ConnectionException
+     *             when connection is in the state that does not allow to
+     *             perform this operation.
+     * @throws Exception
+     *             when sending message to the managed system or initializing
+     *             one of the cipherSuite's algorithms fails
+     */
+    public int startSession(int connection, CipherSuite cipherSuite,
+            PrivilegeLevel privilegeLevel, String username, String password,
+            byte[] bmcKey) throws Exception {
+        int sessionId;
+        int tag = generateSessionlessTag();
+        try {
+            sessionId = connections.get(connection).startSession(tag, cipherSuite,
+                    privilegeLevel, username, password, bmcKey);
+        } catch (Exception e) {
+            freeTag(tag);
+            throw e;
+        }
+        freeTag(tag);
+
+        return sessionId;
+    }
+
+    /**
+     * Registers the listener so it will receive notifications from connection
+     *
+     * @param connection
+     *            - index of the {@link Connection} to listen to
+     * @param listener
+     *            - {@link ConnectionListener} to processResponse
+     */
+    public void registerListener(int connection, ConnectionListener listener) {
+        connections.get(connection).registerListener(listener);
+    }
 }

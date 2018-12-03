@@ -20,153 +20,152 @@ import com.veraxsystems.vxipmi.common.TypeConverter;
  */
 public class FruDeviceLocatorRecord extends SensorRecord {
 
-	private int deviceAccessAddress;
+    private int deviceAccessAddress;
 
-	private int deviceId;
+    private int deviceId;
 
-	/**
-	 * false - device is not a logical FRU Device <br>
-	 * true - device is logical FRU Device (accessed via FRU commands to mgmt.
-	 * controller)
-	 */
-	private boolean logical;
+    /**
+     * false - device is not a logical FRU Device <br>
+     * true - device is logical FRU Device (accessed via FRU commands to mgmt.
+     * controller)
+     */
+    private boolean logical;
 
-	private int accessLun;
+    private int accessLun;
 
-	private int managementChannelNumber;
+    private int managementChannelNumber;
 
-	private DeviceType deviceType;
+    private DeviceType deviceType;
 
-	private int deviceTypeModifier;
+    private int deviceTypeModifier;
 
-	private int fruEntityId;
+    private int fruEntityId;
 
-	private int fruEntityInstance;
+    private int fruEntityInstance;
 
-	private String name;
+    private String name;
 
-	@Override
-	protected void populateTypeSpecficValues(byte[] recordData,
-			SensorRecord record) {
+    @Override
+    protected void populateTypeSpecficValues(byte[] recordData, SensorRecord record) {
 
-		setDeviceAccessAddress((TypeConverter.byteToInt(recordData[5]) & 0xfe) >> 1);
+        setDeviceAccessAddress((TypeConverter.byteToInt(recordData[5]) & 0xfe) >> 1);
 
-		setLogical((TypeConverter.byteToInt(recordData[7]) & 0x80) != 0);
+        setLogical((TypeConverter.byteToInt(recordData[7]) & 0x80) != 0);
 
-		int deviceId = TypeConverter.byteToInt(recordData[6]);
+        int deviceIdFromRecord = TypeConverter.byteToInt(recordData[6]);
 
-		if (!isLogical()) {
-			deviceId &= 0xfe;
-			deviceId >>= 1;
-		}
+        if (!isLogical()) {
+            deviceIdFromRecord &= 0xfe;
+            deviceIdFromRecord >>= 1;
+        }
 
-		setDeviceId(deviceId);
-		int id = TypeConverter.byteToInt(recordData[6]);
+        setDeviceId(deviceIdFromRecord);
+        int id = TypeConverter.byteToInt(recordData[6]);
 
-		if (!isLogical()) {
-			id >>= 1;
-		}
+        if (!isLogical()) {
+            id >>= 1;
+        }
 
-		setId(id);
+        setId(id);
 
-		setAccessLun((TypeConverter.byteToInt(recordData[7]) & 0xc) >> 2);
+        setAccessLun((TypeConverter.byteToInt(recordData[7]) & 0xc) >> 2);
 
-		setManagementChannelNumber((TypeConverter.byteToInt(recordData[8]) & 0xf0) >> 4);
+        setManagementChannelNumber((TypeConverter.byteToInt(recordData[8]) & 0xf0) >> 4);
 
-		setDeviceType(DeviceType.parseInt(TypeConverter
-				.byteToInt(recordData[10])));
+        setDeviceType(DeviceType.parseInt(TypeConverter
+                .byteToInt(recordData[10])));
 
-		setDeviceTypeModifier(TypeConverter.byteToInt(recordData[11]));
+        setDeviceTypeModifier(TypeConverter.byteToInt(recordData[11]));
 
-		setFruEntityId(TypeConverter.byteToInt(recordData[12]));
+        setFruEntityId(TypeConverter.byteToInt(recordData[12]));
 
-		setFruEntityInstance(TypeConverter.byteToInt(recordData[13]));
+        setFruEntityInstance(TypeConverter.byteToInt(recordData[13]));
 
-		byte[] name = new byte[recordData.length - 16];
+        byte[] nameData = new byte[recordData.length - 16];
 
-		System.arraycopy(recordData, 16, name, 0, name.length);
+        System.arraycopy(recordData, 16, nameData, 0, nameData.length);
 
-		setName(decodeName(recordData[15], name));
-	}
+        setName(decodeName(recordData[15], nameData));
+    }
 
-	public int getDeviceAccessAddress() {
-		return deviceAccessAddress;
-	}
+    public int getDeviceAccessAddress() {
+        return deviceAccessAddress;
+    }
 
-	public void setDeviceAccessAddress(int deviceAccessAddress) {
-		this.deviceAccessAddress = deviceAccessAddress;
-	}
+    public void setDeviceAccessAddress(int deviceAccessAddress) {
+        this.deviceAccessAddress = deviceAccessAddress;
+    }
 
-	public int getDeviceId() {
-		return deviceId;
-	}
+    public int getDeviceId() {
+        return deviceId;
+    }
 
-	public void setDeviceId(int deviceId) {
-		this.deviceId = deviceId;
-	}
+    public void setDeviceId(int deviceId) {
+        this.deviceId = deviceId;
+    }
 
-	public boolean isLogical() {
-		return logical;
-	}
+    public boolean isLogical() {
+        return logical;
+    }
 
-	public void setLogical(boolean logical) {
-		this.logical = logical;
-	}
+    public void setLogical(boolean logical) {
+        this.logical = logical;
+    }
 
-	public int getAccessLun() {
-		return accessLun;
-	}
+    public int getAccessLun() {
+        return accessLun;
+    }
 
-	public void setAccessLun(int accessLun) {
-		this.accessLun = accessLun;
-	}
+    public void setAccessLun(int accessLun) {
+        this.accessLun = accessLun;
+    }
 
-	public int getManagementChannelNumber() {
-		return managementChannelNumber;
-	}
+    public int getManagementChannelNumber() {
+        return managementChannelNumber;
+    }
 
-	public void setManagementChannelNumber(int managementChannelNumber) {
-		this.managementChannelNumber = managementChannelNumber;
-	}
+    public void setManagementChannelNumber(int managementChannelNumber) {
+        this.managementChannelNumber = managementChannelNumber;
+    }
 
-	public DeviceType getDeviceType() {
-		return deviceType;
-	}
+    public DeviceType getDeviceType() {
+        return deviceType;
+    }
 
-	public void setDeviceType(DeviceType deviceType) {
-		this.deviceType = deviceType;
-	}
+    public void setDeviceType(DeviceType deviceType) {
+        this.deviceType = deviceType;
+    }
 
-	public int getDeviceTypeModifier() {
-		return deviceTypeModifier;
-	}
+    public int getDeviceTypeModifier() {
+        return deviceTypeModifier;
+    }
 
-	public void setDeviceTypeModifier(int deviceTypeModifier) {
-		this.deviceTypeModifier = deviceTypeModifier;
-	}
+    public void setDeviceTypeModifier(int deviceTypeModifier) {
+        this.deviceTypeModifier = deviceTypeModifier;
+    }
 
-	public int getFruEntityId() {
-		return fruEntityId;
-	}
+    public int getFruEntityId() {
+        return fruEntityId;
+    }
 
-	public void setFruEntityId(int fruEntityId) {
-		this.fruEntityId = fruEntityId;
-	}
+    public void setFruEntityId(int fruEntityId) {
+        this.fruEntityId = fruEntityId;
+    }
 
-	public int getFruEntityInstance() {
-		return fruEntityInstance;
-	}
+    public int getFruEntityInstance() {
+        return fruEntityInstance;
+    }
 
-	public void setFruEntityInstance(int fruEntityInstance) {
-		this.fruEntityInstance = fruEntityInstance;
-	}
+    public void setFruEntityInstance(int fruEntityInstance) {
+        this.fruEntityInstance = fruEntityInstance;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
 }

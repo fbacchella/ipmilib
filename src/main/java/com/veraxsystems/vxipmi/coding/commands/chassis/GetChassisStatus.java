@@ -34,79 +34,77 @@ import com.veraxsystems.vxipmi.common.TypeConverter;
  */
 public class GetChassisStatus extends IpmiCommandCoder {
 
-	/**
-	 * Initiates GetChassisStatus for encoding and decoding.
-	 * 
-	 * @param version
-	 *            - IPMI version of the command.
-	 * @param cipherSuite
-	 *            - {@link CipherSuite} containing authentication,
-	 *            confidentiality and integrity algorithms for this session.
-	 * @param authenticationType
-	 *            - Type of authentication used. Must be RMCPPlus for IPMI v2.0.
-	 */
-	public GetChassisStatus(IpmiVersion version, CipherSuite cipherSuite,
-			AuthenticationType authenticationType) {
-		super(version, cipherSuite, authenticationType);
+    /**
+     * Initiates GetChassisStatus for encoding and decoding.
+     *
+     * @param version
+     *            - IPMI version of the command.
+     * @param cipherSuite
+     *            - {@link CipherSuite} containing authentication,
+     *            confidentiality and integrity algorithms for this session.
+     * @param authenticationType
+     *            - Type of authentication used. Must be RMCPPlus for IPMI v2.0.
+     */
+    public GetChassisStatus(IpmiVersion version, CipherSuite cipherSuite,
+            AuthenticationType authenticationType) {
+        super(version, cipherSuite, authenticationType);
 
-		if (version == IpmiVersion.V20
-				&& authenticationType != AuthenticationType.RMCPPlus) {
-			throw new IllegalArgumentException(
-					"Authentication Type must be RMCPPlus for IPMI v2.0 messages");
-		}
-	}
+        if (version == IpmiVersion.V20
+                && authenticationType != AuthenticationType.RMCPPlus) {
+            throw new IllegalArgumentException(
+                    "Authentication Type must be RMCPPlus for IPMI v2.0 messages");
+        }
+    }
 
-	@Override
-	protected IpmiLanMessage preparePayload(int sequenceNumber) {
-		return new IpmiLanRequest(getNetworkFunction(), getCommandCode(), null,
-				TypeConverter.intToByte(sequenceNumber % 64));
-	}
+    @Override
+    protected IpmiLanMessage preparePayload(int sequenceNumber) {
+        return new IpmiLanRequest(getNetworkFunction(), getCommandCode(), null,
+                TypeConverter.intToByte(sequenceNumber));
+    }
 
-	@Override
-	public byte getCommandCode() {
-		return CommandCodes.GET_CHASSIS_STATUS;
-	}
+    @Override
+    public byte getCommandCode() {
+        return CommandCodes.GET_CHASSIS_STATUS;
+    }
 
-	@Override
-	public NetworkFunction getNetworkFunction() {
-		return NetworkFunction.ChassisRequest;
-	}
+    @Override
+    public NetworkFunction getNetworkFunction() {
+        return NetworkFunction.ChassisRequest;
+    }
 
-	@Override
-	public ResponseData getResponseData(IpmiMessage message)
-			throws IllegalArgumentException, IPMIException,
-			NoSuchAlgorithmException, InvalidKeyException {
-		if (!isCommandResponse(message)) {
-			throw new IllegalArgumentException(
-					"This is not a response for Get Chassis Status command");
-		}
-		if (!(message.getPayload() instanceof IpmiLanResponse)) {
-			throw new IllegalArgumentException("Invalid response payload");
-		}
-		if (((IpmiLanResponse) message.getPayload()).getCompletionCode() != CompletionCode.Ok) {
-			throw new IPMIException(
-					((IpmiLanResponse) message.getPayload())
-							.getCompletionCode());
-		}
+    @Override
+    public ResponseData getResponseData(IpmiMessage message) throws IPMIException, NoSuchAlgorithmException, InvalidKeyException {
+        if (!isCommandResponse(message)) {
+            throw new IllegalArgumentException(
+                    "This is not a response for Get Chassis Status command");
+        }
+        if (!(message.getPayload() instanceof IpmiLanResponse)) {
+            throw new IllegalArgumentException("Invalid response payload");
+        }
+        if (((IpmiLanResponse) message.getPayload()).getCompletionCode() != CompletionCode.Ok) {
+            throw new IPMIException(
+                    ((IpmiLanResponse) message.getPayload())
+                            .getCompletionCode());
+        }
 
-		byte[] raw = message.getPayload().getIpmiCommandData();
+        byte[] raw = message.getPayload().getIpmiCommandData();
 
-		if (raw == null || (raw.length != 3 && raw.length != 4)) {
-			throw new IllegalArgumentException(
-					"Invalid response payload length");
-		}
+        if (raw == null || (raw.length != 3 && raw.length != 4)) {
+            throw new IllegalArgumentException(
+                    "Invalid response payload length");
+        }
 
-		GetChassisStatusResponseData responseData = new GetChassisStatusResponseData();
+        GetChassisStatusResponseData responseData = new GetChassisStatusResponseData();
 
-		responseData.setCurrentPowerState(raw[0]);
-		responseData.setLastPowerEvent(raw[1]);
-		responseData.setMiscChassisState(raw[2]);
+        responseData.setCurrentPowerState(raw[0]);
+        responseData.setLastPowerEvent(raw[1]);
+        responseData.setMiscChassisState(raw[2]);
 
-		if (raw.length == 4) {
-			responseData.setFrontPanelButtonCapabilities(raw[3]);
-		}
+        if (raw.length == 4) {
+            responseData.setFrontPanelButtonCapabilities(raw[3]);
+        }
 
-		return responseData;
-	}
+        return responseData;
+    }
 
 }

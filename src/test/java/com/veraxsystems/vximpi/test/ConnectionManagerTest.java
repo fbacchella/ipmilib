@@ -20,6 +20,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
+import com.veraxsystems.vxipmi.coding.payload.IpmiPayload;
+import com.veraxsystems.vxipmi.common.Constants;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import junit.framework.TestCase;
@@ -41,293 +43,298 @@ import com.veraxsystems.vxipmi.transport.UdpMessenger;
  */
 public class ConnectionManagerTest extends TestCase {
 
-	private ConnectionManager manager;
-	private Properties properties;
-	
-	private static Logger logger = Logger.getLogger(ConnectionManagerTest.class);
-	
-	private static final int PORT = 6666;
+    private ConnectionManager manager;
+    private Properties properties;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		properties = new Properties();
-		properties.load(new FileInputStream(
-				"src/test/resources/test.properties"));
-		manager = new ConnectionManager(PORT);
-	}
+    private static Logger logger = Logger.getLogger(ConnectionManagerTest.class);
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-		logger.info("-----------------------------");
-		manager.close();
-	}
+    private static final int PORT = 6666;
 
-	private static boolean lock;
-	private static Integer finishedCorrectly;
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        properties = new Properties();
+        properties.load(new FileInputStream(
+                "src/test/resources/test.properties"));
+        manager = new ConnectionManager(PORT);
+    }
 
-	/**
-	 * Tests sending multiple parallel sessionless messages and providng them
-	 * proper tags.
-	 */
-	@Test
-	public void testOverload() {
-		logger.info("Testing parallel sessionless messages");
-		lock = true;
-		int runs = 200;
-		finishedCorrectly = runs;
-		for (int i = 0; i < runs; ++i) {
-			OverloadRunner or = null;
-			try {
-				or = new OverloadRunner(i, InetAddress.getByName(properties
-						.getProperty("testIp")));
-			} catch (UnknownHostException e) {
-				e.printStackTrace();
-				fail(e.getMessage());
-			}
-			or.start();
-		}
-		lock = false;
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        logger.info("-----------------------------");
+        manager.close();
+    }
 
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+    private static boolean lock;
+    private static Integer finishedCorrectly;
 
-		logger.info("Packets sent: "
-				+ UdpMessenger.getSentPackets());
-		assertEquals((Integer) 0, finishedCorrectly);
-	}
+    /**
+     * Tests sending multiple parallel sessionless messages and providng them
+     * proper tags.
+     */
+    @Test
+    public void testOverload() {
+        logger.info("Testing parallel sessionless messages");
+        lock = true;
+        int runs = 200;
+        finishedCorrectly = runs;
+        for (int i = 0; i < runs; ++i) {
+            OverloadRunner or = null;
+            try {
+                or = new OverloadRunner(i, InetAddress.getByName(properties
+                        .getProperty("testIp")));
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+                fail(e.getMessage());
+            }
+            or.start();
+        }
+        lock = false;
 
-	/**
-	 * Tests message timeout. After a timeout message should is removed form
-	 * {@link MessageQueue} and error message is returned.
-	 */
-	@Test
-	public void testTimeout() {
-		logger.info("Testing message timeout");
-		logger.info("Expecting exception");
-		lock = true;
-		int runs = 1;
-		finishedCorrectly = runs;
-		OverloadRunner or = null;
-		for (int i = 0; i < runs; ++i) {
-			or = null;
-			try {
-				or = new OverloadRunner(i,
-						InetAddress.getByName("192.168.127.200"));
-			} catch (UnknownHostException e) {
-				e.printStackTrace();
-				fail(e.getMessage());
-			}
-			or.start();
-		}
-		lock = false;
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-		try {
-			Thread.sleep(40000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		assertEquals((Integer) runs, finishedCorrectly);
-		assertEquals(false, or.isCorrect());
-	}
+        logger.info("Packets sent: "
+                + UdpMessenger.getSentPackets());
+        assertEquals((Integer) 0, finishedCorrectly);
+    }
 
-	/**
-	 * Tests retrying sending a message after failure in a first attempt.
-	 */
-	@Test
-	public void testRetry() {
-		logger.info("Testing retry");
-		logger.info("Expecting exception");
-		lock = true;
-		int runs = 1;
-		finishedCorrectly = runs;
-		OverloadRunner or = null;
-		for (int i = 0; i < runs; ++i) {
-			or = null;
-			try {
-				or = new OverloadRunner(i,
-						InetAddress.getByName("192.168.127.200"));
-			} catch (UnknownHostException e) {
-				e.printStackTrace();
-				fail(e.getMessage());
-			}
-			or.start();
-		}
-		lock = false;
+    /**
+     * Tests message timeout. After a timeout message should is removed form
+     * {@link MessageQueue} and error message is returned.
+     */
+    @Test
+    public void testTimeout() {
+        logger.info("Testing message timeout");
+        logger.info("Expecting exception");
+        lock = true;
+        int runs = 1;
+        finishedCorrectly = runs;
+        OverloadRunner or = null;
+        for (int i = 0; i < runs; ++i) {
+            or = null;
+            try {
+                or = new OverloadRunner(i,
+                        InetAddress.getByName("192.168.127.200"));
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+                fail(e.getMessage());
+            }
+            or.start();
+        }
+        lock = false;
 
-		try {
-			Thread.sleep(40000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		assertEquals((Integer) runs, finishedCorrectly);
-		assertEquals(false, or.isCorrect());
-	}
+        try {
+            Thread.sleep(40000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        assertEquals((Integer) runs, finishedCorrectly);
+        assertEquals(false, or.isCorrect());
+    }
 
-	private static Integer receivedMessages;
-	private static int sent;
+    /**
+     * Tests retrying sending a message after failure in a first attempt.
+     */
+    @Test
+    public void testRetry() {
+        logger.info("Testing retry");
+        logger.info("Expecting exception");
+        lock = true;
+        int runs = 1;
+        finishedCorrectly = runs;
+        OverloadRunner or = null;
+        for (int i = 0; i < runs; ++i) {
+            or = null;
+            try {
+                or = new OverloadRunner(i,
+                        InetAddress.getByName("192.168.127.200"));
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+                fail(e.getMessage());
+            }
+            or.start();
+        }
+        lock = false;
 
-	/**
-	 * Tests sending in-session message.
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	@Test
-	public void testSessionMessages() throws FileNotFoundException, IOException {
-		logger.info("Testing Session Messages");
-		// lock = true;
-		int messages = 100;
-		sent = 0;
-		receivedMessages = 0;
-		finishedCorrectly = messages;
-		OverloadRunner or = null;
-		try {
-			or = new OverloadRunner(0, InetAddress.getByName(properties
-					.getProperty("testIp")));
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
-		// or.start();
-		// lock = false;
+        try {
+            Thread.sleep(40000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        assertEquals((Integer) runs, finishedCorrectly);
+        assertEquals(false, or.isCorrect());
+    }
 
-		or.sendSessionMessages(messages);
+    private static Integer receivedMessages;
+    private static int sent;
 
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		assertEquals((Integer) messages, receivedMessages);
-	}
+    /**
+     * Tests sending in-session message.
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    @Test
+    public void testSessionMessages() throws FileNotFoundException, IOException {
+        logger.info("Testing Session Messages");
+        // lock = true;
+        int messages = 100;
+        sent = 0;
+        receivedMessages = 0;
+        finishedCorrectly = messages;
+        OverloadRunner or = null;
+        try {
+            or = new OverloadRunner(0, InetAddress.getByName(properties
+                    .getProperty("testIp")));
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
+        // or.start();
+        // lock = false;
 
-	private class OverloadRunner extends Thread implements ConnectionListener {
+        or.sendSessionMessages(messages);
 
-		private int index;
-		private InetAddress address;
-		private boolean correct = true;
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        assertEquals((Integer) messages, receivedMessages);
+    }
 
-		public boolean isCorrect() {
-			return correct;
-		}
+    private class OverloadRunner extends Thread implements ConnectionListener {
 
-		public OverloadRunner(int index, InetAddress address) {
-			this.index = index;
-			this.address = address;
-		}
+        private int index;
+        private InetAddress address;
+        private boolean correct = true;
 
-		@Override
-		public void run() {
-			super.run();
-			int index = -1;
-			try {
-				index = manager.createConnection(address);
-			} catch (FileNotFoundException e1) {
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			assertEquals(true, index != -1);
+        public boolean isCorrect() {
+            return correct;
+        }
 
-			manager.registerListener(index, this);
+        public OverloadRunner(int index, InetAddress address) {
+            this.index = index;
+            this.address = address;
+        }
 
-			while (lock) {
-				try {
-					Thread.sleep(1);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
+        @Override
+        public void run() {
+            super.run();
+            int index = -1;
+            try {
+                index = manager.createConnection(address, Constants.IPMI_PORT);
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            assertEquals(true, index != -1);
 
-			Date d = new Date();
-			try {
-				manager.getAvailableCipherSuites(index);
-			} catch (Exception e) {
-				correct = false;
-				e.printStackTrace();
-				fail(e.getMessage());
-			}
-			synchronized (finishedCorrectly) {
-				finishedCorrectly--;
-			}
-			logger.info("Process " + this.index
-					+ " - time spent sending: "
-					+ (new Date().getTime() - d.getTime()));
-		}
+            manager.registerListener(index, this);
 
-		public void sendSessionMessages(int count)
-				throws FileNotFoundException, IOException {
-			int index = -1;
-			index = manager.createConnection(address);
-			assertEquals(true, index != -1);
+            while (lock) {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
 
-			manager.registerListener(index, this);
+            Date d = new Date();
+            try {
+                manager.getAvailableCipherSuites(index);
+            } catch (Exception e) {
+                correct = false;
+                e.printStackTrace();
+                fail(e.getMessage());
+            }
+            synchronized (finishedCorrectly) {
+                finishedCorrectly--;
+            }
+            logger.info("Process " + this.index
+                    + " - time spent sending: "
+                    + (new Date().getTime() - d.getTime()));
+        }
 
-			List<CipherSuite> suites = null;
-			try {
-				suites = manager.getAvailableCipherSuites(index);
-			} catch (Exception e) {
-				e.printStackTrace();
-				fail(e.getMessage());
-			}
+        public void sendSessionMessages(int count) throws IOException {
+            int index = -1;
+            index = manager.createConnection(address, Constants.IPMI_PORT);
+            assertEquals(true, index != -1);
 
-			CipherSuite cs = suites.get(2);
+            manager.registerListener(index, this);
 
-			try {
-				manager.getChannelAuthenticationCapabilities(index, cs,
-						PrivilegeLevel.User);
-			} catch (Exception e) {
-				e.printStackTrace();
-				fail(e.getMessage());
-			}
+            List<CipherSuite> suites = null;
+            try {
+                suites = manager.getAvailableCipherSuites(index);
+            } catch (Exception e) {
+                e.printStackTrace();
+                fail(e.getMessage());
+            }
 
-			try {
-				manager.startSession(index, cs, PrivilegeLevel.User,
-						properties.getProperty("username"),
-						properties.getProperty("password"), null);
-			} catch (Exception e) {
-				e.printStackTrace();
-				fail(e.getMessage());
-			}
+            CipherSuite cs = suites.get(2);
 
-			Connection c = manager.getConnection(index);
+            try {
+                manager.getChannelAuthenticationCapabilities(index, cs,
+                        PrivilegeLevel.User);
+            } catch (Exception e) {
+                e.printStackTrace();
+                fail(e.getMessage());
+            }
 
-			for (int i = 0; i < count; ++i) {
-				try {
-					int result = c.sendIpmiCommand(new GetChassisStatus(
-							IpmiVersion.V20, cs, AuthenticationType.RMCPPlus));
-					if (result < 0) {
-						Thread.sleep(10);
-						--i;
-					} else {
-						++sent;
-						logger.info("Sent " + sent + " messages");
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-					fail(e.getMessage());
-				}
-			}
-		}
+            try {
+                manager.startSession(index, cs, PrivilegeLevel.User,
+                        properties.getProperty("username"),
+                        properties.getProperty("password"), null);
+            } catch (Exception e) {
+                e.printStackTrace();
+                fail(e.getMessage());
+            }
 
-		@Override
-		public void notify(ResponseData responseData, int handle, int tag,
-				Exception exception) {
-			if (exception != null) {
-				System.out.println(exception.getMessage());
-			} else if (responseData == null) {
-				logger.info("Message timed out");
-			} else {
-				synchronized (receivedMessages) {
-					++receivedMessages;
-				}
-				logger.info("Received answer " + tag + " : "
-						+ responseData.getClass().getSimpleName());
-			}
-		}
-	}
+            Connection c = manager.getConnection(index);
+
+            for (int i = 0; i < count; ++i) {
+                try {
+                    int result = c.sendMessage(new GetChassisStatus(
+                            IpmiVersion.V20, cs, AuthenticationType.RMCPPlus), false);
+                    if (result < 0) {
+                        Thread.sleep(10);
+                        --i;
+                    } else {
+                        ++sent;
+                        logger.info("Sent " + sent + " messages");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    fail(e.getMessage());
+                }
+            }
+        }
+
+        @Override
+        public void processResponse(ResponseData responseData, int handle, int tag,
+                                    Exception exception) {
+            if (exception != null) {
+                System.out.println(exception.getMessage());
+            } else if (responseData == null) {
+                logger.info("Message timed out");
+            } else {
+                synchronized (receivedMessages) {
+                    ++receivedMessages;
+                }
+                logger.info("Received answer " + tag + " : "
+                        + responseData.getClass().getSimpleName());
+            }
+        }
+
+        @Override
+        public void processRequest(IpmiPayload payload) {
+            // NOP
+        }
+
+    }
 }

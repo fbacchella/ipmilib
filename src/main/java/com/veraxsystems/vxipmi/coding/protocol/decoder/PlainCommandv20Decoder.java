@@ -13,6 +13,7 @@ package com.veraxsystems.vxipmi.coding.protocol.decoder;
 
 import com.veraxsystems.vxipmi.coding.payload.IpmiPayload;
 import com.veraxsystems.vxipmi.coding.payload.PlainMessage;
+import com.veraxsystems.vxipmi.coding.protocol.PayloadType;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
 import com.veraxsystems.vxipmi.coding.security.ConfidentialityAlgorithm;
 
@@ -22,22 +23,22 @@ import com.veraxsystems.vxipmi.coding.security.ConfidentialityAlgorithm;
  * messages.
  */
 public class PlainCommandv20Decoder extends Protocolv20Decoder {
-	
-	public PlainCommandv20Decoder(CipherSuite cipherSuite) {
-		super(cipherSuite);
-	}
 
-	/**
-	 * 
-	 * @return Payload decoded into {@link PlainMessage}.
-	 */
-	@Override
-	protected IpmiPayload decodePayload(byte[] rawData, int offset,
-			int length, ConfidentialityAlgorithm confidentialityAlgorithm) {
-		byte[] payload = new byte[length];
+    public PlainCommandv20Decoder(CipherSuite cipherSuite) {
+        super(cipherSuite);
+    }
+
+    /**
+     *
+     * @return Payload decoded into {@link PlainMessage}.
+     */
+    @Override
+    protected IpmiPayload decodePayload(byte[] rawData, int offset, int length,
+            ConfidentialityAlgorithm confidentialityAlgorithm, PayloadType payloadType) {
+        byte[] payload = new byte[length];
 
         System.arraycopy(rawData, offset, payload, 0, length);
-        
-        return new PlainMessage(confidentialityAlgorithm.decrypt(payload));        
-	}
+
+        return new PlainMessage(confidentialityAlgorithm.decrypt(payload));
+    }
 }

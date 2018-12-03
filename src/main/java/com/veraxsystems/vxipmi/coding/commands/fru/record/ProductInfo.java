@@ -11,8 +11,9 @@
  */
 package com.veraxsystems.vxipmi.coding.commands.fru.record;
 
-import java.util.ArrayList;
 import com.veraxsystems.vxipmi.common.TypeConverter;
+
+import java.util.ArrayList;
 
 /**
  * FRU record containing Board info.<br>
@@ -23,181 +24,189 @@ import com.veraxsystems.vxipmi.common.TypeConverter;
  */
 public class ProductInfo extends FruRecord {
 
-	private String manufacturerName = "";
+    private String manufacturerName = "";
 
-	private String productName = "";
+    private String productName = "";
 
-	private String productModelNumber = "";
+    private String productModelNumber = "";
 
-	private String productVersion = "";
+    private String productVersion = "";
 
-	private String productSerialNumber = "";
+    private String productSerialNumber = "";
 
-	private String assetTag = "";
+    private String assetTag = "";
 
-	private byte[] fruFileId = new byte[0];
+    private byte[] fruFileId = new byte[0];
 
-	private String[] customProductInfo = new String[0];
+    private String[] customProductInfo = new String[0];
 
-	/**
-	 * Creates and populates record
-	 * 
-	 * @param fruData
-	 *            - raw data containing record
-	 * @param offset
-	 *            - offset to the record in the data
-	 */
-	public ProductInfo(byte[] fruData, int offset) {
-		super();
+    /**
+     * Creates and populates record
+     *
+     * @param fruData
+     *            - raw data containing record
+     * @param offset
+     *            - offset to the record in the data
+     */
+    public ProductInfo(final byte[] fruData, final int offset) {
+        super();
 
-		if (fruData[offset] != 0x1) {
-			throw new IllegalArgumentException("Invalid format version");
-		}
+        if (fruData[offset] != 0x1) {
+            throw new IllegalArgumentException("Invalid format version");
+        }
 
-		int languageCode = TypeConverter.byteToInt(fruData[offset + 2]);
+        int languageCode = TypeConverter.byteToInt(fruData[offset + 2]);
 
-		int partNumber = TypeConverter.byteToInt(fruData[offset + 3]);
+        int partNumber = TypeConverter.byteToInt(fruData[offset + 3]);
 
-		offset += 4;
+        ArrayList<String> customInfo = readCustomInfo(fruData, languageCode, partNumber, offset + 4);
 
-		int index = 0;
+        customProductInfo = new String[customInfo.size()];
+        customProductInfo = customInfo.toArray(customProductInfo);
+    }
 
-		ArrayList<String> customInfo = new ArrayList<String>();
+    private ArrayList<String> readCustomInfo(final byte[] fruData, final int languageCode, final int partNumber, final int offset) {
+        int index = 0;
 
-		while (partNumber != 0xc1 && offset < fruData.length) {
+        ArrayList<String> customInfo = new ArrayList<String>();
 
-			int partType = (partNumber & 0xc0) >> 6;
+        int currentOffset = offset;
+        int currentPartNumber = partNumber;
 
-			int partDataLength = (partNumber & 0x3f);
+        while (currentPartNumber != 0xc1 && currentOffset < fruData.length) {
 
-			if (partDataLength > 0 && partDataLength + offset < fruData.length) {
+            int partType = (currentPartNumber & 0xc0) >> 6;
 
-				byte[] partNumberData = new byte[partDataLength];
+            int partDataLength = (currentPartNumber & 0x3f);
 
-				System.arraycopy(fruData, offset, partNumberData, 0,
-						partDataLength);
+            if (partDataLengthWithinBounds(fruData, currentOffset, partDataLength)) {
 
-				offset += partDataLength;
+                byte[] partNumberData = new byte[partDataLength];
 
-				switch (index) {
-				case 0:
-					setManufacturerName(FruRecord.decodeString(partType,
-							partNumberData, languageCode != 0
-									&& languageCode != 25));
-					break;
-				case 1:
-					setProductName(FruRecord.decodeString(partType,
-							partNumberData, languageCode != 0
-									&& languageCode != 25));
-					break;
-				case 2:
-					setProductModelNumber(FruRecord.decodeString(partType,
-							partNumberData, languageCode != 0
-									&& languageCode != 25));
-					break;
-				case 3:
-					setProductVersion(FruRecord.decodeString(partType,
-							partNumberData, languageCode != 0
-									&& languageCode != 25));
-					break;
-				case 4:
-					setProductSerialNumber(FruRecord.decodeString(partType,
-							partNumberData, true));
-					break;
-				case 5:
-					setAssetTag(FruRecord.decodeString(partType,
-							partNumberData, languageCode != 0
-									&& languageCode != 25));
-					break;
-				case 6:
-					setFruFileId(partNumberData);
-					break;
-				default:
-					if (partDataLength == 0) {
-						partNumber = TypeConverter.byteToInt(fruData[offset]);
-						++offset;
-						continue;
-					}
-					customInfo.add(FruRecord.decodeString(partType,
-							partNumberData, languageCode != 0
-									&& languageCode != 25));
-					break;
-				}
-			}
+                System.arraycopy(fruData, currentOffset, partNumberData, 0,
+                        partDataLength);
 
-			partNumber = TypeConverter.byteToInt(fruData[offset]);
+                currentOffset += partDataLength;
 
-			++offset;
+                switch (index) {
+                case 0:
+                    setManufacturerName(FruRecord.decodeString(partType,
+                            partNumberData, isEnglishLanguageCode(languageCode)));
+                    break;
+                case 1:
+                    setProductName(FruRecord.decodeString(partType,
+                            partNumberData, isEnglishLanguageCode(languageCode)));
+                    break;
+                case 2:
+                    setProductModelNumber(FruRecord.decodeString(partType,
+                            partNumberData, isEnglishLanguageCode(languageCode)));
+                    break;
+                case 3:
+                    setProductVersion(FruRecord.decodeString(partType,
+                            partNumberData, isEnglishLanguageCode(languageCode)));
+                    break;
+                case 4:
+                    setProductSerialNumber(FruRecord.decodeString(partType,
+                            partNumberData, true));
+                    break;
+                case 5:
+                    setAssetTag(FruRecord.decodeString(partType,
+                            partNumberData, isEnglishLanguageCode(languageCode)));
+                    break;
+                case 6:
+                    setFruFileId(partNumberData);
+                    break;
+                default:
+                    if (partDataLength == 0) {
+                        currentPartNumber = TypeConverter.byteToInt(fruData[currentOffset]);
+                        ++currentOffset;
+                        continue;
+                    }
+                    customInfo.add(FruRecord.decodeString(partType,
+                            partNumberData, isEnglishLanguageCode(languageCode)));
+                    break;
+                }
+            }
 
-			++index;
-		}
+            currentPartNumber = TypeConverter.byteToInt(fruData[currentOffset]);
 
-		customProductInfo = new String[customInfo.size()];
-		customProductInfo = customInfo.toArray(customProductInfo);
-	}
+            ++currentOffset;
 
-	public String getManufacturerName() {
-		return manufacturerName;
-	}
+            ++index;
+        }
+        return customInfo;
+    }
 
-	public void setManufacturerName(String manufacturerName) {
-		this.manufacturerName = manufacturerName;
-	}
+    private boolean isEnglishLanguageCode(int languageCode) {
+        return languageCode != 0 && languageCode != 25;
+    }
 
-	public String getProductName() {
-		return productName;
-	}
+    private boolean partDataLengthWithinBounds(byte[] fruData, int currentOffset, int partDataLength) {
+        return partDataLength > 0 && partDataLength + currentOffset < fruData.length;
+    }
 
-	public void setProductName(String productName) {
-		this.productName = productName;
-	}
+    public String getManufacturerName() {
+        return manufacturerName;
+    }
 
-	public String getProductModelNumber() {
-		return productModelNumber;
-	}
+    public void setManufacturerName(String manufacturerName) {
+        this.manufacturerName = manufacturerName;
+    }
 
-	public void setProductModelNumber(String productModelNumber) {
-		this.productModelNumber = productModelNumber;
-	}
+    public String getProductName() {
+        return productName;
+    }
 
-	public String getProductVersion() {
-		return productVersion;
-	}
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
 
-	public void setProductVersion(String productVersion) {
-		this.productVersion = productVersion;
-	}
+    public String getProductModelNumber() {
+        return productModelNumber;
+    }
 
-	public void setProductSerialNumber(String productSerialNumber) {
-		this.productSerialNumber = productSerialNumber;
-	}
+    public void setProductModelNumber(String productModelNumber) {
+        this.productModelNumber = productModelNumber;
+    }
 
-	public String getProductSerialNumber() {
-		return productSerialNumber;
-	}
+    public String getProductVersion() {
+        return productVersion;
+    }
 
-	public String getAssetTag() {
-		return assetTag;
-	}
+    public void setProductVersion(String productVersion) {
+        this.productVersion = productVersion;
+    }
 
-	public void setAssetTag(String assetTag) {
-		this.assetTag = assetTag;
-	}
+    public void setProductSerialNumber(String productSerialNumber) {
+        this.productSerialNumber = productSerialNumber;
+    }
 
-	public byte[] getFruFileId() {
-		return fruFileId;
-	}
+    public String getProductSerialNumber() {
+        return productSerialNumber;
+    }
 
-	public void setFruFileId(byte[] fruFileId) {
-		this.fruFileId = fruFileId;
-	}
+    public String getAssetTag() {
+        return assetTag;
+    }
 
-	public String[] getCustomProductInfo() {
-		return customProductInfo;
-	}
+    public void setAssetTag(String assetTag) {
+        this.assetTag = assetTag;
+    }
 
-	public void setCustomProductInfo(String[] customProductInfo) {
-		this.customProductInfo = customProductInfo;
-	}
+    public byte[] getFruFileId() {
+        return fruFileId;
+    }
+
+    public void setFruFileId(byte[] fruFileId) {
+        this.fruFileId = fruFileId;
+    }
+
+    public String[] getCustomProductInfo() {
+        return customProductInfo;
+    }
+
+    public void setCustomProductInfo(String[] customProductInfo) {
+        this.customProductInfo = customProductInfo;
+    }
 
 }

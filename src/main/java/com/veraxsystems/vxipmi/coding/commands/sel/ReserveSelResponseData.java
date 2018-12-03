@@ -17,14 +17,14 @@ import com.veraxsystems.vxipmi.coding.commands.ResponseData;
  * Wrapper for Reserve SEL command response.
  */
 public class ReserveSelResponseData implements ResponseData {
-	private int reservationId;
+    private int reservationId;
 
-	public void setReservationId(int reservationId) {
-		this.reservationId = reservationId;
-	}
+    public void setReservationId(int reservationId) {
+        this.reservationId = reservationId;
+    }
 
-	public int getReservationId() {
-		return reservationId;
-	}
-	
+    public int getReservationId() {
+        return reservationId;
+    }
+
 }

@@ -19,37 +19,37 @@ import com.veraxsystems.vxipmi.coding.commands.ResponseData;
  */
 public class Rakp3ResponseData implements ResponseData {
 
-	private byte messageTag;
+    private byte messageTag;
 
-	private byte statusCode;
+    private byte statusCode;
 
-	/**
-	 * The Console Session ID specified by the RMCP+ Open Session Request
-	 * message associated with this response.
-	 */
-	private int consoleSessionId;
+    /**
+     * The Console Session ID specified by the RMCP+ Open Session Request
+     * message associated with this response.
+     */
+    private int consoleSessionId;
 
-	public void setMessageTag(byte messageTag) {
-		this.messageTag = messageTag;
-	}
+    public void setMessageTag(byte messageTag) {
+        this.messageTag = messageTag;
+    }
 
-	public byte getMessageTag() {
-		return messageTag;
-	}
+    public byte getMessageTag() {
+        return messageTag;
+    }
 
-	public void setStatusCode(byte statusCode) {
-		this.statusCode = statusCode;
-	}
+    public void setStatusCode(byte statusCode) {
+        this.statusCode = statusCode;
+    }
 
-	public byte getStatusCode() {
-		return statusCode;
-	}
+    public byte getStatusCode() {
+        return statusCode;
+    }
 
-	public void setConsoleSessionId(int consoleSessionId) {
-		this.consoleSessionId = consoleSessionId;
-	}
+    public void setConsoleSessionId(int consoleSessionId) {
+        this.consoleSessionId = consoleSessionId;
+    }
 
-	public int getConsoleSessionId() {
-		return consoleSessionId;
-	}
+    public int getConsoleSessionId() {
+        return consoleSessionId;
+    }
 }

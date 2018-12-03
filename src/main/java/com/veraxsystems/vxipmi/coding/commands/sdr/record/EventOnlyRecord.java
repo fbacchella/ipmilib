@@ -21,268 +21,268 @@ import com.veraxsystems.vxipmi.common.TypeConverter;
  */
 public class EventOnlyRecord extends SensorRecord {
 
-	private byte sensorOwnerId;
-
-	private AddressType addressType;
+    private byte sensorOwnerId;
 
-	private byte channelNumber;
+    private AddressType addressType;
 
-	private byte sensorOwnerLun;
+    private byte channelNumber;
 
-	private byte sensorNumber;
+    private byte sensorOwnerLun;
 
-	private EntityId entityId;
+    private byte sensorNumber;
 
-	/**
-	 * Entity is physical if true, logical otherwise.
-	 */
-	private boolean entityPhysical;
+    private EntityId entityId;
 
-	private byte entityInstanceNumber;
+    /**
+     * Entity is physical if true, logical otherwise.
+     */
+    private boolean entityPhysical;
 
-	private SensorType sensorType;
-	
-	private int eventReadingType;
-	
-	private SensorDirection sensorDirection;
+    private byte entityInstanceNumber;
 
-	private String name;
+    private SensorType sensorType;
 
-	/**
-	 * The instance modifier is a character(s) that software can append to the
-	 * end of the ID String. This field selects whether the appended
-	 * character(s) will be numeric or alpha.
-	 */
-	private InstanceModifierType idInstanceModifierType;
+    private int eventReadingType;
 
-	/**
-	 * Sensor numbers sharing this record are sequential starting with the
-	 * sensor number specified by the Sensor Number field for this record.
-	 */
-	private int shareCount;
+    private SensorDirection sensorDirection;
 
-	private boolean entityInstanceIncrements;
+    private String name;
 
-	/**
-	 * Suppose sensor ID is 'Temp' for 'Temperature Sensor', share count = 3, ID
-	 * string instance modifier = numeric, instance modifier offset = 5 - then
-	 * the sensors could be identified as: Temp 5, Temp 6, Temp 7 <br>
-	 * If the modifier = alpha, offset=0 corresponds to 'A', offset=25
-	 * corresponds to 'Z', and offset = 26 corresponds to 'AA', thus, for
-	 * offset=26 the sensors could be identified as: Temp AA, Temp AB, Temp AC
-	 */
-	private int idInstanceModifierOffset;
+    /**
+     * The instance modifier is a character(s) that software can append to the
+     * end of the ID String. This field selects whether the appended
+     * character(s) will be numeric or alpha.
+     */
+    private InstanceModifierType idInstanceModifierType;
 
-	
-	@Override
-	protected void populateTypeSpecficValues(byte[] recordData,
-			SensorRecord record) {
-		
-		setSensorOwnerId(TypeConverter.intToByte((TypeConverter
-				.byteToInt(recordData[5]) & 0xfe) >> 1));
+    /**
+     * Sensor numbers sharing this record are sequential starting with the
+     * sensor number specified by the Sensor Number field for this record.
+     */
+    private int shareCount;
 
-		setAddressType(AddressType.parseInt(TypeConverter
-				.byteToInt(recordData[5]) & 0x01));
+    private boolean entityInstanceIncrements;
 
-		setChannelNumber(TypeConverter.intToByte((TypeConverter
-				.byteToInt(recordData[6]) & 0xf0) >> 4));
+    /**
+     * Suppose sensor ID is 'Temp' for 'Temperature Sensor', share count = 3, ID
+     * string instance modifier = numeric, instance modifier offset = 5 - then
+     * the sensors could be identified as: Temp 5, Temp 6, Temp 7 <br>
+     * If the modifier = alpha, offset=0 corresponds to 'A', offset=25
+     * corresponds to 'Z', and offset = 26 corresponds to 'AA', thus, for
+     * offset=26 the sensors could be identified as: Temp AA, Temp AB, Temp AC
+     */
+    private int idInstanceModifierOffset;
 
-		setSensorOwnerLun(TypeConverter.intToByte(TypeConverter
-				.byteToInt(recordData[6]) & 0x3));
 
-		setSensorNumber(recordData[7]);
+    @Override
+    protected void populateTypeSpecficValues(byte[] recordData,
+            SensorRecord record) {
 
-		setEntityId(EntityId.parseInt(TypeConverter.byteToInt(recordData[8])));
+        setSensorOwnerId(TypeConverter.intToByte((TypeConverter
+                .byteToInt(recordData[5]) & 0xfe) >> 1));
 
-		setEntityPhysical((TypeConverter.byteToInt(recordData[9]) & 0x80) == 0);
+        setAddressType(AddressType.parseInt(TypeConverter
+                .byteToInt(recordData[5]) & 0x01));
 
-		setEntityInstanceNumber(TypeConverter.intToByte(TypeConverter
-				.byteToInt(recordData[9]) & 0x7f));
+        setChannelNumber(TypeConverter.intToByte((TypeConverter
+                .byteToInt(recordData[6]) & 0xf0) >> 4));
 
-		setSensorType(SensorType.parseInt(TypeConverter
-				.byteToInt(recordData[10])));
-		
-		setEventReadingType(TypeConverter.byteToInt(recordData[11]));
+        setSensorOwnerLun(TypeConverter.intToByte(TypeConverter
+                .byteToInt(recordData[6]) & 0x3));
 
-		setSensorDirection(SensorDirection.parseInt((TypeConverter
-				.byteToInt(recordData[12]) & 0xc0) >> 6));
+        setSensorNumber(recordData[7]);
 
-		setIdInstanceModifierType(InstanceModifierType.parseInt((TypeConverter
-				.byteToInt(recordData[12]) & 0x30) >> 4));
-		
-		setShareCount(TypeConverter.byteToInt(recordData[12]) & 0xf);
-		
-		setEntityInstanceIncrements((TypeConverter.byteToInt(recordData[13]) & 0x80) != 0);
-		
-		setIdInstanceModifierOffset(TypeConverter.byteToInt(recordData[13]) & 0x7f);
-		
-		byte[] name = new byte[recordData.length - 17];
-		
-		System.arraycopy(recordData, 17, name, 0, name.length);
-		
-		setName(decodeName(recordData[16], name));
+        setEntityId(EntityId.parseInt(TypeConverter.byteToInt(recordData[8])));
 
-	}
+        setEntityPhysical((TypeConverter.byteToInt(recordData[9]) & 0x80) == 0);
 
+        setEntityInstanceNumber(TypeConverter.intToByte(TypeConverter
+                .byteToInt(recordData[9]) & 0x7f));
 
-	public byte getSensorOwnerId() {
-		return sensorOwnerId;
-	}
+        setSensorType(SensorType.parseInt(TypeConverter
+                .byteToInt(recordData[10])));
 
+        setEventReadingType(TypeConverter.byteToInt(recordData[11]));
 
-	public void setSensorOwnerId(byte sensorOwnerId) {
-		this.sensorOwnerId = sensorOwnerId;
-	}
+        setSensorDirection(SensorDirection.parseInt((TypeConverter
+                .byteToInt(recordData[12]) & 0xc0) >> 6));
 
+        setIdInstanceModifierType(InstanceModifierType.parseInt((TypeConverter
+                .byteToInt(recordData[12]) & 0x30) >> 4));
 
-	public AddressType getAddressType() {
-		return addressType;
-	}
+        setShareCount(TypeConverter.byteToInt(recordData[12]) & 0xf);
 
+        setEntityInstanceIncrements((TypeConverter.byteToInt(recordData[13]) & 0x80) != 0);
 
-	public void setAddressType(AddressType addressType) {
-		this.addressType = addressType;
-	}
+        setIdInstanceModifierOffset(TypeConverter.byteToInt(recordData[13]) & 0x7f);
 
+        byte[] nameData = new byte[recordData.length - 17];
 
-	public byte getChannelNumber() {
-		return channelNumber;
-	}
+        System.arraycopy(recordData, 17, nameData, 0, nameData.length);
 
+        setName(decodeName(recordData[16], nameData));
 
-	public void setChannelNumber(byte channelNumber) {
-		this.channelNumber = channelNumber;
-	}
+    }
 
 
-	public byte getSensorOwnerLun() {
-		return sensorOwnerLun;
-	}
+    public byte getSensorOwnerId() {
+        return sensorOwnerId;
+    }
 
 
-	public void setSensorOwnerLun(byte sensorOwnerLun) {
-		this.sensorOwnerLun = sensorOwnerLun;
-	}
+    public void setSensorOwnerId(byte sensorOwnerId) {
+        this.sensorOwnerId = sensorOwnerId;
+    }
 
 
-	public byte getSensorNumber() {
-		return sensorNumber;
-	}
+    public AddressType getAddressType() {
+        return addressType;
+    }
 
 
-	public void setSensorNumber(byte sensorNumber) {
-		this.sensorNumber = sensorNumber;
-	}
+    public void setAddressType(AddressType addressType) {
+        this.addressType = addressType;
+    }
 
 
-	public EntityId getEntityId() {
-		return entityId;
-	}
+    public byte getChannelNumber() {
+        return channelNumber;
+    }
 
 
-	public void setEntityId(EntityId entityId) {
-		this.entityId = entityId;
-	}
+    public void setChannelNumber(byte channelNumber) {
+        this.channelNumber = channelNumber;
+    }
 
 
-	public boolean isEntityPhysical() {
-		return entityPhysical;
-	}
+    public byte getSensorOwnerLun() {
+        return sensorOwnerLun;
+    }
 
 
-	public void setEntityPhysical(boolean entityPhysical) {
-		this.entityPhysical = entityPhysical;
-	}
+    public void setSensorOwnerLun(byte sensorOwnerLun) {
+        this.sensorOwnerLun = sensorOwnerLun;
+    }
 
 
-	public byte getEntityInstanceNumber() {
-		return entityInstanceNumber;
-	}
+    public byte getSensorNumber() {
+        return sensorNumber;
+    }
 
 
-	public void setEntityInstanceNumber(byte entityInstanceNumber) {
-		this.entityInstanceNumber = entityInstanceNumber;
-	}
+    public void setSensorNumber(byte sensorNumber) {
+        this.sensorNumber = sensorNumber;
+    }
 
 
-	public SensorType getSensorType() {
-		return sensorType;
-	}
+    public EntityId getEntityId() {
+        return entityId;
+    }
 
 
-	public void setSensorType(SensorType sensorType) {
-		this.sensorType = sensorType;
-	}
+    public void setEntityId(EntityId entityId) {
+        this.entityId = entityId;
+    }
 
 
-	public int getEventReadingType() {
-		return eventReadingType;
-	}
+    public boolean isEntityPhysical() {
+        return entityPhysical;
+    }
 
 
-	public void setEventReadingType(int eventReadingType) {
-		this.eventReadingType = eventReadingType;
-	}
+    public void setEntityPhysical(boolean entityPhysical) {
+        this.entityPhysical = entityPhysical;
+    }
 
 
-	public SensorDirection getSensorDirection() {
-		return sensorDirection;
-	}
+    public byte getEntityInstanceNumber() {
+        return entityInstanceNumber;
+    }
 
 
-	public void setSensorDirection(SensorDirection sensorDirection) {
-		this.sensorDirection = sensorDirection;
-	}
+    public void setEntityInstanceNumber(byte entityInstanceNumber) {
+        this.entityInstanceNumber = entityInstanceNumber;
+    }
 
 
-	public String getName() {
-		return name;
-	}
+    public SensorType getSensorType() {
+        return sensorType;
+    }
 
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setSensorType(SensorType sensorType) {
+        this.sensorType = sensorType;
+    }
 
 
-	public InstanceModifierType getIdInstanceModifierType() {
-		return idInstanceModifierType;
-	}
+    public int getEventReadingType() {
+        return eventReadingType;
+    }
 
 
-	public void setIdInstanceModifierType(
-			InstanceModifierType idInstanceModifierType) {
-		this.idInstanceModifierType = idInstanceModifierType;
-	}
+    public void setEventReadingType(int eventReadingType) {
+        this.eventReadingType = eventReadingType;
+    }
 
 
-	public int getShareCount() {
-		return shareCount;
-	}
+    public SensorDirection getSensorDirection() {
+        return sensorDirection;
+    }
 
 
-	public void setShareCount(int shareCount) {
-		this.shareCount = shareCount;
-	}
+    public void setSensorDirection(SensorDirection sensorDirection) {
+        this.sensorDirection = sensorDirection;
+    }
 
 
-	public boolean isEntityInstanceIncrements() {
-		return entityInstanceIncrements;
-	}
+    public String getName() {
+        return name;
+    }
 
 
-	public void setEntityInstanceIncrements(boolean entityInstanceIncrements) {
-		this.entityInstanceIncrements = entityInstanceIncrements;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
 
-	public int getIdInstanceModifierOffset() {
-		return idInstanceModifierOffset;
-	}
+    public InstanceModifierType getIdInstanceModifierType() {
+        return idInstanceModifierType;
+    }
 
 
-	public void setIdInstanceModifierOffset(int idInstanceModifierOffset) {
-		this.idInstanceModifierOffset = idInstanceModifierOffset;
-	}
+    public void setIdInstanceModifierType(
+            InstanceModifierType idInstanceModifierType) {
+        this.idInstanceModifierType = idInstanceModifierType;
+    }
+
+
+    public int getShareCount() {
+        return shareCount;
+    }
+
+
+    public void setShareCount(int shareCount) {
+        this.shareCount = shareCount;
+    }
+
+
+    public boolean isEntityInstanceIncrements() {
+        return entityInstanceIncrements;
+    }
+
+
+    public void setEntityInstanceIncrements(boolean entityInstanceIncrements) {
+        this.entityInstanceIncrements = entityInstanceIncrements;
+    }
+
+
+    public int getIdInstanceModifierOffset() {
+        return idInstanceModifierOffset;
+    }
+
+
+    public void setIdInstanceModifierOffset(int idInstanceModifierOffset) {
+        this.idInstanceModifierOffset = idInstanceModifierOffset;
+    }
 
 }

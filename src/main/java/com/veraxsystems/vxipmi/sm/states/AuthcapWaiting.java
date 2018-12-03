@@ -33,52 +33,44 @@ import com.veraxsystems.vxipmi.sm.events.Timeout;
  */
 public class AuthcapWaiting extends State {
 
-	private int tag;
+    private int tag;
 
-	public AuthcapWaiting(int tag) {
-		this.tag = tag;
-	}
+    public AuthcapWaiting(int tag) {
+        this.tag = tag;
+    }
 
-	@Override
-	public void doTransition(StateMachine stateMachine,
-			StateMachineEvent machineEvent) {
-		if (machineEvent instanceof Timeout) {
-			stateMachine.setCurrent(new Ciphers());
-		} else if (machineEvent instanceof AuthenticationCapabilitiesReceived) {
-			stateMachine.setCurrent(new Authcap());
-		} else {
-			stateMachine.doExternalAction(new ErrorAction(
-					new IllegalArgumentException("Invalid transition")));
-		}
-	}
+    @Override
+    public void doTransition(StateMachine stateMachine,
+            StateMachineEvent machineEvent) {
+        if (machineEvent instanceof Timeout) {
+            stateMachine.setCurrent(new Ciphers());
+        } else if (machineEvent instanceof AuthenticationCapabilitiesReceived) {
+            stateMachine.setCurrent(new Authcap());
+        } else {
+            stateMachine.doExternalAction(new ErrorAction(
+                    new IllegalArgumentException("Invalid transition")));
+        }
+    }
 
-	@Override
-	public void doAction(StateMachine stateMachine, RmcpMessage message) {
-		if (ProtocolDecoder.decodeAuthenticationType(message) == AuthenticationType.RMCPPlus) {
-			return; // this isn't IPMI v1.5 message so we ignore it
-		}
-		Protocolv15Decoder decoder = new Protocolv15Decoder();
-		IpmiMessage ipmiMessage = null;
-		try {
-			ipmiMessage = decoder.decode(message);
-			/*System.out.println("[AW "
-					+ stateMachine.hashCode()
-					+ "] Expected: "
-					+ tag
-					+ " encountered: "
-					+ TypeConverter.byteToInt(((IpmiLanResponse) ipmiMessage
-							.getPayload()).getSequenceNumber()));*/
-			GetChannelAuthenticationCapabilities capabilities = new GetChannelAuthenticationCapabilities();
-			if (capabilities.isCommandResponse(ipmiMessage)
-					&& TypeConverter.byteToInt(((IpmiLanResponse) ipmiMessage
-							.getPayload()).getSequenceNumber()) == tag) {
-				stateMachine.doExternalAction(new ResponseAction(capabilities
-						.getResponseData(ipmiMessage)));
-			}
-		} catch (Exception e) {
-			//stateMachine.doTransition(new Timeout());
-			stateMachine.doExternalAction(new ErrorAction(e));
-		}
-	}
+    @Override
+    public void doAction(StateMachine stateMachine, RmcpMessage message) {
+        if (ProtocolDecoder.decodeAuthenticationType(message) == AuthenticationType.RMCPPlus) {
+            return; // this isn't IPMI v1.5 message so we ignore it
+        }
+        Protocolv15Decoder decoder = new Protocolv15Decoder();
+        IpmiMessage ipmiMessage = null;
+        try {
+            ipmiMessage = decoder.decode(message);
+            GetChannelAuthenticationCapabilities capabilities = new GetChannelAuthenticationCapabilities();
+            if (capabilities.isCommandResponse(ipmiMessage)
+                    && TypeConverter.byteToInt(((IpmiLanResponse) ipmiMessage
+                            .getPayload()).getSequenceNumber()) == tag) {
+                stateMachine.doExternalAction(new ResponseAction(capabilities
+                        .getResponseData(ipmiMessage)));
+            }
+        } catch (Exception e) {
+            stateMachine.doExternalAction(new ErrorAction(e));
+        }
+    }
 
 }

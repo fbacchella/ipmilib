@@ -20,201 +20,201 @@ import com.veraxsystems.vxipmi.common.TypeConverter;
  */
 public class ManagementControllerDeviceLocatorRecord extends SensorRecord {
 
-	private int deviceAddress;
+    private int deviceAddress;
 
-	private int channelNumber;
+    private int channelNumber;
 
-	/**
-	 * Device functions as chassis device,
-	 */
-	private boolean supportsChassis;
+    /**
+     * Device functions as chassis device,
+     */
+    private boolean supportsChassis;
 
-	/**
-	 * Controller responds to Bridge NetFn commands
-	 */
-	private boolean supportsBridge;
+    /**
+     * Controller responds to Bridge NetFn commands
+     */
+    private boolean supportsBridge;
 
-	/**
-	 * Device generates event messages on IPMB
-	 */
-	private boolean supportsIpmbEventGenerator;
+    /**
+     * Device generates event messages on IPMB
+     */
+    private boolean supportsIpmbEventGenerator;
 
-	/**
-	 * Device accepts event messages from IPMB
-	 */
-	private boolean supportsIpmbEventReciever;
+    /**
+     * Device accepts event messages from IPMB
+     */
+    private boolean supportsIpmbEventReciever;
 
-	/**
-	 * Device accepts FRU commands to FRU Device #0 at LUN 00b
-	 */
-	private boolean supportsFruInventoryDevice;
+    /**
+     * Device accepts FRU commands to FRU Device #0 at LUN 00b
+     */
+    private boolean supportsFruInventoryDevice;
 
-	/**
-	 * Device provides interface to SEL
-	 */
-	private boolean supportsSelDevice;
+    /**
+     * Device provides interface to SEL
+     */
+    private boolean supportsSelDevice;
 
-	/**
-	 * For BMC, indicates BMC provides interface to SDR Repository. For other
-	 * controller, indicates controller accepts Device SDR commands
-	 */
-	private boolean supportsSdrRepositoryDevice;
+    /**
+     * For BMC, indicates BMC provides interface to SDR Repository. For other
+     * controller, indicates controller accepts Device SDR commands
+     */
+    private boolean supportsSdrRepositoryDevice;
 
-	/**
-	 * Device accepts sensor commands
-	 */
-	private boolean supportsSensors;
-	
-	/**
-	 * Entity ID for the FRU associated with this device.
-	 */
-	private int entityId;
-	
-	/**
-	 * Instance number for entity.
-	 */
-	private int entityInstance;
-	
-	private String name;
+    /**
+     * Device accepts sensor commands
+     */
+    private boolean supportsSensors;
 
-	@Override
-	protected void populateTypeSpecficValues(byte[] recordData,
-			SensorRecord record) {
-		
-		setDeviceAddress(TypeConverter.byteToInt(recordData[5]) >> 1);
-		
-		setChannelNumber(TypeConverter.byteToInt(recordData[6]) & 0xf);
-		
-		setSupportsChassis((TypeConverter.byteToInt(recordData[8]) & 0x80) != 0);
+    /**
+     * Entity ID for the FRU associated with this device.
+     */
+    private int entityId;
 
-		setSupportsBridge((TypeConverter.byteToInt(recordData[8]) & 0x40) != 0);
+    /**
+     * Instance number for entity.
+     */
+    private int entityInstance;
 
-		setSupportsIpmbEventGenerator((TypeConverter.byteToInt(recordData[8]) & 0x20) != 0);
+    private String name;
 
-		setSupportsIpmbEventReciever((TypeConverter.byteToInt(recordData[8]) & 0x10) != 0);
+    @Override
+    protected void populateTypeSpecficValues(byte[] recordData,
+            SensorRecord record) {
 
-		setSupportsFruInventoryDevice((TypeConverter.byteToInt(recordData[8]) & 0x8) != 0);
+        setDeviceAddress(TypeConverter.byteToInt(recordData[5]) >> 1);
 
-		setSupportsSelDevice((TypeConverter.byteToInt(recordData[8]) & 0x4) != 0);
+        setChannelNumber(TypeConverter.byteToInt(recordData[6]) & 0xf);
 
-		setSupportsSdrRepositoryDevice((TypeConverter.byteToInt(recordData[8]) & 0x2) != 0);
+        setSupportsChassis((TypeConverter.byteToInt(recordData[8]) & 0x80) != 0);
 
-		setSupportsSensors((TypeConverter.byteToInt(recordData[8]) & 0x1) != 0);
-		
-		setEntityId(TypeConverter.byteToInt(recordData[12]));
-		
-		setEntityInstance(TypeConverter.byteToInt(recordData[13]));
-		
-		byte[] name = new byte[recordData.length - 16];
-		
-		System.arraycopy(recordData, 16, name, 0, name.length);
-		
-		setName(decodeName(recordData[15], name));
+        setSupportsBridge((TypeConverter.byteToInt(recordData[8]) & 0x40) != 0);
 
-	}
+        setSupportsIpmbEventGenerator((TypeConverter.byteToInt(recordData[8]) & 0x20) != 0);
 
-	public int getDeviceAddress() {
-		return deviceAddress;
-	}
+        setSupportsIpmbEventReciever((TypeConverter.byteToInt(recordData[8]) & 0x10) != 0);
 
-	public void setDeviceAddress(int deviceAddress) {
-		this.deviceAddress = deviceAddress;
-	}
+        setSupportsFruInventoryDevice((TypeConverter.byteToInt(recordData[8]) & 0x8) != 0);
 
-	public int getChannelNumber() {
-		return channelNumber;
-	}
+        setSupportsSelDevice((TypeConverter.byteToInt(recordData[8]) & 0x4) != 0);
 
-	public void setChannelNumber(int channelNumber) {
-		this.channelNumber = channelNumber;
-	}
+        setSupportsSdrRepositoryDevice((TypeConverter.byteToInt(recordData[8]) & 0x2) != 0);
 
-	public boolean isSupportsChassis() {
-		return supportsChassis;
-	}
+        setSupportsSensors((TypeConverter.byteToInt(recordData[8]) & 0x1) != 0);
 
-	public void setSupportsChassis(boolean supportsChassis) {
-		this.supportsChassis = supportsChassis;
-	}
+        setEntityId(TypeConverter.byteToInt(recordData[12]));
 
-	public boolean isSupportsBridge() {
-		return supportsBridge;
-	}
+        setEntityInstance(TypeConverter.byteToInt(recordData[13]));
 
-	public void setSupportsBridge(boolean supportsBridge) {
-		this.supportsBridge = supportsBridge;
-	}
+        byte[] nameData = new byte[recordData.length - 16];
 
-	public boolean isSupportsIpmbEventGenerator() {
-		return supportsIpmbEventGenerator;
-	}
+        System.arraycopy(recordData, 16, nameData, 0, nameData.length);
 
-	public void setSupportsIpmbEventGenerator(boolean supportsIpmbEventGenerator) {
-		this.supportsIpmbEventGenerator = supportsIpmbEventGenerator;
-	}
+        setName(decodeName(recordData[15], nameData));
 
-	public boolean isSupportsIpmbEventReciever() {
-		return supportsIpmbEventReciever;
-	}
+    }
 
-	public void setSupportsIpmbEventReciever(boolean supportsIpmbEventReciever) {
-		this.supportsIpmbEventReciever = supportsIpmbEventReciever;
-	}
+    public int getDeviceAddress() {
+        return deviceAddress;
+    }
 
-	public boolean isSupportsFruInventoryDevice() {
-		return supportsFruInventoryDevice;
-	}
+    public void setDeviceAddress(int deviceAddress) {
+        this.deviceAddress = deviceAddress;
+    }
 
-	public void setSupportsFruInventoryDevice(boolean supportsFruInventoryDevice) {
-		this.supportsFruInventoryDevice = supportsFruInventoryDevice;
-	}
+    public int getChannelNumber() {
+        return channelNumber;
+    }
 
-	public boolean isSupportsSelDevice() {
-		return supportsSelDevice;
-	}
+    public void setChannelNumber(int channelNumber) {
+        this.channelNumber = channelNumber;
+    }
 
-	public void setSupportsSelDevice(boolean supportsSelDevice) {
-		this.supportsSelDevice = supportsSelDevice;
-	}
+    public boolean isSupportsChassis() {
+        return supportsChassis;
+    }
 
-	public boolean isSupportsSdrRepositoryDevice() {
-		return supportsSdrRepositoryDevice;
-	}
+    public void setSupportsChassis(boolean supportsChassis) {
+        this.supportsChassis = supportsChassis;
+    }
 
-	public void setSupportsSdrRepositoryDevice(boolean supportsSdrRepositoryDevice) {
-		this.supportsSdrRepositoryDevice = supportsSdrRepositoryDevice;
-	}
+    public boolean isSupportsBridge() {
+        return supportsBridge;
+    }
 
-	public boolean isSupportsSensors() {
-		return supportsSensors;
-	}
+    public void setSupportsBridge(boolean supportsBridge) {
+        this.supportsBridge = supportsBridge;
+    }
 
-	public void setSupportsSensors(boolean supportsSensors) {
-		this.supportsSensors = supportsSensors;
-	}
+    public boolean isSupportsIpmbEventGenerator() {
+        return supportsIpmbEventGenerator;
+    }
 
-	public int getEntityId() {
-		return entityId;
-	}
+    public void setSupportsIpmbEventGenerator(boolean supportsIpmbEventGenerator) {
+        this.supportsIpmbEventGenerator = supportsIpmbEventGenerator;
+    }
 
-	public void setEntityId(int entityId) {
-		this.entityId = entityId;
-	}
+    public boolean isSupportsIpmbEventReciever() {
+        return supportsIpmbEventReciever;
+    }
 
-	public int getEntityInstance() {
-		return entityInstance;
-	}
+    public void setSupportsIpmbEventReciever(boolean supportsIpmbEventReciever) {
+        this.supportsIpmbEventReciever = supportsIpmbEventReciever;
+    }
 
-	public void setEntityInstance(int entityInstance) {
-		this.entityInstance = entityInstance;
-	}
+    public boolean isSupportsFruInventoryDevice() {
+        return supportsFruInventoryDevice;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public void setSupportsFruInventoryDevice(boolean supportsFruInventoryDevice) {
+        this.supportsFruInventoryDevice = supportsFruInventoryDevice;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public boolean isSupportsSelDevice() {
+        return supportsSelDevice;
+    }
+
+    public void setSupportsSelDevice(boolean supportsSelDevice) {
+        this.supportsSelDevice = supportsSelDevice;
+    }
+
+    public boolean isSupportsSdrRepositoryDevice() {
+        return supportsSdrRepositoryDevice;
+    }
+
+    public void setSupportsSdrRepositoryDevice(boolean supportsSdrRepositoryDevice) {
+        this.supportsSdrRepositoryDevice = supportsSdrRepositoryDevice;
+    }
+
+    public boolean isSupportsSensors() {
+        return supportsSensors;
+    }
+
+    public void setSupportsSensors(boolean supportsSensors) {
+        this.supportsSensors = supportsSensors;
+    }
+
+    public int getEntityId() {
+        return entityId;
+    }
+
+    public void setEntityId(int entityId) {
+        this.entityId = entityId;
+    }
+
+    public int getEntityInstance() {
+        return entityInstance;
+    }
+
+    public void setEntityInstance(int entityInstance) {
+        this.entityInstance = entityInstance;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
 }

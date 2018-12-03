@@ -11,65 +11,68 @@
  */
 package com.veraxsystems.vxipmi.coding.security;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * HMAC-SHA1-96 integrity algorithm.
  */
 public class IntegrityHmacSha1_96 extends IntegrityAlgorithm {
 
-	private Mac mac;
+    public static final String ALGORITHM_NAME = "HmacSHA1";
+    private Mac mac;
 
-	private static final byte[] CONST1 = new byte[] { 1, 1, 1, 1,
-			1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+    private static final byte[] CONST1 = new byte[] { 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 
-	/**
-	 * Initiates HMAC-SHA1-96 integrity algorithm.
-	 * 
-	 * @throws NoSuchAlgorithmException
-	 *             - when initiation of the algorithm fails
-	 */
-	public IntegrityHmacSha1_96() throws NoSuchAlgorithmException {
-		mac = Mac.getInstance("HmacSHA1");
-	}
-	
-	@Override
-	public void initialize(byte[] sik) throws InvalidKeyException {
-		super.initialize(sik);
-		
-		SecretKeySpec k1 = new SecretKeySpec(sik, "HmacSHA1");
+    /**
+     * Initiates HMAC-SHA1-96 integrity algorithm.
+     *
+     * @throws NoSuchAlgorithmException
+     *             - when initiation of the algorithm fails
+     */
+    public IntegrityHmacSha1_96() throws NoSuchAlgorithmException {
+        mac = Mac.getInstance(ALGORITHM_NAME);
+    }
 
-		mac.init(k1);
-		
-		k1 = new SecretKeySpec(mac.doFinal(CONST1), "HmacSHA1");
-		
-		mac.init(k1);
-	}
+    @Override
+    public void initialize(byte[] sik) throws InvalidKeyException {
+        super.initialize(sik);
 
-	@Override
-	public byte getCode() {
-		return SecurityConstants.IA_HMAC_SHA1_96;
-	}
+        SecretKeySpec k1 = new SecretKeySpec(sik, ALGORITHM_NAME);
 
-	@Override
-	public byte[] generateAuthCode(byte[] base) {
-		if (sik == null) {
-			throw new NullPointerException("Algorithm not initialized.");
-		}
+        mac.init(k1);
 
-		byte[] result = new byte[12];
-		
-		if(base[base.length - 2] == 0 /*there are no integrity pad bytes*/) {
-			base = injectIntegrityPad(base,12);
-		}
+        k1 = new SecretKeySpec(mac.doFinal(CONST1), ALGORITHM_NAME);
 
-		System.arraycopy(mac.doFinal(base), 0, result, 0, 12);
+        mac.init(k1);
+    }
 
-		return result;
-	}
+    @Override
+    public byte getCode() {
+        return SecurityConstants.IA_HMAC_SHA1_96;
+    }
+
+    @Override
+    public byte[] generateAuthCode(final byte[] base) {
+        if (sik == null) {
+            throw new NullPointerException("Algorithm not initialized.");
+        }
+
+        byte[] result = new byte[12];
+        byte[] updatedBase;
+
+        if(base[base.length - 2] == 0 /*there are no integrity pad bytes*/) {
+            updatedBase = injectIntegrityPad(base,12);
+        } else {
+            updatedBase = base;
+        }
+
+        System.arraycopy(mac.doFinal(updatedBase), 0, result, 0, 12);
+
+        return result;
+    }
 
 }

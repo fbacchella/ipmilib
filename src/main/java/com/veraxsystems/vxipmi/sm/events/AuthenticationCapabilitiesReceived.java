@@ -22,20 +22,20 @@ import com.veraxsystems.vxipmi.sm.states.AuthcapWaiting;
  * @see StateMachine
  */
 public class AuthenticationCapabilitiesReceived extends StateMachineEvent {
-	private int sessionId;
-	private PrivilegeLevel privilegeLevel;
-	
-	public AuthenticationCapabilitiesReceived(int sessionId, PrivilegeLevel privilegeLevel) {
-		this.sessionId = sessionId;
-		this.privilegeLevel = privilegeLevel;
-	}
-	
-	public int getSessionId() {
-		return sessionId;
-	}
-	public PrivilegeLevel getPrivilegeLevel() {
-		return privilegeLevel;
-	}
-	
-	
+    private int sessionId;
+    private PrivilegeLevel privilegeLevel;
+
+    public AuthenticationCapabilitiesReceived(int sessionId, PrivilegeLevel privilegeLevel) {
+        this.sessionId = sessionId;
+        this.privilegeLevel = privilegeLevel;
+    }
+
+    public int getSessionId() {
+        return sessionId;
+    }
+    public PrivilegeLevel getPrivilegeLevel() {
+        return privilegeLevel;
+    }
+
+
 }

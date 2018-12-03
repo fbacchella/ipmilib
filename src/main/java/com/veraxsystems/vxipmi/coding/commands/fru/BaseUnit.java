@@ -15,44 +15,44 @@ package com.veraxsystems.vxipmi.coding.commands.fru;
  * Represents unit which is used to access FRU
  */
 public enum BaseUnit {
-	Bytes(BaseUnit.BYTES), Words(BaseUnit.WORDS), ;
-	private static final int BYTES = 0;
-	private static final int WORDS = 1;
-	private static final int BYTESIZE = 1;
-	private static final int WORDSIZE = 16;
+    Bytes(BaseUnit.BYTES), Words(BaseUnit.WORDS), ;
+    private static final int BYTES = 0;
+    private static final int WORDS = 1;
+    private static final int BYTESIZE = 1;
+    private static final int WORDSIZE = 16;
 
-	private int code;
+    private int code;
 
-	BaseUnit(int code) {
-		this.code = code;
-	}
+    BaseUnit(int code) {
+        this.code = code;
+    }
 
-	public int getCode() {
-		return code;
-	}
+    public int getCode() {
+        return code;
+    }
 
-	public static BaseUnit parseInt(int value) {
-		switch (value) {
-		case BYTES:
-			return Bytes;
-		case WORDS:
-			return Words;
-		default:
-			throw new IllegalArgumentException("Invalid value: " + value);
-		}
-	}
+    public static BaseUnit parseInt(int value) {
+        switch (value) {
+        case BYTES:
+            return Bytes;
+        case WORDS:
+            return Words;
+        default:
+            throw new IllegalArgumentException("Invalid value: " + value);
+        }
+    }
 
-	/**
-	 * Returns size of the unit in bytes.
-	 */
-	public int getSize() {
-		switch (this) {
-		case Bytes:
-			return BYTESIZE;
-		case Words:
-			return WORDSIZE;
-		default:
-			throw new IllegalArgumentException("Invalid value: " + this);
-		}
-	}
+    /**
+     * Returns size of the unit in bytes.
+     */
+    public int getSize() {
+        switch (this) {
+        case Bytes:
+            return BYTESIZE;
+        case Words:
+            return WORDSIZE;
+        default:
+            throw new IllegalArgumentException("Invalid value: " + this);
+        }
+    }
 }

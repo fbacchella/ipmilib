@@ -25,28 +25,37 @@ import com.veraxsystems.vxipmi.sm.states.State;
  * @see StateMachine
  */
 public class SessionUpkeep extends StateMachineEvent {
-	private int sessionId;
-	private int sequenceNumber;
+    private int sessionId;
+    private int messageSequenceNumber;
+    private int sessionSequenceNumber;
 
-	/**
-	 * Prepares {@link SessionUpkeep}
-	 * 
-	 * @param sessionId
-	 *            - managed system session ID
-	 * 
-	 * @param sequenceNumber
-	 *            - generated sequence number for the message to send
-	 */
-	public SessionUpkeep(int sessionId, int sequenceNumber) {
-		this.sequenceNumber = sequenceNumber;
-		this.sessionId = sessionId;
-	}
+    /**
+     * Prepares {@link SessionUpkeep}
+     *
+     * @param sessionId
+     *            - managed system session ID
+     *
+     * @param messageSequenceNumber
+     *            - generated payload sequence number for the message to send
+     *
+     * @param sessionSequenceNumber
+     *             - generated session sequence number for the message to send.
+     */
+    public SessionUpkeep(int sessionId, int messageSequenceNumber, int sessionSequenceNumber) {
+        this.messageSequenceNumber = messageSequenceNumber;
+        this.sessionSequenceNumber = sessionSequenceNumber;
+        this.sessionId = sessionId;
+    }
 
-	public int getSessionId() {
-		return sessionId;
-	}
+    public int getSessionId() {
+        return sessionId;
+    }
 
-	public int getSequenceNumber() {
-		return sequenceNumber;
-	}
+    public int getMessageSequenceNumber() {
+        return messageSequenceNumber;
+    }
+
+    public int getSessionSequenceNumber() {
+        return sessionSequenceNumber;
+    }
 }

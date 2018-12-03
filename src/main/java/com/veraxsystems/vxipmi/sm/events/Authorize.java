@@ -24,16 +24,16 @@ import com.veraxsystems.vxipmi.sm.states.OpenSessionWaiting;
  */
 public class Authorize extends Default {
 
-	private int sessionId;
-	
-	public int getSessionId() {
-		return sessionId;
-	}
+    private int sessionId;
 
-	public Authorize(CipherSuite cipherSuite, int sequenceNumber,
-			PrivilegeLevel privilegeLevel, int sessionId) {
-		super(cipherSuite, sequenceNumber, privilegeLevel);
-		this.sessionId = sessionId;
-	}
+    public int getSessionId() {
+        return sessionId;
+    }
+
+    public Authorize(CipherSuite cipherSuite, int sequenceNumber,
+            PrivilegeLevel privilegeLevel, int sessionId) {
+        super(cipherSuite, sequenceNumber, privilegeLevel);
+        this.sessionId = sessionId;
+    }
 
 }

@@ -1,8 +1,5 @@
 package com.veraxsystems.vxipmi.coding.commands.session;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
 import com.veraxsystems.vxipmi.coding.commands.CommandCodes;
 import com.veraxsystems.vxipmi.coding.commands.IpmiCommandCoder;
 import com.veraxsystems.vxipmi.coding.commands.IpmiVersion;
@@ -18,6 +15,9 @@ import com.veraxsystems.vxipmi.coding.protocol.AuthenticationType;
 import com.veraxsystems.vxipmi.coding.protocol.IpmiMessage;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
 import com.veraxsystems.vxipmi.common.TypeConverter;
+
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * Wrapper class for Set Session Privilege Level command
@@ -60,11 +60,11 @@ public class SetSessionPrivilegeLevel extends IpmiCommandCoder {
         requestData[0] = TypeConverter.intToByte(getRequestedPrivilegeLevelEncoded());
 
         return new IpmiLanRequest(getNetworkFunction(), getCommandCode(), requestData,
-                TypeConverter.intToByte(sequenceNumber % 64));
+                TypeConverter.intToByte(sequenceNumber));
     }
 
     @Override
-    public ResponseData getResponseData(IpmiMessage message) throws IllegalArgumentException, IPMIException,
+    public ResponseData getResponseData(IpmiMessage message) throws IPMIException,
             NoSuchAlgorithmException, InvalidKeyException {
         if (!isCommandResponse(message)) {
             throw new IllegalArgumentException("This is not a response for Get SEL Entry command");

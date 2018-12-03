@@ -28,35 +28,35 @@ import com.veraxsystems.vxipmi.sm.events.StateMachineEvent;
  */
 public class Authcap extends State {
 
-	@Override
-	public void doTransition(StateMachine stateMachine,
-			StateMachineEvent machineEvent) {
-		if (machineEvent instanceof Authorize) {
-			Authorize event = (Authorize) machineEvent;
+    @Override
+    public void doTransition(StateMachine stateMachine,
+            StateMachineEvent machineEvent) {
+        if (machineEvent instanceof Authorize) {
+            Authorize event = (Authorize) machineEvent;
 
-			OpenSession openSession = new OpenSession(event.getSessionId(),
-					event.getPrivilegeLevel(), event.getCipherSuite());
+            OpenSession openSession = new OpenSession(event.getSessionId(),
+                    event.getPrivilegeLevel(), event.getCipherSuite());
 
-			try {
-				stateMachine.setCurrent(new OpenSessionWaiting(event.getSequenceNumber()));
-				stateMachine.sendMessage(Encoder.encode(
-						new Protocolv20Encoder(), openSession,
-						event.getSequenceNumber(), 0));
-			} catch (Exception e) {
-				stateMachine.setCurrent(this);
-				stateMachine.doExternalAction(new ErrorAction(e));
-			}
-		} else {
-			stateMachine.doExternalAction(new ErrorAction(
-					new IllegalArgumentException("Invalid transition: "
-							+ machineEvent.getClass().getSimpleName())));
-		}
+            try {
+                stateMachine.setCurrent(new OpenSessionWaiting(event.getSequenceNumber()));
+                stateMachine.sendMessage(Encoder.encode(
+                        new Protocolv20Encoder(), openSession,
+                        event.getSequenceNumber(), 0, 0));
+            } catch (Exception e) {
+                stateMachine.setCurrent(this);
+                stateMachine.doExternalAction(new ErrorAction(e));
+            }
+        } else {
+            stateMachine.doExternalAction(new ErrorAction(
+                    new IllegalArgumentException("Invalid transition: "
+                            + machineEvent.getClass().getSimpleName())));
+        }
 
-	}
+    }
 
-	@Override
-	public void doAction(StateMachine stateMachine, RmcpMessage message) {
-
-	}
+    @Override
+    public void doAction(StateMachine stateMachine, RmcpMessage message) {
+        // No action needed
+    }
 
 }

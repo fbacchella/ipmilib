@@ -18,17 +18,17 @@ import com.veraxsystems.vxipmi.coding.commands.ResponseData;
  * Class that wraps {@link ResponseData} that was received successfully.
  */
 public class IpmiResponseData extends IpmiResponse {
-	private ResponseData responseData;
+    private ResponseData responseData;
 
-	/**
-	 * @return {@link ResponseData} received successfully.
-	 */
-	public ResponseData getResponseData() {
-		return responseData;
-	}
+    /**
+     * @return {@link ResponseData} received successfully.
+     */
+    public ResponseData getResponseData() {
+        return responseData;
+    }
 
-	public IpmiResponseData(ResponseData data, int tag, ConnectionHandle handle) {
-		super(tag, handle);
-		responseData = data;
-	}
+    public IpmiResponseData(ResponseData data, int tag, ConnectionHandle handle) {
+        super(tag, handle);
+        responseData = data;
+    }
 }

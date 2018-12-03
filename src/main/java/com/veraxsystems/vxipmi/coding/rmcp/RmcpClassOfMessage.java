@@ -15,42 +15,42 @@ package com.veraxsystems.vxipmi.coding.rmcp;
  * Types of RMCP messages.
  */
 public enum RmcpClassOfMessage {
-	/**
-	 * ASF ACK Class of Message
-	 */
-	Ack(RmcpClassOfMessage.ACK), Asf(RmcpClassOfMessage.ASF),
-	/**
-	 * OEM-defined Class of Message
-	 */
-	Oem(RmcpClassOfMessage.OEM), Ipmi(RmcpClassOfMessage.IPMI), ;
-	
-	private static final int ACK = 134;
-	private static final int ASF = 6;
-	private static final int OEM = 8;
-	private static final int IPMI = 7;
+    /**
+     * ASF ACK Class of Message
+     */
+    Ack(RmcpClassOfMessage.ACK), Asf(RmcpClassOfMessage.ASF),
+    /**
+     * OEM-defined Class of Message
+     */
+    Oem(RmcpClassOfMessage.OEM), Ipmi(RmcpClassOfMessage.IPMI), ;
 
-	private int code;
+    private static final int ACK = 134;
+    private static final int ASF = 6;
+    private static final int OEM = 8;
+    private static final int IPMI = 7;
 
-	RmcpClassOfMessage(int code) {
-		this.code = code;
-	}
+    private int code;
 
-	public int getCode() {
-		return code;
-	}
+    RmcpClassOfMessage(int code) {
+        this.code = code;
+    }
 
-	public static RmcpClassOfMessage parseInt(int value) {
-		switch (value) {
-		case ACK:
-			return Ack;
-		case ASF:
-			return Asf;
-		case OEM:
-			return Oem;
-		case IPMI:
-			return Ipmi;
-		default:
-			throw new IllegalArgumentException("Invalid value: " + value);
-		}
-	}
+    public int getCode() {
+        return code;
+    }
+
+    public static RmcpClassOfMessage parseInt(int value) {
+        switch (value) {
+        case ACK:
+            return Ack;
+        case ASF:
+            return Asf;
+        case OEM:
+            return Oem;
+        case IPMI:
+            return Ipmi;
+        default:
+            throw new IllegalArgumentException("Invalid value: " + value);
+        }
+    }
 }

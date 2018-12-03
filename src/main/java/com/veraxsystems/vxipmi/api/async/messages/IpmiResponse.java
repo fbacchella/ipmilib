@@ -12,35 +12,35 @@
 package com.veraxsystems.vxipmi.api.async.messages;
 
 import com.veraxsystems.vxipmi.api.async.ConnectionHandle;
-import com.veraxsystems.vxipmi.api.async.IpmiListener;
+import com.veraxsystems.vxipmi.api.async.IpmiResponseListener;
 import com.veraxsystems.vxipmi.coding.commands.PrivilegeLevel;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
 
 /**
- * Interface for response messages delivered to {@link IpmiListener}s
+ * Interface for response messages delivered to {@link IpmiResponseListener}s
  */
 public abstract class IpmiResponse {
-	private int tag;
-	private ConnectionHandle handle;
+    private int tag;
+    private ConnectionHandle handle;
 
-	/**
-	 * {@link ConnectionHandle} to the message that was an origin of the
-	 * response Handle contains only the id of the connection, not the
-	 * {@link CipherSuite} and {@link PrivilegeLevel} used in that connection.
-	 */
-	public ConnectionHandle getHandle() {
-		return handle;
-	}
+    /**
+     * {@link ConnectionHandle} to the message that was an origin of the
+     * response Handle contains only the id of the connection, not the
+     * {@link CipherSuite} and {@link PrivilegeLevel} used in that connection.
+     */
+    public ConnectionHandle getHandle() {
+        return handle;
+    }
 
-	/**
-	 * Tag of the message that is associated with the {@link IpmiResponse}
-	 */
-	public int getTag() {
-		return tag;
-	}
+    /**
+     * Tag of the message that is associated with the {@link IpmiResponse}
+     */
+    public int getTag() {
+        return tag;
+    }
 
-	public IpmiResponse(int tag, ConnectionHandle handle) {
-		this.tag = tag;
-		this.handle = handle;
-	}
+    public IpmiResponse(int tag, ConnectionHandle handle) {
+        this.tag = tag;
+        this.handle = handle;
+    }
 }

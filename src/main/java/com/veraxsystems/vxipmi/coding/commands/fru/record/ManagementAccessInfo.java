@@ -18,48 +18,48 @@ import com.veraxsystems.vxipmi.common.TypeConverter;
  */
 public class ManagementAccessInfo extends MultiRecordInfo {
 
-	private ManagementAccessRecordType recordType;
+    private ManagementAccessRecordType recordType;
 
-	private String accessInfo;
+    private String accessInfo;
 
-	/**
-	 * Creates and populates record
-	 * 
-	 * @param fruData
-	 *            - raw data containing record
-	 * @param offset
-	 *            - offset to the record in the data
-	 * @param length
-	 *            - length of the record
-	 */
-	public ManagementAccessInfo(byte[] fruData, int offset, int length) {
-		super();
-		// TODO: Test when server containing such records will be available
+    /**
+     * Creates and populates record
+     *
+     * @param fruData
+     *            - raw data containing record
+     * @param offset
+     *            - offset to the record in the data
+     * @param length
+     *            - length of the record
+     */
+    public ManagementAccessInfo(byte[] fruData, int offset, int length) {
+        super();
+        // TODO: Test when server containing such records will be available
 
-		recordType = ManagementAccessRecordType.parseInt(TypeConverter
-				.byteToInt(fruData[offset]));
+        recordType = ManagementAccessRecordType.parseInt(TypeConverter
+                .byteToInt(fruData[offset]));
 
-		byte[] buffer = new byte[length - 1];
-		
-		System.arraycopy(fruData, offset + 1, buffer, 0, length - 1);
-		
-		accessInfo = new String(buffer);
-	}
+        byte[] buffer = new byte[length - 1];
 
-	public ManagementAccessRecordType getRecordType() {
-		return recordType;
-	}
+        System.arraycopy(fruData, offset + 1, buffer, 0, length - 1);
 
-	public void setRecordType(ManagementAccessRecordType recordType) {
-		this.recordType = recordType;
-	}
+        accessInfo = new String(buffer);
+    }
 
-	public String getAccessInfo() {
-		return accessInfo;
-	}
+    public ManagementAccessRecordType getRecordType() {
+        return recordType;
+    }
 
-	public void setAccessInfo(String accessInfo) {
-		this.accessInfo = accessInfo;
-	}
+    public void setRecordType(ManagementAccessRecordType recordType) {
+        this.recordType = recordType;
+    }
+
+    public String getAccessInfo() {
+        return accessInfo;
+    }
+
+    public void setAccessInfo(String accessInfo) {
+        this.accessInfo = accessInfo;
+    }
 
 }

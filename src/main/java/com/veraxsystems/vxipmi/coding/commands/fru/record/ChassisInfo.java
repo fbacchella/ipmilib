@@ -22,111 +22,111 @@ import com.veraxsystems.vxipmi.common.TypeConverter;
  */
 public class ChassisInfo extends FruRecord {
 
-	private ChassisType chassisType;
+    private ChassisType chassisType;
 
-	private String chassisPartNumber = "";
+    private String chassisPartNumber = "";
 
-	private String chassisSerialNumber = "";
+    private String chassisSerialNumber = "";
 
-	private String[] customChassisInfo = new String[0];
+    private String[] customChassisInfo = new String[0];
 
-	/**
-	 * Creates and populates record
-	 * 
-	 * @param fruData
-	 *            - raw data containing record
-	 * @param offset
-	 *            - offset to the record in the data
-	 */
-	public ChassisInfo(byte[] fruData, int offset) {
-		super();
+    /**
+     * Creates and populates record
+     *
+     * @param fruData
+     *            - raw data containing record
+     * @param offset
+     *            - offset to the record in the data
+     */
+    public ChassisInfo(final byte[] fruData, final int offset) {
+        super();
 
-		if (fruData[offset] != 0x1) {
-			throw new IllegalArgumentException("Invalid format version");
-		}
+        if (fruData[offset] != 0x1) {
+            throw new IllegalArgumentException("Invalid format version");
+        }
 
-		chassisType = ChassisType.parseInt(TypeConverter
-				.byteToInt(fruData[offset + 2]));
+        chassisType = ChassisType.parseInt(TypeConverter
+                .byteToInt(fruData[offset + 2]));
 
-		int partNumber = TypeConverter.byteToInt(fruData[offset + 3]);
+        int partNumber = TypeConverter.byteToInt(fruData[offset + 3]);
 
-		offset += 4;
+        int currentOffset = offset + 4;
 
-		int index = 0;
+        int index = 0;
 
-		ArrayList<String> customInfo = new ArrayList<String>();
+        ArrayList<String> customInfo = new ArrayList<String>();
 
-		while (partNumber != 0xc1 && offset < fruData.length) {
+        while (partNumber != 0xc1 && currentOffset < fruData.length) {
 
-			int partType = (partNumber & 0xc0) >> 6;
+            int partType = (partNumber & 0xc0) >> 6;
 
-			int partDataLength = (partNumber & 0x3f);
+            int partDataLength = (partNumber & 0x3f);
 
-			if (partDataLength > 0 && partDataLength + offset < fruData.length) {
+            if (partDataLength > 0 && partDataLength + currentOffset < fruData.length) {
 
-				byte[] partNumberData = new byte[partDataLength];
+                byte[] partNumberData = new byte[partDataLength];
 
-				System.arraycopy(fruData, offset, partNumberData, 0,
-						partDataLength);
+                System.arraycopy(fruData, currentOffset, partNumberData, 0,
+                        partDataLength);
 
-				offset += partDataLength;
+                currentOffset += partDataLength;
 
-				switch (index) {
-				case 0:
-					setChassisPartNumber(FruRecord.decodeString(partType,
-							partNumberData, true));
-					break;
-				case 1:
-					setChassisSerialNumber(FruRecord.decodeString(partType,
-							partNumberData, true));
-					break;
-				default:
-					if (partDataLength == 0) {
-						continue;
-					}
-					customInfo.add(FruRecord.decodeString(partType,
-							partNumberData, true));
-					break;
-				}
-			}
+                switch (index) {
+                case 0:
+                    setChassisPartNumber(FruRecord.decodeString(partType,
+                            partNumberData, true));
+                    break;
+                case 1:
+                    setChassisSerialNumber(FruRecord.decodeString(partType,
+                            partNumberData, true));
+                    break;
+                default:
+                    if (partDataLength == 0) {
+                        continue;
+                    }
+                    customInfo.add(FruRecord.decodeString(partType,
+                            partNumberData, true));
+                    break;
+                }
+            }
 
-			partNumber = TypeConverter.byteToInt(fruData[offset]);
+            partNumber = TypeConverter.byteToInt(fruData[currentOffset]);
 
-			++offset;
+            ++currentOffset;
 
-			++index;
-		}
+            ++index;
+        }
 
-		customChassisInfo = new String[customInfo.size()];
-		customChassisInfo = customInfo.toArray(customChassisInfo);
-	}
+        customChassisInfo = new String[customInfo.size()];
+        customChassisInfo = customInfo.toArray(customChassisInfo);
+    }
 
-	public ChassisType getChassisType() {
-		return chassisType;
-	}
+    public ChassisType getChassisType() {
+        return chassisType;
+    }
 
-	public void setChassisType(ChassisType chassisType) {
-		this.chassisType = chassisType;
-	}
+    public void setChassisType(ChassisType chassisType) {
+        this.chassisType = chassisType;
+    }
 
-	public String getChassisPartNumber() {
-		return chassisPartNumber;
-	}
+    public String getChassisPartNumber() {
+        return chassisPartNumber;
+    }
 
-	public void setChassisPartNumber(String chassisPartNumber) {
-		this.chassisPartNumber = chassisPartNumber;
-	}
+    public void setChassisPartNumber(String chassisPartNumber) {
+        this.chassisPartNumber = chassisPartNumber;
+    }
 
-	public String getChassisSerialNumber() {
-		return chassisSerialNumber;
-	}
+    public String getChassisSerialNumber() {
+        return chassisSerialNumber;
+    }
 
-	public void setChassisSerialNumber(String chassisSerialNumber) {
-		this.chassisSerialNumber = chassisSerialNumber;
-	}
+    public void setChassisSerialNumber(String chassisSerialNumber) {
+        this.chassisSerialNumber = chassisSerialNumber;
+    }
 
-	public String[] getCustomChassisInfo() {
-		return customChassisInfo;
-	}
+    public String[] getCustomChassisInfo() {
+        return customChassisInfo;
+    }
 
 }

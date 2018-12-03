@@ -23,36 +23,36 @@ import com.veraxsystems.vxipmi.common.TypeConverter;
  */
 public final class CommandsConstants {
 
-	/**
-	 * Highest available authentication level
-	 */
-	public static final byte AL_HIGHEST_AVAILABLE = 0x00;
+    /**
+     * Highest available authentication level
+     */
+    public static final byte AL_HIGHEST_AVAILABLE = 0x00;
 
-	/**
-	 * Authentication level = Callback
-	 */
-	public static final byte AL_CALLBACK = 0x01;
+    /**
+     * Authentication level = Callback
+     */
+    public static final byte AL_CALLBACK = 0x01;
 
-	/**
-	 * Authentication level = User
-	 */
-	public static final byte AL_USER = 0x02;
+    /**
+     * Authentication level = User
+     */
+    public static final byte AL_USER = 0x02;
 
-	/**
-	 * Authentication level = Operator
-	 */
-	public static final byte AL_OPERATOR = 0x03;
+    /**
+     * Authentication level = Operator
+     */
+    public static final byte AL_OPERATOR = 0x03;
 
-	/**
-	 * Authentication level = Administrator
-	 */
-	public static final byte AL_ADMINISTRATOR = 0x04;
+    /**
+     * Authentication level = Administrator
+     */
+    public static final byte AL_ADMINISTRATOR = 0x04;
 
-	/**
-	 * OEM-defined authentication level
-	 */
-	public static final byte AL_OEM = 0x05;
+    /**
+     * OEM-defined authentication level
+     */
+    public static final byte AL_OEM = 0x05;
 
-	private CommandsConstants() {
-	}
+    private CommandsConstants() {
+    }
 }

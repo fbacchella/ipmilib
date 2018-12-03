@@ -18,18 +18,18 @@ import com.veraxsystems.vxipmi.coding.commands.ResponseData;
  */
 public class ReserveSdrRepositoryResponseData implements ResponseData {
 
-	/**
-	 * This value is required in other requests, such as the 'Delete SDR'
-	 * command. These commands will not execute unless the correct Reservation
-	 * ID value is provided.
-	 */
-	private int reservationId;
+    /**
+     * This value is required in other requests, such as the 'Delete SDR'
+     * command. These commands will not execute unless the correct Reservation
+     * ID value is provided.
+     */
+    private int reservationId;
 
-	public void setReservationId(int reservationId) {
-		this.reservationId = reservationId;
-	}
+    public void setReservationId(int reservationId) {
+        this.reservationId = reservationId;
+    }
 
-	public int getReservationId() {
-		return reservationId;
-	}
+    public int getReservationId() {
+        return reservationId;
+    }
 }

@@ -16,12 +16,12 @@ package com.veraxsystems.vxipmi.connection;
  */
 public class ConnectionException extends Exception {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 3912859025179839078L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 3912859025179839078L;
 
-	public ConnectionException(String message) {
-		super(message);
-	}
+    public ConnectionException(String message) {
+        super(message);
+    }
 }

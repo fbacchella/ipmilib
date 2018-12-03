@@ -19,15 +19,15 @@ import java.util.Random;
  * 
  */
 public final class Randomizer {
-	private static Random rand = new Random(new Date().getTime());
+    private static Random rand = new Random(new Date().getTime());
 
-	private Randomizer() {
-	}
+    private Randomizer() {
+    }
 
-	/**
-	 * @return Generated random {@link Integer}
-	 */
-	public static int getInt() {
-		return rand.nextInt();
-	}
+    /**
+     * @return Generated random {@link Integer}
+     */
+    public static int getInt() {
+        return rand.nextInt();
+    }
 }

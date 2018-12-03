@@ -18,43 +18,43 @@ import com.veraxsystems.vxipmi.common.TypeConverter;
  */
 public class OemRecord extends SensorRecord {
 
-	private int manufacturerId;
-	
-	private byte[] oemData;
-	
-	@Override
-	protected void populateTypeSpecficValues(byte[] recordData,
-			SensorRecord record) {
-		
-		byte[] buffer = new byte[4];
-		
-		System.arraycopy(recordData, 5, buffer, 0, 3);
-		
-		buffer[3] = 0;
-		
-		setManufacturerId(TypeConverter.littleEndianByteArrayToInt(buffer));
-		
-		byte[] data = new byte[recordData.length - 8];
-		
-		System.arraycopy(recordData, 8, data, 0, data.length);
-		
-		setOemData(data);		
-	}
+    private int manufacturerId;
 
-	public int getManufacturerId() {
-		return manufacturerId;
-	}
+    private byte[] oemData;
 
-	public void setManufacturerId(int manufacturerId) {
-		this.manufacturerId = manufacturerId;
-	}
+    @Override
+    protected void populateTypeSpecficValues(byte[] recordData,
+            SensorRecord record) {
 
-	public byte[] getOemData() {
-		return oemData;
-	}
+        byte[] buffer = new byte[4];
 
-	public void setOemData(byte[] oemData) {
-		this.oemData = oemData;
-	}
+        System.arraycopy(recordData, 5, buffer, 0, 3);
+
+        buffer[3] = 0;
+
+        setManufacturerId(TypeConverter.littleEndianByteArrayToInt(buffer));
+
+        byte[] data = new byte[recordData.length - 8];
+
+        System.arraycopy(recordData, 8, data, 0, data.length);
+
+        setOemData(data);
+    }
+
+    public int getManufacturerId() {
+        return manufacturerId;
+    }
+
+    public void setManufacturerId(int manufacturerId) {
+        this.manufacturerId = manufacturerId;
+    }
+
+    public byte[] getOemData() {
+        return oemData;
+    }
+
+    public void setOemData(byte[] oemData) {
+        this.oemData = oemData;
+    }
 
 }

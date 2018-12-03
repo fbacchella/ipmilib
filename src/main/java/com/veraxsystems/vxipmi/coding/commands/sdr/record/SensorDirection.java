@@ -17,38 +17,38 @@ package com.veraxsystems.vxipmi.coding.commands.sdr.record;
  * specify whether it is an input voltage or an output voltage.
  */
 public enum SensorDirection {
-	Unspecified(SensorDirection.UNSPECIFIED), 
-	Input(SensorDirection.INPUT), 
-	Output(SensorDirection.OUTPUT), 
-	Reserved(SensorDirection.RESERVED), ;
-	
-	private static final int UNSPECIFIED = 0;
-	private static final int INPUT = 1;
-	private static final int OUTPUT = 2;
-	private static final int RESERVED = 3;
+    Unspecified(SensorDirection.UNSPECIFIED),
+    Input(SensorDirection.INPUT),
+    Output(SensorDirection.OUTPUT),
+    Reserved(SensorDirection.RESERVED), ;
 
-	private int code;
+    private static final int UNSPECIFIED = 0;
+    private static final int INPUT = 1;
+    private static final int OUTPUT = 2;
+    private static final int RESERVED = 3;
 
-	SensorDirection(int code) {
-		this.code = code;
-	}
+    private int code;
 
-	public int getCode() {
-		return code;
-	}
+    SensorDirection(int code) {
+        this.code = code;
+    }
 
-	public static SensorDirection parseInt(int value) {
-		switch (value) {
-		case UNSPECIFIED:
-			return Unspecified;
-		case INPUT:
-			return Input;
-		case OUTPUT:
-			return Output;
-		case RESERVED:
-			return Reserved;
-		default:
-			throw new IllegalArgumentException("Invalid value: " + value);
-		}
-	}
+    public int getCode() {
+        return code;
+    }
+
+    public static SensorDirection parseInt(int value) {
+        switch (value) {
+        case UNSPECIFIED:
+            return Unspecified;
+        case INPUT:
+            return Input;
+        case OUTPUT:
+            return Output;
+        case RESERVED:
+            return Reserved;
+        default:
+            throw new IllegalArgumentException("Invalid value: " + value);
+        }
+    }
 }

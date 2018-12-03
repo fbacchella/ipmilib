@@ -22,22 +22,22 @@ import com.veraxsystems.vxipmi.common.TypeConverter;
  * @see TypeConverter#intToByte(int)
  */
 public final class RmcpConstants {
-	
-	/**
-	 * RMCP version 1.0
-	 */
-	public static final byte RMCP_V1_0 = 0x06;
-	
-	/**
-	 * IANA Enterprise Number = ASF IANA
-	 */
-	public static final int ASFIANA = 4542;
-	
-	/**
-	 * ASF Message type = Presence Ping
-	 */
-	public static final byte PRESENCE_PING = (byte) (0x80 - 256);
-	
-	private RmcpConstants() {
-	}
+
+    /**
+     * RMCP version 1.0
+     */
+    public static final byte RMCP_V1_0 = 0x06;
+
+    /**
+     * IANA Enterprise Number = ASF IANA
+     */
+    public static final int ASFIANA = 4542;
+
+    /**
+     * ASF Message type = Presence Ping
+     */
+    public static final byte PRESENCE_PING = (byte) (0x80 - 256);
+
+    private RmcpConstants() {
+    }
 }

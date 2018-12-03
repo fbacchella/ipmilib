@@ -24,19 +24,19 @@ import com.veraxsystems.vxipmi.sm.states.SessionValid;
  * @see StateMachine
  */
 public class StartSession extends StateMachineEvent {
-	private CipherSuite cipherSuite;
-	private int sessionId;
-	
-	public StartSession(CipherSuite cipherSuite, int sessionId) {
-		this.cipherSuite = cipherSuite;
-		this.sessionId = sessionId;
-	}
+    private CipherSuite cipherSuite;
+    private int sessionId;
 
-	public CipherSuite getCipherSuite() {
-		return cipherSuite;
-	}
+    public StartSession(CipherSuite cipherSuite, int sessionId) {
+        this.cipherSuite = cipherSuite;
+        this.sessionId = sessionId;
+    }
 
-	public int getSessionId() {
-		return sessionId;
-	}
+    public CipherSuite getCipherSuite() {
+        return cipherSuite;
+    }
+
+    public int getSessionId() {
+        return sessionId;
+    }
 }

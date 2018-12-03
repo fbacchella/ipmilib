@@ -14,6 +14,7 @@ package com.veraxsystems.vxipmi.coding.protocol.decoder;
 import com.veraxsystems.vxipmi.coding.protocol.AuthenticationType;
 import com.veraxsystems.vxipmi.coding.protocol.IpmiMessage;
 import com.veraxsystems.vxipmi.coding.protocol.Ipmiv15Message;
+import com.veraxsystems.vxipmi.coding.protocol.PayloadType;
 import com.veraxsystems.vxipmi.coding.rmcp.RmcpMessage;
 import com.veraxsystems.vxipmi.common.TypeConverter;
 
@@ -22,79 +23,75 @@ import com.veraxsystems.vxipmi.common.TypeConverter;
  */
 public class Protocolv15Decoder extends ProtocolDecoder {
 
-	public Protocolv15Decoder() {
-		super();
-	}
+    public Protocolv15Decoder() {
+        super();
+    }
 
-	/**
-	 * Decodes IPMI v1.5 message fields.
-	 * 
-	 * @param rmcpMessage
-	 *            - RMCP message to decode.
-	 * @return decoded message
-	 * @see Ipmiv15Message
-	 * @throws IllegalArgumentException
-	 *             when delivered RMCP message does not contain encapsulated
-	 *             IPMI message.
-	 */
-	@Override
-	public IpmiMessage decode(RmcpMessage rmcpMessage)
-			throws IllegalArgumentException {
-		Ipmiv15Message message = new Ipmiv15Message();
+    /**
+     * Decodes IPMI v1.5 message fields.
+     *
+     * @param rmcpMessage
+     *            - RMCP message to decode.
+     * @return decoded message
+     * @see Ipmiv15Message
+     * @throws IllegalArgumentException
+     *             when delivered RMCP message does not contain encapsulated
+     *             IPMI message.
+     */
+    @Override
+    public IpmiMessage decode(RmcpMessage rmcpMessage) {
+        Ipmiv15Message message = new Ipmiv15Message();
 
-		byte[] raw = rmcpMessage.getData();
+        byte[] raw = rmcpMessage.getData();
 
-		message.setAuthenticationType(decodeAuthenticationType(raw[0]));
+        message.setAuthenticationType(decodeAuthenticationType(raw[0]));
 
-		int offset = 1;
+        int offset = 1;
 
-		message.setSessionSequenceNumber(decodeSessionSequenceNumber(raw,
-				offset));
+        message.setSessionSequenceNumber(decodeSessionSequenceNumber(raw,
+                offset));
 
-		offset += 4;
+        offset += 4;
 
-		message.setSessionID(decodeSessionID(raw, offset));
+        message.setSessionID(decodeSessionID(raw, offset));
 
-		offset += 4;
+        offset += 4;
 
-		if (message.getAuthenticationType() != AuthenticationType.None) {
-			message.setAuthCode(decodeAuthCode(raw, offset));
-			offset += 16;
-		}
+        if (message.getAuthenticationType() != AuthenticationType.None) {
+            message.setAuthCode(decodeAuthCode(raw, offset));
+            offset += 16;
+        }
 
-		int payloadLength = decodePayloadLength(raw, offset);
-		
-		message.setPayloadLength(payloadLength);
-		++offset;
+        int payloadLength = decodePayloadLength(raw, offset);
 
-		message.setPayload(decodePayload(raw, offset,
-				payloadLength,
-				message.getConfidentialityAlgorithm()));
+        message.setPayloadLength(payloadLength);
+        ++offset;
 
-		offset += payloadLength;
+        message.setPayload(decodePayload(raw, offset, payloadLength,
+                message.getConfidentialityAlgorithm(), PayloadType.Ipmi));
 
-		return message;
-	}
+        return message;
+    }
 
-	/**
-	 * Decodes authentication code.
-	 * 
-	 * @param rawMessage
-	 *            - Byte array holding whole message data.
-	 * @param offset
-	 *            - Offset to authentication code in header.
-	 * @return authentication code.
-	 */
-	private byte[] decodeAuthCode(byte[] rawMessage, int offset) {
-		byte[] authCode = new byte[16];
+    /**
+     * Decodes authentication code.
+     *
+     * @param rawMessage
+     *            - Byte array holding whole message data.
+     * @param offset
+     *            - Offset to authentication code in header.
+     * @return authentication code.
+     */
+    private byte[] decodeAuthCode(byte[] rawMessage, int offset) {
+        byte[] authCode = new byte[16];
 
-		System.arraycopy(rawMessage, offset, authCode, 0, 16);
+        System.arraycopy(rawMessage, offset, authCode, 0, 16);
 
-		return authCode;
-	}
+        return authCode;
+    }
 
-	@Override
-	protected int decodePayloadLength(byte[] rawData, int offset) {
-		return TypeConverter.byteToInt(rawData[offset]);
-	}
+    @Override
+    protected int decodePayloadLength(byte[] rawData, int offset) {
+        return TypeConverter.byteToInt(rawData[offset]);
+    }
 }

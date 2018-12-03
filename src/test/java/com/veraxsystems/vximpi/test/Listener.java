@@ -12,7 +12,7 @@
 package com.veraxsystems.vximpi.test;
 
 import com.veraxsystems.vxipmi.coding.Decoder;
-import com.veraxsystems.vxipmi.coding.commands.IpmiCommandCoder;
+import com.veraxsystems.vxipmi.coding.PayloadCoder;
 import com.veraxsystems.vxipmi.coding.payload.lan.IPMIException;
 import com.veraxsystems.vxipmi.coding.protocol.decoder.Protocolv20Decoder;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
@@ -24,55 +24,55 @@ import com.veraxsystems.vxipmi.transport.UdpMessage;
  */
 public class Listener implements UdpListener {
 
-	private int receivedCnt;
+    private int receivedCnt;
 
-	private boolean ccOk = true;
-	private boolean ok = true;
+    private boolean ccOk = true;
+    private boolean ok = true;
 
-	private CipherSuite cipherSuite;
-	private IpmiCommandCoder commandCoder;
+    private CipherSuite cipherSuite;
+    private PayloadCoder payloadCoder;
 
-	public Listener(CipherSuite cipherSuite, IpmiCommandCoder commandCoder) {
-		this.cipherSuite = cipherSuite;
-		this.commandCoder = commandCoder;
-	}
+    public Listener(CipherSuite cipherSuite, PayloadCoder payloadCoder) {
+        this.cipherSuite = cipherSuite;
+        this.payloadCoder = payloadCoder;
+    }
 
-	@Override
-	public void notifyMessage(UdpMessage message) {
-		++receivedCnt;
-		try {
-			Decoder.decode(message.getMessage(), new Protocolv20Decoder(
-					cipherSuite), commandCoder);
-		} catch (IPMIException e) {
-			setCcOk(false);
-			setOk(false);
-		} catch (Exception e) {
-			setOk(false);
-		}
-	}
+    @Override
+    public void notifyMessage(UdpMessage message) {
+        ++receivedCnt;
+        try {
+            Decoder.decode(message.getMessage(), new Protocolv20Decoder(
+                    cipherSuite), payloadCoder);
+        } catch (IPMIException e) {
+            setCcOk(false);
+            setOk(false);
+        } catch (Exception e) {
+            setOk(false);
+        }
+    }
 
-	public void setReceivedCnt(int receivedCnt) {
-		this.receivedCnt = receivedCnt;
-	}
+    public void setReceivedCnt(int receivedCnt) {
+        this.receivedCnt = receivedCnt;
+    }
 
-	public int getReceivedCnt() {
-		return receivedCnt;
-	}
+    public int getReceivedCnt() {
+        return receivedCnt;
+    }
 
-	public void setCcOk(boolean ccOk) {
-		this.ccOk = ccOk;
-	}
+    public void setCcOk(boolean ccOk) {
+        this.ccOk = ccOk;
+    }
 
-	public boolean isCcOk() {
-		return ccOk;
-	}
+    public boolean isCcOk() {
+        return ccOk;
+    }
 
-	public void setOk(boolean ok) {
-		this.ok = ok;
-	}
+    public void setOk(boolean ok) {
+        this.ok = ok;
+    }
 
-	public boolean isOk() {
-		return ok;
-	}
+    public boolean isOk() {
+        return ok;
+    }
 
 }

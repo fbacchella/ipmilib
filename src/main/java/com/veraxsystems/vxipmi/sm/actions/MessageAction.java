@@ -19,13 +19,13 @@ import com.veraxsystems.vxipmi.sm.states.SessionValid;
  * levels of the architecture) received in the {@link SessionValid} state.
  */
 public class MessageAction extends StateMachineAction {
-	public MessageAction(Ipmiv20Message message) {
-		ipmiResponseData = message;
-	}
+    public MessageAction(Ipmiv20Message message) {
+        ipmiResponseData = message;
+    }
 
-	private Ipmiv20Message ipmiResponseData;
+    private Ipmiv20Message ipmiResponseData;
 
-	public Ipmiv20Message getIpmiv20Message() {
-		return (Ipmiv20Message) ipmiResponseData;
-	}
+    public Ipmiv20Message getIpmiv20Message() {
+        return ipmiResponseData;
+    }
 }

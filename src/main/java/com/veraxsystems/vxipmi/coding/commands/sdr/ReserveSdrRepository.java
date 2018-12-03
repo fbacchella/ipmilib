@@ -11,9 +11,6 @@
  */
 package com.veraxsystems.vxipmi.coding.commands.sdr;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
 import com.veraxsystems.vxipmi.coding.commands.CommandCodes;
 import com.veraxsystems.vxipmi.coding.commands.IpmiCommandCoder;
 import com.veraxsystems.vxipmi.coding.commands.IpmiVersion;
@@ -29,81 +26,83 @@ import com.veraxsystems.vxipmi.coding.protocol.IpmiMessage;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
 import com.veraxsystems.vxipmi.common.TypeConverter;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
 /**
  * Wrapper for Reserve SDR Repository command.
  */
 public class ReserveSdrRepository extends IpmiCommandCoder {
 
-	/**
-	 * Initiates ReserveSdrRepository for both encoding and decoding.
-	 * 
-	 * @param version
-	 *            - IPMI version of the command.
-	 * @param cipherSuite
-	 *            - {@link CipherSuite} containing authentication,
-	 *            confidentiality and integrity algorithms for this session.
-	 * @param authenticationType
-	 *            - Type of authentication used. Must be RMCPPlus for IPMI v2.0.
-	 */
-	public ReserveSdrRepository(IpmiVersion version, CipherSuite cipherSuite,
-			AuthenticationType authenticationType) {
-		super(version, cipherSuite, authenticationType);
-	}
+    /**
+     * Initiates ReserveSdrRepository for both encoding and decoding.
+     *
+     * @param version
+     *            - IPMI version of the command.
+     * @param cipherSuite
+     *            - {@link CipherSuite} containing authentication,
+     *            confidentiality and integrity algorithms for this session.
+     * @param authenticationType
+     *            - Type of authentication used. Must be RMCPPlus for IPMI v2.0.
+     */
+    public ReserveSdrRepository(IpmiVersion version, CipherSuite cipherSuite,
+            AuthenticationType authenticationType) {
+        super(version, cipherSuite, authenticationType);
+    }
 
-	@Override
-	public byte getCommandCode() {
-		return CommandCodes.RESERVE_SDR_REPOSITORY;
-	}
+    @Override
+    public byte getCommandCode() {
+        return CommandCodes.RESERVE_SDR_REPOSITORY;
+    }
 
-	@Override
-	public NetworkFunction getNetworkFunction() {
-		return NetworkFunction.StorageRequest;
-	}
+    @Override
+    public NetworkFunction getNetworkFunction() {
+        return NetworkFunction.StorageRequest;
+    }
 
-	@Override
-	protected IpmiPayload preparePayload(int sequenceNumber)
-			throws NoSuchAlgorithmException, InvalidKeyException {
-		return new IpmiLanRequest(getNetworkFunction(), getCommandCode(), null,
-				TypeConverter.intToByte(sequenceNumber % 64));
-	}
+    @Override
+    protected IpmiPayload preparePayload(int sequenceNumber)
+            throws NoSuchAlgorithmException, InvalidKeyException {
+        return new IpmiLanRequest(getNetworkFunction(), getCommandCode(), null,
+                TypeConverter.intToByte(sequenceNumber));
+    }
 
-	@Override
-	public ResponseData getResponseData(IpmiMessage message)
-			throws IllegalArgumentException, IPMIException,
-			NoSuchAlgorithmException, InvalidKeyException {
-		if (!isCommandResponse(message)) {
-			throw new IllegalArgumentException(
-					"This is not a response for Reserve SDR Repository command");
-		}
-		if (!(message.getPayload() instanceof IpmiLanResponse)) {
-			throw new IllegalArgumentException("Invalid response payload");
-		}
-		if (((IpmiLanResponse) message.getPayload()).getCompletionCode() != CompletionCode.Ok) {
-			throw new IPMIException(
-					((IpmiLanResponse) message.getPayload())
-							.getCompletionCode());
-		}
+    @Override
+    public ResponseData getResponseData(IpmiMessage message) throws IPMIException,
+            NoSuchAlgorithmException, InvalidKeyException {
+        if (!isCommandResponse(message)) {
+            throw new IllegalArgumentException(
+                    "This is not a response for Reserve SDR Repository command");
+        }
+        if (!(message.getPayload() instanceof IpmiLanResponse)) {
+            throw new IllegalArgumentException("Invalid response payload");
+        }
+        if (((IpmiLanResponse) message.getPayload()).getCompletionCode() != CompletionCode.Ok) {
+            throw new IPMIException(
+                    ((IpmiLanResponse) message.getPayload())
+                            .getCompletionCode());
+        }
 
-		byte[] raw = message.getPayload().getIpmiCommandData();
+        byte[] raw = message.getPayload().getIpmiCommandData();
 
-		if (raw == null || raw.length != 2) {
-			throw new IllegalArgumentException(
-					"Invalid response payload length");
-		}
+        if (raw == null || raw.length != 2) {
+            throw new IllegalArgumentException(
+                    "Invalid response payload length");
+        }
 
-		ReserveSdrRepositoryResponseData responseData = new ReserveSdrRepositoryResponseData();
+        ReserveSdrRepositoryResponseData responseData = new ReserveSdrRepositoryResponseData();
 
-		byte[] buffer = new byte[4];
+        byte[] buffer = new byte[4];
 
-		buffer[0] = raw[0];
-		buffer[1] = raw[1];
-		buffer[2] = 0;
-		buffer[3] = 0;
+        buffer[0] = raw[0];
+        buffer[1] = raw[1];
+        buffer[2] = 0;
+        buffer[3] = 0;
 
-		responseData.setReservationId(TypeConverter
-				.littleEndianByteArrayToInt(buffer));
+        responseData.setReservationId(TypeConverter
+                .littleEndianByteArrayToInt(buffer));
 
-		return responseData;
-	}
+        return responseData;
+    }
 
 }

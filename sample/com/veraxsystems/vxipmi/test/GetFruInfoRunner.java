@@ -233,7 +233,6 @@ public class GetFruInfoRunner {
             nextRecId = data.getNextRecordId();
             return sensorDataToPopulate;
         } catch (IPMIException e) {
-            // System.out.println(e.getCompletionCode() + ": " + e.getMessage());
             // The following error codes mean that record is too large to be
             // sent in one chunk. This means we need to split the data in
             // smaller parts.

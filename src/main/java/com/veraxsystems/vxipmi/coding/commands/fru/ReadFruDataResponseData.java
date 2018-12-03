@@ -20,13 +20,13 @@ import com.veraxsystems.vxipmi.coding.commands.ResponseData;
  * decoded by {@link ReadFruData#decodeFruData(java.util.List)}.
  */
 public class ReadFruDataResponseData implements ResponseData {
-	private byte[] fruData;
+    private byte[] fruData;
 
-	public void setFruData(byte[] fruData) {
-		this.fruData = fruData;
-	}
+    public void setFruData(byte[] fruData) {
+        this.fruData = fruData;
+    }
 
-	public byte[] getFruData() {
-		return fruData;
-	}
+    public byte[] getFruData() {
+        return fruData;
+    }
 }

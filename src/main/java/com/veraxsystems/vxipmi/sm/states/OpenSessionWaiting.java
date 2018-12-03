@@ -36,55 +36,47 @@ import com.veraxsystems.vxipmi.sm.events.Timeout;
  */
 public class OpenSessionWaiting extends State {
 
-	private int tag;
+    private int tag;
 
-	public OpenSessionWaiting(int tag) {
-		this.tag = tag;
-	}
+    public OpenSessionWaiting(int tag) {
+        this.tag = tag;
+    }
 
-	@Override
-	public void doTransition(StateMachine stateMachine,
-			StateMachineEvent machineEvent) {
-		if (machineEvent instanceof DefaultAck) {
-			stateMachine.setCurrent(new OpenSessionComplete());
-		} else if (machineEvent instanceof Timeout) {
-			stateMachine.setCurrent(new Authcap());
-		} else {
-			stateMachine.doExternalAction(new ErrorAction(
-					new IllegalArgumentException("Invalid transition")));
-		}
-	}
+    @Override
+    public void doTransition(StateMachine stateMachine,
+            StateMachineEvent machineEvent) {
+        if (machineEvent instanceof DefaultAck) {
+            stateMachine.setCurrent(new OpenSessionComplete());
+        } else if (machineEvent instanceof Timeout) {
+            stateMachine.setCurrent(new Authcap());
+        } else {
+            stateMachine.doExternalAction(new ErrorAction(
+                    new IllegalArgumentException("Invalid transition")));
+        }
+    }
 
-	@Override
-	public void doAction(StateMachine stateMachine, RmcpMessage message) {
-		if (ProtocolDecoder.decodeAuthenticationType(message) != AuthenticationType.RMCPPlus) {
-			return; // this isn't IPMI v2.0 message so we ignore it
-		}
-		PlainCommandv20Decoder decoder = new PlainCommandv20Decoder(
-				CipherSuite.getEmpty());
-		if (Protocolv20Decoder.decodePayloadType(message.getData()[1]) != PayloadType.RmcpOpenSessionResponse) {
-			return;
-		}
-		IpmiMessage ipmiMessage = null;
-		try {
-			ipmiMessage = decoder.decode(message);
-			/*System.out.println("[OSW "
-					+ stateMachine.hashCode()
-					+ "] Expected: "
-					+ tag
-					+ " encountered: "
-					+ TypeConverter.byteToInt(((PlainMessage) ipmiMessage
-							.getPayload()).getPayloadData()[0]));*/
-			OpenSession openSession = new OpenSession(CipherSuite.getEmpty());
-			if (openSession.isCommandResponse(ipmiMessage)
-					&& TypeConverter.byteToInt(((PlainMessage) ipmiMessage
-							.getPayload()).getPayloadData()[0]) == tag) {
-				stateMachine.doExternalAction(new ResponseAction(openSession
-						.getResponseData(ipmiMessage)));
-			}
-		} catch (Exception e) {
-			// stateMachine.doTransition(new Timeout());
-			stateMachine.doExternalAction(new ErrorAction(e));
-		}
-	}
+    @Override
+    public void doAction(StateMachine stateMachine, RmcpMessage message) {
+        if (ProtocolDecoder.decodeAuthenticationType(message) != AuthenticationType.RMCPPlus) {
+            return; // this isn't IPMI v2.0 message so we ignore it
+        }
+        PlainCommandv20Decoder decoder = new PlainCommandv20Decoder(
+                CipherSuite.getEmpty());
+        if (Protocolv20Decoder.decodePayloadType(message.getData()[1]) != PayloadType.RmcpOpenSessionResponse) {
+            return;
+        }
+        IpmiMessage ipmiMessage = null;
+        try {
+            ipmiMessage = decoder.decode(message);
+            OpenSession openSession = new OpenSession(CipherSuite.getEmpty());
+            if (openSession.isCommandResponse(ipmiMessage)
+                    && TypeConverter.byteToInt(((PlainMessage) ipmiMessage
+                            .getPayload()).getPayloadData()[0]) == tag) {
+                stateMachine.doExternalAction(new ResponseAction(openSession
+                        .getResponseData(ipmiMessage)));
+            }
+        } catch (Exception e) {
+            stateMachine.doExternalAction(new ErrorAction(e));
+        }
+    }
 }

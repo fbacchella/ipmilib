@@ -16,5 +16,5 @@ package com.veraxsystems.vxipmi.coding.rmcp;
  *
  */
 public enum RmcpVersion {
-	RMCP1_0,
+    RMCP1_0,
 }

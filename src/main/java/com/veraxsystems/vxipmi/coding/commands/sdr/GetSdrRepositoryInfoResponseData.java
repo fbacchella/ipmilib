@@ -17,70 +17,70 @@ import com.veraxsystems.vxipmi.coding.commands.ResponseData;
  * Wrapper for Get SDR Repository Info response.
  */
 public class GetSdrRepositoryInfoResponseData implements ResponseData {
-	/**
-	 * Version number of the SDR command set for the SDR Device.
-	 */
-	private int sdrVersion;
-	
-	/**
-	 * Number of records in the SDR Repository
-	 */
-	private int recordCount;
-	
-	/**
-	 * Most recent addition timestamp.
-	 */
-	private int addTimestamp;
-	
-	/**
-	 * Most recent erase (delete or clear) timestamp.
-	 */
-	private int delTimestamp;
-	
-	/**
-	 * Reserve SDR Repository command supported
-	 */
-	private boolean reserveSupported;
+    /**
+     * Version number of the SDR command set for the SDR Device.
+     */
+    private int sdrVersion;
 
-	public void setSdrVersion(int sdrVersion) {
-		this.sdrVersion = sdrVersion;
-	}
+    /**
+     * Number of records in the SDR Repository
+     */
+    private int recordCount;
 
-	public int getSdrVersion() {
-		return sdrVersion;
-	}
+    /**
+     * Most recent addition timestamp.
+     */
+    private int addTimestamp;
 
-	public void setRecordCount(int recordCount) {
-		this.recordCount = recordCount;
-	}
+    /**
+     * Most recent erase (delete or clear) timestamp.
+     */
+    private int delTimestamp;
 
-	public int getRecordCount() {
-		return recordCount;
-	}
+    /**
+     * Reserve SDR Repository command supported
+     */
+    private boolean reserveSupported;
 
-	public void setAddTimestamp(int addTimestamp) {
-		this.addTimestamp = addTimestamp;
-	}
+    public void setSdrVersion(int sdrVersion) {
+        this.sdrVersion = sdrVersion;
+    }
 
-	public int getAddTimestamp() {
-		return addTimestamp;
-	}
+    public int getSdrVersion() {
+        return sdrVersion;
+    }
 
-	public void setDelTimestamp(int delTimestamp) {
-		this.delTimestamp = delTimestamp;
-	}
+    public void setRecordCount(int recordCount) {
+        this.recordCount = recordCount;
+    }
 
-	public int getDelTimestamp() {
-		return delTimestamp;
-	}
+    public int getRecordCount() {
+        return recordCount;
+    }
 
-	public void setReserveSupported(boolean reserveSupported) {
-		this.reserveSupported = reserveSupported;
-	}
+    public void setAddTimestamp(int addTimestamp) {
+        this.addTimestamp = addTimestamp;
+    }
 
-	public boolean isReserveSupported() {
-		return reserveSupported;
-	}
-	
-	
+    public int getAddTimestamp() {
+        return addTimestamp;
+    }
+
+    public void setDelTimestamp(int delTimestamp) {
+        this.delTimestamp = delTimestamp;
+    }
+
+    public int getDelTimestamp() {
+        return delTimestamp;
+    }
+
+    public void setReserveSupported(boolean reserveSupported) {
+        this.reserveSupported = reserveSupported;
+    }
+
+    public boolean isReserveSupported() {
+        return reserveSupported;
+    }
+
+
 }

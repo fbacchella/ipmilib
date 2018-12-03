@@ -19,37 +19,35 @@ import com.veraxsystems.vxipmi.sm.events.StateMachineEvent;
  * The abstract for state of the {@link StateMachine}.
  */
 public abstract class State {
-	/**
-	 * Defines the action performed when the state is entered.
-	 * 
-	 * @param stateMachine
-	 *            - the context
-	 */
-	public void onEnter(StateMachine stateMachine) {
-		//System.out.println("[SM " + stateMachine.hashCode() + "] Entering state "
-		//		+ stateMachine.getCurrent().getClass().getSimpleName());
-	}
+    /**
+     * Defines the action performed when the state is entered.
+     *
+     * @param stateMachine
+     *            - the context
+     */
+    public void onEnter(StateMachine stateMachine) {
+    }
 
-	/**
-	 * Performs the state transition
-	 * 
-	 * @param stateMachine
-	 *            - the context
-	 * @param machineEvent
-	 *            - the {@link StateMachineEvent} that was the cause of the
-	 *            transition
-	 */
-	public abstract void doTransition(StateMachine stateMachine,
-			StateMachineEvent machineEvent);
+    /**
+     * Performs the state transition
+     *
+     * @param stateMachine
+     *            - the context
+     * @param machineEvent
+     *            - the {@link StateMachineEvent} that was the cause of the
+     *            transition
+     */
+    public abstract void doTransition(StateMachine stateMachine,
+            StateMachineEvent machineEvent);
 
-	/**
-	 * Defines the action that should be performed when a response form the
-	 * remote system arrives in the current state.
-	 * 
-	 * @param stateMachine
-	 *            - the context
-	 * @param message
-	 *            - the message that appeared
-	 */
-	public abstract void doAction(StateMachine stateMachine, RmcpMessage message);
+    /**
+     * Defines the action that should be performed when a response form the
+     * remote system arrives in the current state.
+     *
+     * @param stateMachine
+     *            - the context
+     * @param message
+     *            - the message that appeared
+     */
+    public abstract void doAction(StateMachine stateMachine, RmcpMessage message);
 }

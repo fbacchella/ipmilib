@@ -11,15 +11,6 @@
  */
 package com.veraxsystems.vximpi.test;
 
-import java.io.FileInputStream;
-import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
-import org.apache.log4j.Logger;
-import org.junit.Test;
-
 import com.veraxsystems.vxipmi.coding.commands.IpmiCommandCoder;
 import com.veraxsystems.vxipmi.coding.commands.IpmiVersion;
 import com.veraxsystems.vxipmi.coding.commands.PrivilegeLevel;
@@ -40,256 +31,269 @@ import com.veraxsystems.vxipmi.coding.commands.sel.GetSelEntry;
 import com.veraxsystems.vxipmi.coding.commands.sel.GetSelInfo;
 import com.veraxsystems.vxipmi.coding.commands.sel.ReserveSel;
 import com.veraxsystems.vxipmi.coding.commands.sel.ReserveSelResponseData;
+import com.veraxsystems.vxipmi.coding.payload.IpmiPayload;
 import com.veraxsystems.vxipmi.coding.protocol.AuthenticationType;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
+import com.veraxsystems.vxipmi.common.Constants;
 import com.veraxsystems.vxipmi.connection.Connection;
 import com.veraxsystems.vxipmi.connection.ConnectionException;
 import com.veraxsystems.vxipmi.connection.ConnectionListener;
 import com.veraxsystems.vxipmi.connection.ConnectionManager;
-
 import junit.framework.TestCase;
+import org.apache.log4j.Logger;
+import org.junit.Test;
+
+import java.io.FileInputStream;
+import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Tests message encoders and decoders.
  */
 public class CoderTest extends TestCase {
 
-	private Properties properties;
+    private Properties properties;
 
-	private ConnectionManager connectionManager;
-	private Connection connection;
-	private CipherSuite cs;
-	private ConnectionListenerImpl listener;
-	
-	private static Logger logger = Logger.getLogger(CoderTest.class);
-	
-	private static final int PORT = 6666;
+    private ConnectionManager connectionManager;
+    private Connection connection;
+    private CipherSuite cs;
+    private ConnectionListenerImpl listener;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		properties = new Properties();
-		properties.load(new FileInputStream("src/test/resources/test.properties"));
+    private static Logger logger = Logger.getLogger(CoderTest.class);
 
-		connectionManager = new ConnectionManager(PORT);
+    private static final int PORT = 6666;
 
-		int index = connectionManager.createConnection(InetAddress
-				.getByName(properties.getProperty("testIp")));
-		List<CipherSuite> cipherSuites = connectionManager
-				.getAvailableCipherSuites(index);
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        properties = new Properties();
+        properties.load(new FileInputStream("src/test/resources/test.properties"));
 
-		assertTrue(cipherSuites.size() > 3);
+        connectionManager = new ConnectionManager(PORT);
 
-		cs = cipherSuites.get(3);
+        int index = connectionManager.createConnection(InetAddress
+                .getByName(properties.getProperty("testIp")), Constants.IPMI_PORT);
+        List<CipherSuite> cipherSuites = connectionManager
+                .getAvailableCipherSuites(index);
 
-		connectionManager.getChannelAuthenticationCapabilities(index, cs,
-				PrivilegeLevel.User);
+        assertTrue(cipherSuites.size() > 3);
 
-		connectionManager.startSession(index, cs, PrivilegeLevel.User,
-				properties.getProperty("username"),
-				properties.getProperty("password"), null);
+        cs = cipherSuites.get(3);
 
-		listener = new ConnectionListenerImpl();
+        connectionManager.getChannelAuthenticationCapabilities(index, cs,
+                PrivilegeLevel.User);
 
-		connectionManager.registerListener(index, listener);
+        connectionManager.startSession(index, cs, PrivilegeLevel.User,
+                properties.getProperty("username"),
+                properties.getProperty("password"), null);
 
-		connection = connectionManager.getConnection(index);
-	}
+        listener = new ConnectionListenerImpl();
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-		connection.closeSession();
-		connection.disconnect();
-		connectionManager.close();
-	}
+        connectionManager.registerListener(index, listener);
 
-	/**
-	 * Tests {@link GetChassisStatus}.
-	 * @throws Exception
-	 */
-	@Test
-	public void testGetChassisStatus() throws Exception {
-		logger.info("Testing Get Chassis Status");
-		sendCommand(new GetChassisStatus(IpmiVersion.V20, cs,
-				AuthenticationType.RMCPPlus));
-	}
+        connection = connectionManager.getConnection(index);
+    }
 
-	/**
-	 * Tests {@link GetFruInventoryAreaInfo}
-	 * @throws Exception
-	 */
-	@Test
-	public void testGetFruInventoryArea() throws Exception {
-		logger.info("Testing Get Fru Inventory Area");
-		sendCommand(new GetFruInventoryAreaInfo(IpmiVersion.V20, cs,
-				AuthenticationType.RMCPPlus, 0));
-	}
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        connection.closeSession();
+        connection.disconnect();
+        connectionManager.close();
+    }
 
-	/**
-	 * Tests {@link ReadFruData}
-	 * @throws Exception
-	 */
-	@Test
-	public void testReadFruData() throws Exception {
-		logger.info("Testing Read Fru Data");
-		sendCommand(new GetFruInventoryAreaInfo(IpmiVersion.V20, cs,
-				AuthenticationType.RMCPPlus, 0));
+    /**
+     * Tests {@link GetChassisStatus}.
+     * @throws Exception
+     */
+    @Test
+    public void testGetChassisStatus() throws Exception {
+        logger.info("Testing Get Chassis Status");
+        sendCommand(new GetChassisStatus(IpmiVersion.V20, cs,
+                AuthenticationType.RMCPPlus));
+    }
 
-		GetFruInventoryAreaInfoResponseData responseData = (GetFruInventoryAreaInfoResponseData) listener.responseData;
+    /**
+     * Tests {@link GetFruInventoryAreaInfo}
+     * @throws Exception
+     */
+    @Test
+    public void testGetFruInventoryArea() throws Exception {
+        logger.info("Testing Get Fru Inventory Area");
+        sendCommand(new GetFruInventoryAreaInfo(IpmiVersion.V20, cs,
+                AuthenticationType.RMCPPlus, 0));
+    }
 
-		List<ReadFruDataResponseData> datas = new ArrayList<ReadFruDataResponseData>();
+    /**
+     * Tests {@link ReadFruData}
+     * @throws Exception
+     */
+    @Test
+    public void testReadFruData() throws Exception {
+        logger.info("Testing Read Fru Data");
+        sendCommand(new GetFruInventoryAreaInfo(IpmiVersion.V20, cs,
+                AuthenticationType.RMCPPlus, 0));
 
-		int size = 100;
-		for (int i = 0; i < responseData.getFruInventoryAreaSize(); i += size) {
-			if (i + size > responseData.getFruInventoryAreaSize())
-				size = responseData.getFruInventoryAreaSize() % 100;
-			sendCommand(new ReadFruData(IpmiVersion.V20, cs,
-					AuthenticationType.RMCPPlus, 0, BaseUnit.Bytes, i, size));
-			datas.add((ReadFruDataResponseData) listener.responseData);
-		}
+        GetFruInventoryAreaInfoResponseData responseData = (GetFruInventoryAreaInfoResponseData) listener.responseData;
 
-		List<FruRecord> records = ReadFruData.decodeFruData(datas);
+        List<ReadFruDataResponseData> datas = new ArrayList<ReadFruDataResponseData>();
 
-		assertTrue(records.size() > 0);
-	}
+        int size = 100;
+        for (int i = 0; i < responseData.getFruInventoryAreaSize(); i += size) {
+            if (i + size > responseData.getFruInventoryAreaSize())
+                size = responseData.getFruInventoryAreaSize() % 100;
+            sendCommand(new ReadFruData(IpmiVersion.V20, cs,
+                    AuthenticationType.RMCPPlus, 0, BaseUnit.Bytes, i, size));
+            datas.add((ReadFruDataResponseData) listener.responseData);
+        }
 
-	/**
-	 * Tests {@link GetSdrRepositoryInfo}
-	 * @throws Exception
-	 */
-	@Test
-	public void testGetSdrRepositoryInfo() throws Exception {
-		logger.info("Testing Get Sdr Repository Info");
-		sendCommand(new GetSdrRepositoryInfo(IpmiVersion.V20, cs,
-				AuthenticationType.RMCPPlus));
-	}
+        List<FruRecord> records = ReadFruData.decodeFruData(datas);
 
-	/**
-	 * Tests {@link ReserveSdrRepository}
-	 * @throws Exception
-	 */
-	@Test
-	public void testReserveSdrRepository() throws Exception {
-		logger.info("Testing Reserve Sdr Repository");
-		sendCommand(new ReserveSdrRepository(IpmiVersion.V20, cs,
-				AuthenticationType.RMCPPlus));
-	}
+        assertTrue(records.size() > 0);
+    }
 
-	/**
-	 * Tests {@link GetSdr}
-	 * @throws Exception
-	 */
-	@Test
-	public void testGetSdr() throws Exception {
-		logger.info("Testing Get Sdr");
-		sendCommand(new ReserveSdrRepository(IpmiVersion.V20, cs,
-				AuthenticationType.RMCPPlus));
-		int id = ((ReserveSdrRepositoryResponseData) listener.responseData)
-				.getReservationId();
-		sendCommand(new GetSdr(IpmiVersion.V20, cs,
-				AuthenticationType.RMCPPlus, id, 0));
-	}
+    /**
+     * Tests {@link GetSdrRepositoryInfo}
+     * @throws Exception
+     */
+    @Test
+    public void testGetSdrRepositoryInfo() throws Exception {
+        logger.info("Testing Get Sdr Repository Info");
+        sendCommand(new GetSdrRepositoryInfo(IpmiVersion.V20, cs,
+                AuthenticationType.RMCPPlus));
+    }
 
-	/**
-	 * Tests {@link ReserveSdrRepository}
-	 * @throws Exception
-	 */
-	@Test
-	public void testGetSensorReading() throws Exception {
-		logger.info("Testing Get Sensor Reading");
-		sendCommand(new ReserveSdrRepository(IpmiVersion.V20, cs,
-				AuthenticationType.RMCPPlus));
-		int id = ((ReserveSdrRepositoryResponseData) listener.responseData)
-				.getReservationId();
-		sendCommand(new GetSdr(IpmiVersion.V20, cs,
-				AuthenticationType.RMCPPlus, id, 1));
-		sendCommand(new GetSensorReading(IpmiVersion.V20, cs,
-				AuthenticationType.RMCPPlus, 1));
-	}
+    /**
+     * Tests {@link ReserveSdrRepository}
+     * @throws Exception
+     */
+    @Test
+    public void testReserveSdrRepository() throws Exception {
+        logger.info("Testing Reserve Sdr Repository");
+        sendCommand(new ReserveSdrRepository(IpmiVersion.V20, cs,
+                AuthenticationType.RMCPPlus));
+    }
 
-	/**
-	 * Tests {@link GetSelInfo}
-	 * @throws Exception
-	 */
-	@Test
-	public void testGetSelInfo() throws Exception {
-		logger.info("Testing Get Sel Info");
-		sendCommand(new GetSelInfo(IpmiVersion.V20, cs,
-				AuthenticationType.RMCPPlus));
-	}
+    /**
+     * Tests {@link GetSdr}
+     * @throws Exception
+     */
+    @Test
+    public void testGetSdr() throws Exception {
+        logger.info("Testing Get Sdr");
+        sendCommand(new ReserveSdrRepository(IpmiVersion.V20, cs,
+                AuthenticationType.RMCPPlus));
+        int id = ((ReserveSdrRepositoryResponseData) listener.responseData)
+                .getReservationId();
+        sendCommand(new GetSdr(IpmiVersion.V20, cs,
+                AuthenticationType.RMCPPlus, id, 0));
+    }
 
-	/**
-	 * Tests {@link ReserveSel}
-	 * @throws Exception
-	 */
-	@Test
-	public void testReserveSel() throws Exception {
-		logger.info("Testing Reserve Sel");
-		sendCommand(new ReserveSel(IpmiVersion.V20, cs,
-				AuthenticationType.RMCPPlus));
-	}
+    /**
+     * Tests {@link ReserveSdrRepository}
+     * @throws Exception
+     */
+    @Test
+    public void testGetSensorReading() throws Exception {
+        logger.info("Testing Get Sensor Reading");
+        sendCommand(new ReserveSdrRepository(IpmiVersion.V20, cs,
+                AuthenticationType.RMCPPlus));
+        int id = ((ReserveSdrRepositoryResponseData) listener.responseData)
+                .getReservationId();
+        sendCommand(new GetSdr(IpmiVersion.V20, cs,
+                AuthenticationType.RMCPPlus, id, 1));
+        sendCommand(new GetSensorReading(IpmiVersion.V20, cs,
+                AuthenticationType.RMCPPlus, 1));
+    }
 
-	/**
-	 * Tests {@link GetSelEntry}
-	 * @throws Exception
-	 */
-	@Test
-	public void testGetSelEntry() throws Exception {
-		logger.info("Testing Get Sel Entry");
-		sendCommand(new ReserveSel(IpmiVersion.V20, cs,
-				AuthenticationType.RMCPPlus));
-		int id = ((ReserveSelResponseData) listener.responseData)
-				.getReservationId();
-		sendCommand(new GetSelEntry(IpmiVersion.V20, cs,
-				AuthenticationType.RMCPPlus, id, 1));
-	}
+    /**
+     * Tests {@link GetSelInfo}
+     * @throws Exception
+     */
+    @Test
+    public void testGetSelInfo() throws Exception {
+        logger.info("Testing Get Sel Info");
+        sendCommand(new GetSelInfo(IpmiVersion.V20, cs,
+                AuthenticationType.RMCPPlus));
+    }
 
-	private void sendCommand(IpmiCommandCoder coder)
-			throws ArithmeticException, ConnectionException,
-			InterruptedException {
-		connection.sendIpmiCommand(coder);
+    /**
+     * Tests {@link ReserveSel}
+     * @throws Exception
+     */
+    @Test
+    public void testReserveSel() throws Exception {
+        logger.info("Testing Reserve Sel");
+        sendCommand(new ReserveSel(IpmiVersion.V20, cs,
+                AuthenticationType.RMCPPlus));
+    }
 
-		int time = 0;
+    /**
+     * Tests {@link GetSelEntry}
+     * @throws Exception
+     */
+    @Test
+    public void testGetSelEntry() throws Exception {
+        logger.info("Testing Get Sel Entry");
+        sendCommand(new ReserveSel(IpmiVersion.V20, cs,
+                AuthenticationType.RMCPPlus));
+        int id = ((ReserveSelResponseData) listener.responseData)
+                .getReservationId();
+        sendCommand(new GetSelEntry(IpmiVersion.V20, cs,
+                AuthenticationType.RMCPPlus, id, 1));
+    }
 
-		int timeout = 5000;
+    private void sendCommand(IpmiCommandCoder coder)
+            throws ArithmeticException, ConnectionException,
+            InterruptedException {
+        connection.sendMessage(coder, false);
 
-		while (!listener.responseArrived && time < timeout) {
-			Thread.sleep(1);
-		}
+        int time = 0;
 
-		assertNotNull(listener.getResponseData());
+        int timeout = 5000;
 
-		logger.info("Received answer for "
-				+ coder.getClass().getSimpleName());
-	}
-	
-	private class ConnectionListenerImpl implements ConnectionListener {
+        while (!listener.responseArrived && time < timeout);
 
-		private ResponseData responseData;
-		private boolean responseArrived;
+        assertNotNull(listener.getResponseData());
 
-		public ResponseData getResponseData() {
-			responseArrived = false;
-			return responseData;
-		}
+        logger.info("Received answer for "
+                + coder.getClass().getSimpleName());
+    }
 
-		public ConnectionListenerImpl() {
-			responseArrived = false;
-			responseData = null;
-		}
+    private class ConnectionListenerImpl implements ConnectionListener {
 
-		@Override
-		public void notify(ResponseData responseData, int handle, int tag,
-				Exception exception) {
-			this.responseData = responseData;
-			if (exception != null) {
-				System.out.println(exception.getMessage());
-				exception.printStackTrace();
-				this.responseData = null;
-			}
-			responseArrived = true;
-			logger.info("Response arrived");
-		}
-	}
+        private ResponseData responseData;
+        private boolean responseArrived;
+
+        public ResponseData getResponseData() {
+            responseArrived = false;
+            return responseData;
+        }
+
+        public ConnectionListenerImpl() {
+            responseArrived = false;
+            responseData = null;
+        }
+
+        @Override
+        public void processResponse(ResponseData responseData, int handle, int tag,
+                                    Exception exception) {
+            this.responseData = responseData;
+            if (exception != null) {
+                System.out.println(exception.getMessage());
+                exception.printStackTrace();
+                this.responseData = null;
+            }
+            responseArrived = true;
+            logger.info("Response arrived");
+        }
+
+        @Override
+        public void processRequest(IpmiPayload payload) {
+            // NOP
+        }
+
+    }
 }

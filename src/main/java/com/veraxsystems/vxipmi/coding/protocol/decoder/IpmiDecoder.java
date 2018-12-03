@@ -30,7 +30,7 @@ public interface IpmiDecoder {
      * @throws IllegalArgumentException
      * when delivered RMCP message does not contain encapsulated IPMI message.
      * @throws InvalidKeyException 
-	 *             - when initiation of the integrity algorithm fails
+     *             - when initiation of the integrity algorithm fails
      */
-    IpmiMessage decode(RmcpMessage rmcpMessage) throws IllegalArgumentException, InvalidKeyException;
+    IpmiMessage decode(RmcpMessage rmcpMessage) throws InvalidKeyException;
 }

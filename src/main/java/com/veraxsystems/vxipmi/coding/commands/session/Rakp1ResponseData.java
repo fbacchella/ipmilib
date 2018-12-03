@@ -18,54 +18,54 @@ import com.veraxsystems.vxipmi.coding.commands.ResponseData;
  * @see Rakp1
  */
 public class Rakp1ResponseData implements ResponseData {
-	
-	private byte messageTag;
-	
-	private byte statusCode;
-	
-	private int remoteConsoleSessionId;
-	
-	private byte[] managedSystemRandomNumber;
-	
-	private byte[] managedSystemGuid;
 
-	public void setMessageTag(byte messageTag) {
-		this.messageTag = messageTag;
-	}
+    private byte messageTag;
 
-	public byte getMessageTag() {
-		return messageTag;
-	}
+    private byte statusCode;
 
-	public void setStatusCode(byte statusCode) {
-		this.statusCode = statusCode;
-	}
+    private int remoteConsoleSessionId;
 
-	public byte getStatusCode() {
-		return statusCode;
-	}
+    private byte[] managedSystemRandomNumber;
 
-	public void setRemoteConsoleSessionId(int remoteConsoleSessionId) {
-		this.remoteConsoleSessionId = remoteConsoleSessionId;
-	}
+    private byte[] managedSystemGuid;
 
-	public int getRemoteConsoleSessionId() {
-		return remoteConsoleSessionId;
-	}
+    public void setMessageTag(byte messageTag) {
+        this.messageTag = messageTag;
+    }
 
-	public void setManagedSystemGuid(byte[] managedSystemGuid) {
-		this.managedSystemGuid = managedSystemGuid;
-	}
+    public byte getMessageTag() {
+        return messageTag;
+    }
 
-	public byte[] getManagedSystemGuid() {
-		return managedSystemGuid;
-	}
+    public void setStatusCode(byte statusCode) {
+        this.statusCode = statusCode;
+    }
 
-	public void setManagedSystemRandomNumber(byte[] randomNumber) {
-		this.managedSystemRandomNumber = randomNumber;
-	}
+    public byte getStatusCode() {
+        return statusCode;
+    }
 
-	public byte[] getManagedSystemRandomNumber() {
-		return managedSystemRandomNumber;
-	}
+    public void setRemoteConsoleSessionId(int remoteConsoleSessionId) {
+        this.remoteConsoleSessionId = remoteConsoleSessionId;
+    }
+
+    public int getRemoteConsoleSessionId() {
+        return remoteConsoleSessionId;
+    }
+
+    public void setManagedSystemGuid(byte[] managedSystemGuid) {
+        this.managedSystemGuid = managedSystemGuid;
+    }
+
+    public byte[] getManagedSystemGuid() {
+        return managedSystemGuid;
+    }
+
+    public void setManagedSystemRandomNumber(byte[] randomNumber) {
+        this.managedSystemRandomNumber = randomNumber;
+    }
+
+    public byte[] getManagedSystemRandomNumber() {
+        return managedSystemRandomNumber;
+    }
 }

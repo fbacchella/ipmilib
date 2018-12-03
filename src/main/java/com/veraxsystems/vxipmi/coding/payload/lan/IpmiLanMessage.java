@@ -18,6 +18,9 @@ import com.veraxsystems.vxipmi.common.TypeConverter;
  * A wrapper class for IPMI LAN message
  */
 public abstract class IpmiLanMessage extends IpmiPayload {
+    public static final int MIN_SEQUENCE_NUMBER = 1;
+    public static final int MAX_SEQUENCE_NUMBER = 63;
+
     private byte responderAddress;
 
     protected byte networkFunction;
@@ -41,10 +44,10 @@ public abstract class IpmiLanMessage extends IpmiPayload {
     }
 
     public void setNetworkFunction(NetworkFunction networkFunction) {
-    	this.networkFunction = TypeConverter.intToByte(networkFunction.getCode());
+        this.networkFunction = TypeConverter.intToByte(networkFunction.getCode());
     }
 
-    public NetworkFunction getNetworkFunction() throws IllegalArgumentException {
+    public NetworkFunction getNetworkFunction() {
         return NetworkFunction.parseInt(TypeConverter.byteToInt(networkFunction));
     }
 
@@ -118,6 +121,6 @@ public abstract class IpmiLanMessage extends IpmiPayload {
     
     @Override
     public byte[] getIpmiCommandData() {
-    	return getData();
+        return getData();
     }
 }

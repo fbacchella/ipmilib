@@ -20,25 +20,25 @@ import com.veraxsystems.vxipmi.sm.StateMachine;
  * @see StateMachine
  */
 public class Default extends StateMachineEvent {
-	private CipherSuite cipherSuite;
-	private int sequenceNumber;
-	private PrivilegeLevel privilegeLevel;
-	
-	public Default(CipherSuite cipherSuite, int sequenceNumber, PrivilegeLevel privilegeLevel) {
-		this.cipherSuite = cipherSuite;
-		this.sequenceNumber = sequenceNumber;
-		this.privilegeLevel = privilegeLevel;
-	}
-	
-	public CipherSuite getCipherSuite() {
-		return cipherSuite;
-	}
-	public int getSequenceNumber() {
-		return sequenceNumber;
-	}
-	public PrivilegeLevel getPrivilegeLevel() {
-		return privilegeLevel;
-	}
-	
-	
+    private CipherSuite cipherSuite;
+    private int sequenceNumber;
+    private PrivilegeLevel privilegeLevel;
+
+    public Default(CipherSuite cipherSuite, int sequenceNumber, PrivilegeLevel privilegeLevel) {
+        this.cipherSuite = cipherSuite;
+        this.sequenceNumber = sequenceNumber;
+        this.privilegeLevel = privilegeLevel;
+    }
+
+    public CipherSuite getCipherSuite() {
+        return cipherSuite;
+    }
+    public int getSequenceNumber() {
+        return sequenceNumber;
+    }
+    public PrivilegeLevel getPrivilegeLevel() {
+        return privilegeLevel;
+    }
+
+
 }

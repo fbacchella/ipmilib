@@ -14,13 +14,15 @@ package com.veraxsystems.vxipmi.coding.commands.sdr.record;
 /**
  * This record describes the allocation and type for the BMC message channels.
  * This record type has been deprecated
+ *
+ * @deprecated This sensor record has been deprecated
  */
 @Deprecated
 public class BmcMessageChannelInfoRecord extends SensorRecord {
 
-	@Override
-	protected void populateTypeSpecficValues(byte[] recordData,
-			SensorRecord record) {
-	}
+    @Override
+    protected void populateTypeSpecficValues(byte[] recordData, SensorRecord record) {
+        // No specific values for this record type
+    }
 
 }
