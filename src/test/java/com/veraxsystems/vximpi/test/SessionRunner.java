@@ -24,6 +24,7 @@ import com.veraxsystems.vxipmi.coding.commands.PrivilegeLevel;
 import com.veraxsystems.vxipmi.coding.commands.sel.ReserveSel;
 import com.veraxsystems.vxipmi.coding.protocol.AuthenticationType;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
+import com.veraxsystems.vxipmi.common.Constants;
 import com.veraxsystems.vxipmi.common.Randomizer;
 import com.veraxsystems.vxipmi.connection.Connection;
 import com.veraxsystems.vxipmi.connection.ConnectionException;
@@ -64,7 +65,7 @@ public class SessionRunner extends Thread {
 		for (int i = 0; i < 1; ++i) {
 			try {
 				connection = new Connection(messenger, i);
-				connection.connect(address, 30000);
+				connection.connect(address, Constants.IPMI_PORT, 30000);
 			} catch (FileNotFoundException e1) {
 				e1.printStackTrace();
 			} catch (IOException e1) {
@@ -84,8 +85,8 @@ public class SessionRunner extends Thread {
 						properties.getProperty("password"), null);
 				Thread.sleep(Math.abs(Randomizer.getInt()) % 200);
 				for (int j = 0; j < 200; ++j) {
-					connection.sendIpmiCommand(new ReserveSel(IpmiVersion.V20,
-							cs, AuthenticationType.RMCPPlus));
+					connection.sendMessage(new ReserveSel(IpmiVersion.V20,
+							cs, AuthenticationType.RMCPPlus), false);
 					Thread.sleep(Math.abs(Randomizer.getInt()) % 200);
 				}
 			} catch (Exception e) {
