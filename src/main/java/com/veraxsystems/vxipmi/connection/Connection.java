@@ -332,6 +332,8 @@ public class Connection extends TimerTask implements MachineObserver {
 			PrivilegeLevel requestedPrivilegeLevel) throws Exception {
 
 		if (!(stateMachine.getCurrent().getClass() == Ciphers.class)) {
+			// Don't throw up on invalid state
+			stateMachine.setCurrent(new Ciphers());
 			throw new StateConnectionException(stateMachine.getCurrent());
 		}
 
