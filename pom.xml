@@ -4,7 +4,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>fr.jrds.verax</groupId>
+    <groupId>fr.jrds</groupId>
     <artifactId>vxIPMI</artifactId>
     <name>Verax IPMI module</name>
     <version>1.0.17.2-SNAPSHOT</version>
