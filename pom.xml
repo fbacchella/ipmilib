@@ -10,6 +10,12 @@
 	<version>2.0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
+
 	<build>
 		<finalName>vxIPMI</finalName>
 		<plugins>
@@ -138,18 +144,5 @@
 		<project.build.mainClass>com.veraxsystems.vxipmi.encoding.DecoderRunner</project.build.mainClass>
 		<junit.version>4.7</junit.version>
 	</properties>
-
-	<distributionManagement>
-		<repository>
-			<id>releases</id>
-			<name>releases</name>
-			<url>${verax.releases.repo.url}</url>
-		</repository>
-		<snapshotRepository>
-			<id>jfrog-snapshots</id>
-			<name>oss-jfrog-artifactory-snapshots</name>
-			<url>https://oss.jfrog.org/artifactory/oss-snapshot-local</url>
-		</snapshotRepository>
-	</distributionManagement>
 
 </project>
