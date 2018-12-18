@@ -11,8 +11,6 @@
  */
 package com.veraxsystems.vxipmi.transport;
 
-import org.apache.log4j.Logger;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -21,6 +19,8 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.log4j.Logger;
 
 /**
  * Handles the UDP connection.
@@ -45,7 +45,7 @@ public class UdpMessenger extends Thread implements Messenger {
 
     private static final int DEFAULTBUFFERSIZE = 512;
 
-    private static Logger logger = Logger.getLogger(UdpMessenger.class);
+    private static final Logger logger = Logger.getLogger(UdpMessenger.class);
 
     public int getPort() {
         return port;
@@ -85,6 +85,8 @@ public class UdpMessenger extends Thread implements Messenger {
         bufferSize = DEFAULTBUFFERSIZE;
         socket = new DatagramSocket(this.port, address);
         socket.setSoTimeout(0);
+        setDaemon(true);
+        setName("IpmiUdpMessenger" + address + ":" + socket.getLocalPort());
         this.start();
     }
 
@@ -104,12 +106,11 @@ public class UdpMessenger extends Thread implements Messenger {
 
     @Override
     public void run() {
-        super.run();
 
         boolean run = true;
 
         while (run) {
-            DatagramPacket response = new DatagramPacket(new byte[512], 512);
+            DatagramPacket response = new DatagramPacket(new byte[bufferSize], bufferSize);
 
             try {
                 socket.receive(response);
@@ -118,7 +119,7 @@ public class UdpMessenger extends Thread implements Messenger {
                 message.setPort(response.getPort());
                 byte[] buffer = new byte[response.getLength()];
                 System.arraycopy(response.getData(), 0, buffer, 0,
-                        buffer.length);
+                                 buffer.length);
                 message.setMessage(buffer);
 
                 notifyListeners(message);
@@ -129,7 +130,7 @@ public class UdpMessenger extends Thread implements Messenger {
                 } else {
                     logger.error(se.getMessage(), se);
                 }
-            } catch (Exception e) {
+            } catch (IOException e) {
                 logger.error(e.getMessage(), e);
             } finally {
                 if (socket.isClosed()) {
@@ -165,8 +166,10 @@ public class UdpMessenger extends Thread implements Messenger {
      *            - {@link UdpListener} to register.
      */
     public void register(UdpListener listener) {
-        synchronized (listeners) {
-            listeners.add(listener);
+        if (listener != null) {
+            synchronized (listeners) {
+                listeners.add(listener);
+            } 
         }
     }
 
@@ -177,8 +180,10 @@ public class UdpMessenger extends Thread implements Messenger {
      *            - {@link UdpListener} to unregister
      */
     public void unregister(UdpListener listener) {
-        synchronized (listeners) {
-            listeners.remove(listener);
+        if (listener != null) {
+            synchronized (listeners) {
+                listeners.remove(listener);
+            } 
         }
     }
 
@@ -202,14 +207,9 @@ public class UdpMessenger extends Thread implements Messenger {
      */
     public synchronized void send(UdpMessage message) throws IOException {
         DatagramPacket packet = new DatagramPacket(message.getMessage(),
-                message.getMessage().length, message.getAddress(),
-                message.getPort());
+                                                   message.getMessage().length, message.getAddress(),
+                                                   message.getPort());
         socket.send(packet);
-        try {
-            Thread.sleep(1);
-        } catch (InterruptedException e) {
-            // TODO: log
-        }
         ++sentPackets;
     }
 }
