@@ -1,0 +1,92 @@
+version: 2.1
+jobs:
+    checkout:
+        docker:
+            - image: circleci/openjdk:8-jdk
+              environment:
+                  discovery.type: single-node
+        steps:
+            - checkout
+            - restore_cache:
+                key: vxIPMI-{{ checksum "pom.xml" }}
+            - run: "mvn -B dependency:go-offline"
+            - run: "[ -x /home/circleci/jfrog ] || (cd && curl -fL https://getcli.jfrog.io | sh)"
+            - persist_to_workspace:
+                root: /
+                paths:
+                    - home/circleci/.m2/repository
+                    - home/circleci/project
+                    - home/circleci/jfrog
+    build:
+        docker:
+            - image: circleci/openjdk:8-jdk
+              environment:
+                  discovery.type: single-node
+        steps:
+            - attach_workspace:
+                at: /tmp/ws
+            - run:
+                command: |
+                    mv -n /tmp/ws/home/circleci/.m2 /home/circleci/
+                    mv -n /tmp/ws/home/circleci/project/* /home/circleci/project/
+                    mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
+            - run:
+                command: mvn -B clean compile
+                environment:
+                    JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
+            - persist_to_workspace:
+                root: /
+                paths:
+                    - home/circleci/.m2/repository
+                    - home/circleci/project/target
+    publish:
+        docker:
+            - image: circleci/openjdk:8-jdk
+              environment:
+                  discovery.type: single-node
+        steps:
+            - attach_workspace:
+                at: /tmp/ws
+            - run:
+                command: |
+                    mv -n /tmp/ws/home/circleci/jfrog /home/circleci/jfrog
+                    mv -n /tmp/ws/home/circleci/project/* /home/circleci/project/
+                    mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
+            - run: mvn -B deploy -Dmaven.test.skip=true -Dmaven.main.skip -Dmaven.install.skip=true -DaltDeploymentRepository=local::default::file:target/deploy
+            - run: |
+                VERSION=$(mvn -B help:evaluate -Dexpression=project.version -q -DforceStdout)
+                ARTEFACT=$(mvn -B help:evaluate -Dexpression=project.artifactId -q -DforceStdout)
+                GROUPPATH=$(mvn -B help:evaluate -Dexpression=project.groupId -q -DforceStdout | sed 's#\.#/#g')
+                /home/circleci/jfrog bt u --user $BINTRAY_USER --key $BINTRAY_KEY 'target/deploy/*' $BINTRAY_REPO/ipmilib/$VERSION $GROUPPATH/$ARTEFACT/$VERSION/
+    savecache:
+        docker:
+            - image: circleci/openjdk:8-jdk
+              environment:
+                  discovery.type: single-node
+        steps:
+            - attach_workspace:
+                at: /tmp/ws
+            - run:
+                command: |
+                    mv /tmp/ws/home/circleci/project/pom.xml /home/circleci/project/
+                    mv /tmp/ws/home/circleci/.m2 /home/circleci/
+            - save_cache:
+                paths:
+                    - /home/circleci/.m2/repository
+                    - /home/circleci/jfrog
+                key: vxIPMI-{{ checksum "pom.xml" }}
+workflows:
+  version: 2.1
+  build_and_test:
+    jobs:
+      - checkout
+      - build:
+          requires:
+              - checkout
+      - publish:
+          requires:
+              - build
+      - savecache:
+          requires:
+              - publish
+      
