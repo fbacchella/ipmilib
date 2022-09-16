@@ -1,0 +1,27 @@
+<settings>
+    <servers>
+        <server>
+            <id>ossrh</id>
+            <username>${env.SONATYPE_USERNAME}</username>
+            <password>${env.SONATYPE_PASSWORD}</password>
+        </server>
+    </servers>
+    <profiles>
+        <profile>
+            <id>sonar</id>
+            <properties>
+                <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+                <sonar.organization>${env.SONARCLOUD_ORG}</sonar.organization>
+                <sonar.login>${env.SONARCLOUD_LOGIN}</sonar.login>
+            </properties>
+        </profile>
+        <profile>
+            <id>skip</id>
+            <properties>
+                <mdep.skip>true</mdep.skip>
+                <maven.resources.skip>true</maven.resources.skip>
+                <maven.main.skip>true</maven.main.skip>
+            </properties>
+        </profile>
+    </profiles>
+</settings>
