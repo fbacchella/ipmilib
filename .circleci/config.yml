@@ -2,7 +2,7 @@ version: 2.1
 jobs:
     checkout:
         docker:
-            - image: cimg/openjdk:18.0
+            - image: cimg/openjdk:21.0
         steps:
             - checkout
             - restore_cache:
@@ -21,7 +21,7 @@ jobs:
                       - home/circleci/project
     build:
         docker:
-            - image: cimg/openjdk:18.0
+            - image: cimg/openjdk:21.0
         steps:
             - attach_workspace:
                 at: /tmp/ws
@@ -40,9 +40,9 @@ jobs:
                 paths:
                     - home/circleci/.m2/repository
                     - home/circleci/project/target
-    testsj18:
+    testsj21:
         docker:
-            - image: cimg/openjdk:18.0
+            - image: cimg/openjdk:21.0
         steps:
             - attach_workspace:
                 at: /tmp/ws
@@ -136,7 +136,7 @@ jobs:
             #don't persist_to_workspace, can't be done in parallel with testsj13
     publish:
         docker:
-            - image: cimg/openjdk:18.0
+            - image: cimg/openjdk:21.0
         steps:
             - attach_workspace:
                 at: /tmp/ws
@@ -165,7 +165,7 @@ jobs:
                     - home/circleci/.sonar/cache
     savecache:
         docker:
-            - image: cimg/openjdk:18.0
+            - image: cimg/openjdk:21.0
         steps:
             - attach_workspace:
                 at: /tmp/ws
@@ -187,7 +187,7 @@ workflows:
       - build:
           requires:
               - checkout
-      - testsj18:
+      - testsj21:
           requires:
               - build
           context: "Security variables"
@@ -202,7 +202,7 @@ workflows:
               - build
       - publish:
           requires:
-              - testsj18
+              - testsj21
               - testsj17
               - testsj11
               - testsj8
