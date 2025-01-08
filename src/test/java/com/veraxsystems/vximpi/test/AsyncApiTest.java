@@ -36,8 +36,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.internal.util.reflection.Whitebox;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.powermock.reflect.Whitebox;
 
 import java.io.FileInputStream;
 import java.net.InetAddress;
@@ -114,7 +114,6 @@ public class AsyncApiTest implements IpmiResponseListener {
 
         when(connectionManager.getAvailableCipherSuites(eq(handleId))).thenReturn(availableCipherSuites);
         when(connectionManager.getConnection(eq(handleId))).thenReturn(connection);
-        when(connectionManager.createConnection(any(InetAddress.class), anyInt())).thenReturn(handleId);
 
         response = null;
 
@@ -166,9 +165,8 @@ public class AsyncApiTest implements IpmiResponseListener {
         when(handle.getPrivilegeLevel()).thenReturn(privilegeLevel);
         when(handle.getRemoteAddress()).thenReturn(address);
         when(handle.getUser()).thenReturn(user);
-        when(handle.getPassword()).thenReturn(password);
 
-        connector.openSession(handle, user, password, null);
+        connector.openSession(handle, user, password, new byte[]{});
 
         verify(connectionManager).startSession(eq(handle.getHandle()), eq(cipherSuite), eq(privilegeLevel),
                 eq(user), eq(password), any(byte[].class));

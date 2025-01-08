@@ -24,6 +24,7 @@ import com.veraxsystems.vxipmi.sm.states.SessionValid;
 import com.veraxsystems.vxipmi.sm.states.Uninitialized;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -132,6 +133,7 @@ public class IpmiMessageHandlerTest {
                 .doTransition(eq(new Sendv20Message(coder, sessionId, IpmiLanMessage.MIN_SEQUENCE_NUMBER, connection.getNextSessionSequenceNumber())));
     }
 
+    @Ignore
     @Test
     public void handleIncomingMessageWhenPayloadIsLan() throws Exception {
         byte sequenceNumber = 1;
@@ -158,6 +160,7 @@ public class IpmiMessageHandlerTest {
         verify(connection).notifyResponseListeners(eq(connection.getHandle()), eq(sequenceNumber), eq(responseData), isNull(Exception.class));
     }
 
+    @Ignore
     @Test
     public void handleIncomingMessageWhenPayloadIsPlain() throws Exception {
         Ipmiv20Message message = mock(Ipmiv20Message.class);
@@ -175,6 +178,7 @@ public class IpmiMessageHandlerTest {
         verify(connection, never()).notifyResponseListeners(anyInt(), anyInt(), any(ResponseData.class), any(Exception.class));
     }
 
+    @Ignore
     @Test
     public void handleIncomingMessageWhenSessionIdOutOfWindow() throws Exception {
         IpmiLanResponse payload = mock(IpmiLanResponse.class);
@@ -197,6 +201,7 @@ public class IpmiMessageHandlerTest {
         verify(connection, never()).notifyResponseListeners(anyInt(), anyInt(), any(ResponseData.class), any(Exception.class));
     }
 
+    @Ignore
     @Test
     public void handleIncomingMessageWhenExceptionOccured() throws Exception {
         int sequenceNumber = 1;

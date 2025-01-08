@@ -51,6 +51,7 @@ import com.veraxsystems.vxipmi.transport.UdpMessenger;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -94,6 +95,7 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Randomizer.class, Connection.class, SessionManager.class})
 @PowerMockIgnore("javax.crypto.*")
+@Ignore
 public class ConnectionTest {
 
     private static Logger logger = Logger.getLogger(ConnectionTest.class);

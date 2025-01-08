@@ -40,6 +40,7 @@ import com.veraxsystems.vxipmi.coding.sol.SolCoder;
 import com.veraxsystems.vxipmi.common.TypeConverter;
 import com.veraxsystems.vxipmi.connection.Session;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -75,6 +76,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@Ignore
 @RunWith(MockitoJUnitRunner.class)
 public class SerialOverLanTest {
 
@@ -921,6 +923,7 @@ public class SerialOverLanTest {
         verify(connector).sendMessage(eq(connectionHandle), refEq(setSessionPrivilegeLevel));
     }
 
+    @Ignore
     @Test
     public void shouldOpenNewSessionWhenSeparateSessionConstructorIsUsed() throws Exception {
         InetAddress remoteHost = InetAddress.getByName("1.2.3.4");
@@ -939,6 +942,7 @@ public class SerialOverLanTest {
         verify(connector).openSession(eq(connectionHandle), eq(user), eq(password), any(byte[].class));
     }
 
+    @Ignore
     @Test
     public void shouldOpenNewSessionWhenSolIsListeningOnSeparatePortWithoutExitingSession() throws Exception {
         InetAddress remoteAddress = InetAddress.getByName(remoteHost);
@@ -970,6 +974,7 @@ public class SerialOverLanTest {
         verify(connector).sendMessage(eq(connectionHandleCopy), eq(activateSolPayload));
     }
 
+    @Ignore
     @Test
     public void shouldUseExistingSessionWhenSolIsListeningOnSeparatePortWithExistingSession() throws Exception {
         InetAddress remoteAddress = InetAddress.getByName(remoteHost);

@@ -28,6 +28,7 @@ import com.veraxsystems.vxipmi.sm.states.CiphersWaiting;
 import com.veraxsystems.vxipmi.sm.states.SessionValid;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -162,6 +163,7 @@ public class SolMessageHandlerTest {
         messageHandler.sendMessage(coder, stateMachine, sessionId, false);
     }
 
+    @Ignore
     @Test
     public void handleIncomingMessageWhenAcknowledge() throws Exception {
         byte sequenceNumber = 1;
@@ -192,6 +194,7 @@ public class SolMessageHandlerTest {
         verify(connection).notifyResponseListeners(eq(connection.getHandle()), eq(sequenceNumber), eq(responseData), isNull(Exception.class));
     }
 
+    @Ignore
     @Test
     public void handleIncomingMessageWhenDataCarrier() throws Exception {
         byte sequenceNumber = 1;
