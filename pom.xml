@@ -169,27 +169,6 @@
 
     <profiles>
         <profile>
-            <id>java8</id>
-            <activation>
-                <jdk>1.8</jdk>
-            </activation>
-            <properties>
-                <maven.compiler.source>1.8</maven.compiler.source>
-                <maven.compiler.target>1.8</maven.compiler.target>
-                <argLine>${arg.line}</argLine>
-            </properties>
-        </profile>
-        <profile>
-            <id>notjava8</id>
-            <activation>
-                <jdk>(1.8,)</jdk>
-            </activation>
-            <properties>
-                <maven.compiler.release>8</maven.compiler.release>
-                <argLine>${arg.line}</argLine>
-            </properties>
-        </profile>
-        <profile>
             <id>sonar</id>
             <build>
                 <plugins>
