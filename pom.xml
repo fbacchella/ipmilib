@@ -114,8 +114,7 @@
                 </executions>
                 <configuration>
                     <links>
-                        <link>https://docs.oracle.com/javaee/7/api/</link>
-                        <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
+                        <link>https://javadoc.io/doc/ch.qos.reload4j/reload4j/latest/</link>
                     </links>
                 </configuration>
             </plugin>
@@ -179,6 +178,7 @@
 
     <properties>
         <maven.compiler.release>8</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.mainClass>com.veraxsystems.vxipmi.encoding.DecoderRunner</project.build.mainClass>
         <junit.version>4.13.2</junit.version>
         <!-- Indirection needed to keep optionnal jacoco settings and external argument lines-->
