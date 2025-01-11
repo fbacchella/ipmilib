@@ -90,27 +90,27 @@ public class ProductInfo extends FruRecord {
 
                 switch (index) {
                 case 0:
-                    setManufacturerName(FruRecord.decodeString(partType,
+                    setManufacturerName(FruRecord.decodeString(partType, partDataLength,
                             partNumberData, isEnglishLanguageCode(languageCode)));
                     break;
                 case 1:
-                    setProductName(FruRecord.decodeString(partType,
+                    setProductName(FruRecord.decodeString(partType, partDataLength,
                             partNumberData, isEnglishLanguageCode(languageCode)));
                     break;
                 case 2:
-                    setProductModelNumber(FruRecord.decodeString(partType,
+                    setProductModelNumber(FruRecord.decodeString(partType, partDataLength,
                             partNumberData, isEnglishLanguageCode(languageCode)));
                     break;
                 case 3:
-                    setProductVersion(FruRecord.decodeString(partType,
+                    setProductVersion(FruRecord.decodeString(partType, partDataLength,
                             partNumberData, isEnglishLanguageCode(languageCode)));
                     break;
                 case 4:
-                    setProductSerialNumber(FruRecord.decodeString(partType,
+                    setProductSerialNumber(FruRecord.decodeString(partType, partDataLength,
                             partNumberData, true));
                     break;
                 case 5:
-                    setAssetTag(FruRecord.decodeString(partType,
+                    setAssetTag(FruRecord.decodeString(partType, partDataLength,
                             partNumberData, isEnglishLanguageCode(languageCode)));
                     break;
                 case 6:
@@ -122,7 +122,7 @@ public class ProductInfo extends FruRecord {
                         ++currentOffset;
                         continue;
                     }
-                    customInfo.add(FruRecord.decodeString(partType,
+                    customInfo.add(FruRecord.decodeString(partType, partDataLength,
                             partNumberData, isEnglishLanguageCode(languageCode)));
                     break;
                 }

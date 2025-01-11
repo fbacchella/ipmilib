@@ -73,18 +73,18 @@ public class ChassisInfo extends FruRecord {
 
                 switch (index) {
                 case 0:
-                    setChassisPartNumber(FruRecord.decodeString(partType,
+                    setChassisPartNumber(FruRecord.decodeString(partType, partDataLength,
                             partNumberData, true));
                     break;
                 case 1:
-                    setChassisSerialNumber(FruRecord.decodeString(partType,
+                    setChassisSerialNumber(FruRecord.decodeString(partType, partDataLength,
                             partNumberData, true));
                     break;
                 default:
                     if (partDataLength == 0) {
                         continue;
                     }
-                    customInfo.add(FruRecord.decodeString(partType,
+                    customInfo.add(FruRecord.decodeString(partType, partDataLength,
                             partNumberData, true));
                     break;
                 }

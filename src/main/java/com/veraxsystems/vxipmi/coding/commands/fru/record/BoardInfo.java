@@ -111,21 +111,21 @@ public class BoardInfo extends FruRecord {
 
                 switch (index) {
                 case 0:
-                    setBoardManufacturer(FruRecord.decodeString(partType,
+                    setBoardManufacturer(FruRecord.decodeString(partType, partDataLength,
                             partNumberData, languageCode != 0
                                     && languageCode != 25));
                     break;
                 case 1:
-                    setBoardProductName(FruRecord.decodeString(partType,
+                    setBoardProductName(FruRecord.decodeString(partType, partDataLength,
                             partNumberData, languageCode != 0
                                     && languageCode != 25));
                     break;
                 case 2:
-                    setBoardSerialNumber(FruRecord.decodeString(partType,
+                    setBoardSerialNumber(FruRecord.decodeString(partType, partDataLength,
                             partNumberData, true));
                     break;
                 case 3:
-                    setBoardPartNumber(FruRecord.decodeString(partType,
+                    setBoardPartNumber(FruRecord.decodeString(partType, partDataLength,
                             partNumberData, languageCode != 0
                                     && languageCode != 25));
                     break;
@@ -138,7 +138,7 @@ public class BoardInfo extends FruRecord {
                         ++currentOffset;
                         continue;
                     }
-                    customInfo.add(FruRecord.decodeString(partType,
+                    customInfo.add(FruRecord.decodeString(partType, partDataLength,
                             partNumberData, languageCode != 0
                                     && languageCode != 25));
                     break;

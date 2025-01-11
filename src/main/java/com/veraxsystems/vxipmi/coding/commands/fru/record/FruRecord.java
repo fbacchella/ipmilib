@@ -12,6 +12,7 @@
 package com.veraxsystems.vxipmi.coding.commands.fru.record;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import com.veraxsystems.vxipmi.common.TypeConverter;
 
@@ -39,7 +40,7 @@ public abstract class FruRecord {
      *            true if the Language Code is English
      * @return - decoded string
      */
-    protected static String decodeString(int typeFormat, byte[] data,
+    protected static String decodeString(int typeFormat, int length, byte[] data,
             boolean isEnglishLanguageCode) {
         // TODO: Test different encoding types
         switch (typeFormat) {
@@ -55,15 +56,14 @@ public abstract class FruRecord {
 
             return sb.toString();
         case 1:
-            return TypeConverter.decodeBcdPlus(data);
+            return TypeConverter.decodeBcdPlus(length, data);
         case 2:
-            return TypeConverter.decode6bitAscii(data);
+            return TypeConverter.decode6bitAscii(length, data);
         case 3:
-            System.arraycopy(data, 0, data, 0, data.length);
             if (isEnglishLanguageCode) {
-                return new String(data, Charset.forName("ISO-8859-1")).trim();
+                return new String(data, 0, length, StandardCharsets.ISO_8859_1).trim();
             } else {
-                return new String(data, Charset.forName("UTF-8")).trim();
+                return new String(data, StandardCharsets.UTF_8).trim();
             }
         default:
             throw new IllegalArgumentException("Invalid type format");

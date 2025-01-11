@@ -14,6 +14,7 @@ package com.veraxsystems.vxipmi.coding.commands.sdr.record;
 import com.veraxsystems.vxipmi.common.TypeConverter;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Wrapper for SDR entry.
@@ -158,15 +159,16 @@ public abstract class SensorRecord {
      * @return decoded name
      */
     protected String decodeName(byte codingType, byte[] name) {
+        byte len = (byte) (codingType & 0x1f);
         switch ((TypeConverter.byteToInt(codingType) & 0xc0) >> 6) {
         case 0: // unicode
-            return new String(name, Charset.forName("UTF-8"));
+            return new String(name, 0, len, StandardCharsets.UTF_8);
         case 1: // BCD plus
-            return TypeConverter.decodeBcdPlus(name);
+            return TypeConverter.decodeBcdPlus(len, name);
         case 2: // 6-bit packed ASCII
-            return TypeConverter.decode6bitAscii(name);
+            return TypeConverter.decode6bitAscii(len, name);
         case 3: // 8-bit ASCII + Latin 1
-            return new String(name, Charset.forName("ISO-8859-1"));
+            return new String(name, 0, len, StandardCharsets.ISO_8859_1);
         default:
             throw new IllegalArgumentException("Invalid coding type.");
         }

@@ -288,10 +288,10 @@ public final class TypeConverter {
     /**
      * Decodes text encoded in BCD plus format.
      */
-    public static String decodeBcdPlus(byte[] text) {
-        char[] result = new char[text.length * 2];
+    public static String decodeBcdPlus(int length, byte[] text) {
+        char[] result = new char[length * 2];
 
-        for (int i = 0; i < text.length; ++i) {
+        for (int i = 0; i < length; ++i) {
             result[2 * i] = decodeBcdPlusChar(TypeConverter
                     .intToByte((TypeConverter.byteToInt(text[i]) & 0xf0) >> 4));
             result[2 * i + 1] = decodeBcdPlusChar(TypeConverter
@@ -340,7 +340,7 @@ public final class TypeConverter {
         }
     }
 
-    public static String decode6bitAscii(byte[] text) {
+    public static String decode6bitAscii(int length, byte[] text) {
         int cnt = text.length;
         if (cnt % 3 != 0) {
             cnt += 3 - cnt % 3;
