@@ -31,7 +31,7 @@ public class SolInboundStatusFieldTest {
     private Set<SolStatus> statuses;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         this.ackState = SolAckState.ACK;
         this.statuses = new HashSet<SolStatus>();
 
@@ -39,7 +39,7 @@ public class SolInboundStatusFieldTest {
     }
 
     @Test
-    public void createNewFromRawByte() throws Exception {
+    public void createNewFromRawByte() {
         byte raw = 0;
         raw = TypeConverter.setBitOnPosition(6, raw);
 
@@ -58,17 +58,17 @@ public class SolInboundStatusFieldTest {
     }
 
     @Test
-    public void getAckStateReturnsPassedState() throws Exception {
+    public void getAckStateReturnsPassedState() {
         assertEquals(ackState, statusField.getAckState());
     }
 
     @Test
-    public void getStatusesWhenEmptyStatusesReturnsEmptySet() throws Exception {
+    public void getStatusesWhenEmptyStatusesReturnsEmptySet() {
         assertThat(statusField.getStatuses(), is(empty()));
     }
 
     @Test
-    public void getStatusesReturnsPassedStatuses() throws Exception {
+    public void getStatusesReturnsPassedStatuses() {
         Set<SolStatus> expectedStatuses = new HashSet<SolStatus>() {{
             add(SolStatus.CharacterTransferUnavailable);
             add(SolStatus.Break);
@@ -82,7 +82,7 @@ public class SolInboundStatusFieldTest {
     }
 
     @Test
-    public void convertToByteWhenNack() throws Exception {
+    public void convertToByteWhenNack() {
         byte expectedValue = TypeConverter.setBitOnPosition(6, (byte) 0);
         this.statusField = new SolInboundStatusField(SolAckState.NACK, statuses);
 
@@ -90,12 +90,12 @@ public class SolInboundStatusFieldTest {
     }
 
     @Test
-    public void convertToByteWhenAckAndNoStatuses() throws Exception {
+    public void convertToByteWhenAckAndNoStatuses() {
         assertEquals(0, statusField.convertToByte());
     }
 
     @Test
-    public void convertToByteWhenAckAndSomeStatuses() throws Exception {
+    public void convertToByteWhenAckAndSomeStatuses() {
         Set<SolStatus> newStatuses = new HashSet<SolStatus>() {{
             add(SolStatus.CharacterTransferUnavailable);
             add(SolStatus.RtsAsserted);

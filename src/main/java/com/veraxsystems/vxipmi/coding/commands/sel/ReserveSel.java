@@ -26,9 +26,6 @@ import com.veraxsystems.vxipmi.coding.protocol.IpmiMessage;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
 import com.veraxsystems.vxipmi.common.TypeConverter;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
 /**
  * Wrapper for Reserve SEL command.
  */
@@ -61,16 +58,14 @@ public class ReserveSel extends IpmiCommandCoder {
     }
 
     @Override
-    protected IpmiPayload preparePayload(int sequenceNumber)
-            throws NoSuchAlgorithmException, InvalidKeyException {
+    protected IpmiPayload preparePayload(int sequenceNumber) {
         return new IpmiLanRequest(getNetworkFunction(), getCommandCode(), null,
                 TypeConverter.intToByte(sequenceNumber));
     }
 
     @Override
     public ResponseData getResponseData(IpmiMessage message)
-            throws IPMIException,
-            NoSuchAlgorithmException, InvalidKeyException {
+            throws IPMIException {
 
         if (!isCommandResponse(message)) {
             throw new IllegalArgumentException(

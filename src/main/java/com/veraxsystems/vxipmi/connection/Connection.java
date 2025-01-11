@@ -11,6 +11,19 @@
  */
 package com.veraxsystems.vxipmi.connection;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.apache.log4j.Logger;
+
 import com.veraxsystems.vxipmi.coding.PayloadCoder;
 import com.veraxsystems.vxipmi.coding.commands.IpmiVersion;
 import com.veraxsystems.vxipmi.coding.commands.PrivilegeLevel;
@@ -32,8 +45,8 @@ import com.veraxsystems.vxipmi.common.PropertiesManager;
 import com.veraxsystems.vxipmi.common.TypeConverter;
 import com.veraxsystems.vxipmi.sm.MachineObserver;
 import com.veraxsystems.vxipmi.sm.StateMachine;
-import com.veraxsystems.vxipmi.sm.actions.ErrorAction;
 import com.veraxsystems.vxipmi.sm.actions.GetSikAction;
+import com.veraxsystems.vxipmi.sm.actions.IOErrorAction;
 import com.veraxsystems.vxipmi.sm.actions.MessageAction;
 import com.veraxsystems.vxipmi.sm.actions.ResponseAction;
 import com.veraxsystems.vxipmi.sm.actions.StateMachineAction;
@@ -52,19 +65,6 @@ import com.veraxsystems.vxipmi.sm.states.Ciphers;
 import com.veraxsystems.vxipmi.sm.states.SessionValid;
 import com.veraxsystems.vxipmi.sm.states.Uninitialized;
 import com.veraxsystems.vxipmi.transport.Messenger;
-import org.apache.log4j.Logger;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A connection with the specific remote host.
@@ -159,14 +159,9 @@ public class Connection extends TimerTask implements MachineObserver {
      * @param pingPeriod
      *            frequency of the no-op commands that will be sent to keep up
      *            the session
-     * @throws IOException
-     *             when properties file was not found
-     * @throws FileNotFoundException
-     *             when properties file was not found
      * @see #disconnect()
      */
-    public void connect(InetAddress address, int port, int pingPeriod)
-            throws IOException {
+    public void connect(InetAddress address, int port, int pingPeriod) {
         connect(address, port, pingPeriod, false);
     }
 
@@ -178,13 +173,9 @@ public class Connection extends TimerTask implements MachineObserver {
      * - frequency of the no-op commands that will be sent to keep up the session
      * @param skipCiphers
      * - determines if the getAvailableCipherSuites and getChannelAuthenticationCapabilities phases should be skipped
-     * @throws IOException
-     * - when properties file was not found
-     * @throws FileNotFoundException
-     * - when properties file was not found
      * @see #disconnect()
      */
-    public void connect(InetAddress address, int port, int pingPeriod, boolean skipCiphers) throws IOException {
+    public void connect(InetAddress address, int port, int pingPeriod, boolean skipCiphers) {
         MessageHandler ipmiMessageHandler = new IpmiMessageHandler(this, timeout);
         messageHandlers.put(PayloadType.Ipmi, ipmiMessageHandler);
 
@@ -240,10 +231,10 @@ public class Connection extends TimerTask implements MachineObserver {
      * @throws ConnectionException
      *             when connection is in the state that does not allow to
      *             perform this operation.
-     * @throws Exception
+     * @throws IOException
      *             when sending message to the managed system fails
      */
-    public List<CipherSuite> getAvailableCipherSuites(int tag) throws Exception {
+    public List<CipherSuite> getAvailableCipherSuites(int tag) throws IOException {
 
         if (stateMachine.getCurrent().getClass() != Uninitialized.class) {
             throw new ConnectionException(ILLEGAL_CONNECTION_STATE_MESSAGE + stateMachine.getCurrent().getClass().getSimpleName());
@@ -299,7 +290,7 @@ public class Connection extends TimerTask implements MachineObserver {
         return CipherSuite.getCipherSuites(csRaw);
     }
 
-    private void waitForResponse() throws Exception {
+    private void waitForResponse() throws IOException {
         int time = 0;
 
         while (time < timeout && lastAction == null) {
@@ -316,8 +307,8 @@ public class Connection extends TimerTask implements MachineObserver {
             throw new ConnectionException("Command timed out");
         }
         if (!(lastAction instanceof ResponseAction || lastAction instanceof GetSikAction)) {
-            if (lastAction instanceof ErrorAction) {
-                throw ((ErrorAction) lastAction).getException();
+            if (lastAction instanceof IOErrorAction) {
+                throw ((IOErrorAction) lastAction).getException();
             }
             throw new ConnectionException("Invalid StateMachine response: "
                     + lastAction.getClass().getSimpleName());
@@ -579,8 +570,8 @@ public class Connection extends TimerTask implements MachineObserver {
             sik = ((GetSikAction) action).getSik();
         } else if (!(action instanceof MessageAction)) {
             lastAction = action;
-            if (action instanceof ErrorAction) {
-                ErrorAction errorAction = (ErrorAction) action;
+            if (action instanceof IOErrorAction) {
+                IOErrorAction errorAction = (IOErrorAction) action;
                 logger.error(errorAction.getException().getMessage(), errorAction.getException());
             }
         } else {

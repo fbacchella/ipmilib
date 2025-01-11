@@ -11,6 +11,8 @@
  */
 package com.veraxsystems.vxipmi.sm.states;
 
+import java.io.IOException;
+
 import com.veraxsystems.vxipmi.coding.commands.session.GetChannelAuthenticationCapabilities;
 import com.veraxsystems.vxipmi.coding.payload.lan.IpmiLanResponse;
 import com.veraxsystems.vxipmi.coding.protocol.AuthenticationType;
@@ -20,8 +22,9 @@ import com.veraxsystems.vxipmi.coding.protocol.decoder.Protocolv15Decoder;
 import com.veraxsystems.vxipmi.coding.rmcp.RmcpMessage;
 import com.veraxsystems.vxipmi.common.TypeConverter;
 import com.veraxsystems.vxipmi.sm.StateMachine;
-import com.veraxsystems.vxipmi.sm.actions.ErrorAction;
+import com.veraxsystems.vxipmi.sm.actions.IOErrorAction;
 import com.veraxsystems.vxipmi.sm.actions.ResponseAction;
+import com.veraxsystems.vxipmi.sm.actions.RuntimeErrorAction;
 import com.veraxsystems.vxipmi.sm.events.AuthenticationCapabilitiesReceived;
 import com.veraxsystems.vxipmi.sm.events.StateMachineEvent;
 import com.veraxsystems.vxipmi.sm.events.Timeout;
@@ -50,7 +53,7 @@ public class AuthcapWaiting extends State {
         } else if (machineEvent instanceof AuthenticationCapabilitiesReceived) {
             stateMachine.setCurrent(new Authcap());
         } else {
-            stateMachine.doExternalAction(new ErrorAction(
+            stateMachine.doExternalAction(new RuntimeErrorAction(
                     new IllegalArgumentException("Invalid transition")));
         }
     }
@@ -71,8 +74,8 @@ public class AuthcapWaiting extends State {
                 stateMachine.doExternalAction(new ResponseAction(capabilities
                         .getResponseData(ipmiMessage)));
             }
-        } catch (Exception e) {
-            stateMachine.doExternalAction(new ErrorAction(e));
+        } catch (IOException e) {
+            stateMachine.doExternalAction(new IOErrorAction(e));
         }
     }
 

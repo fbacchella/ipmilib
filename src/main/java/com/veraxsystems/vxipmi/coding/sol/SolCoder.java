@@ -16,7 +16,6 @@ import com.veraxsystems.vxipmi.coding.PayloadCoder;
 import com.veraxsystems.vxipmi.coding.commands.IpmiVersion;
 import com.veraxsystems.vxipmi.coding.commands.ResponseData;
 import com.veraxsystems.vxipmi.coding.payload.IpmiPayload;
-import com.veraxsystems.vxipmi.coding.payload.lan.IPMIException;
 import com.veraxsystems.vxipmi.coding.payload.sol.SolAckState;
 import com.veraxsystems.vxipmi.coding.payload.sol.SolInboundMessage;
 import com.veraxsystems.vxipmi.coding.payload.sol.SolInboundStatusField;
@@ -29,8 +28,6 @@ import com.veraxsystems.vxipmi.coding.protocol.PayloadType;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
 import com.veraxsystems.vxipmi.common.TypeConverter;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -123,7 +120,7 @@ public class SolCoder extends PayloadCoder {
     }
 
     @Override
-    protected IpmiPayload preparePayload(int sequenceNumber) throws NoSuchAlgorithmException, InvalidKeyException {
+    protected IpmiPayload preparePayload(int sequenceNumber) {
         byte actualSequenceNumber = acknowledgeOnly ? 0 : TypeConverter.intToByte(sequenceNumber);
 
         SolOutboundMessage request = new SolOutboundMessage(actualSequenceNumber, ackNackSequenceNumber, acceptedCharacters,
@@ -137,7 +134,7 @@ public class SolCoder extends PayloadCoder {
     }
 
     @Override
-    public ResponseData getResponseData(IpmiMessage message) throws IPMIException, NoSuchAlgorithmException, InvalidKeyException {
+    public ResponseData getResponseData(IpmiMessage message) {
         final SolInboundMessage payload = (SolInboundMessage) message.getPayload();
         SolInboundStatusField statusField = payload.getStatusField();
 

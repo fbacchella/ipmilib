@@ -32,7 +32,7 @@ public class SessionManagerTest {
     private SessionManager sessionManager;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         sessionManager = new SessionManager();
     }
 

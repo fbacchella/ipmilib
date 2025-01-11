@@ -11,9 +11,6 @@
  */
 package com.veraxsystems.vxipmi.coding.commands.sdr;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
 import com.veraxsystems.vxipmi.coding.commands.CommandCodes;
 import com.veraxsystems.vxipmi.coding.commands.IpmiCommandCoder;
 import com.veraxsystems.vxipmi.coding.commands.IpmiVersion;
@@ -107,8 +104,7 @@ public class GetSdr extends IpmiCommandCoder {
     }
 
     @Override
-    protected IpmiPayload preparePayload(int sequenceNumber)
-            throws NoSuchAlgorithmException, InvalidKeyException {
+    protected IpmiPayload preparePayload(int sequenceNumber) {
         byte[] payload = new byte[6];
 
         byte[] buffer = TypeConverter.intToByteArray(reservationId);
@@ -129,7 +125,7 @@ public class GetSdr extends IpmiCommandCoder {
     }
 
     @Override
-    public ResponseData getResponseData(IpmiMessage message) throws IPMIException, NoSuchAlgorithmException, InvalidKeyException {
+    public ResponseData getResponseData(IpmiMessage message) throws IPMIException {
         if (!isCommandResponse(message)) {
             throw new IllegalArgumentException(
                     "This is not a response for Get SDR command");

@@ -23,28 +23,28 @@ public class MessageComposerTest {
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void createMessageComposerWhenNegatveMessageSize() throws Exception {
+    public void createMessageComposerWhenNegatveMessageSize() {
         expectedException.expect(IllegalArgumentException.class);
 
         MessageComposer.get(-2);
     }
 
     @Test
-    public void getMessageWhenNoFieldsAppended() throws Exception {
+    public void getMessageWhenNoFieldsAppended() {
         MessageComposer composer = MessageComposer.get(5);
 
         assertArrayEquals(new byte[5], composer.getMessage());
     }
 
     @Test
-    public void getMessageWhenSizeIs0() throws Exception {
+    public void getMessageWhenSizeIs0() {
         MessageComposer composer = MessageComposer.get(0);
 
         assertArrayEquals(new byte[0], composer.getMessage());
     }
 
     @Test
-    public void getMessageWhenSomeFieldsAppended() throws Exception {
+    public void getMessageWhenSomeFieldsAppended() {
         MessageComposer composer = MessageComposer.get(5)
             .appendField((byte) 1)
             .appendField((byte) 4)
@@ -57,7 +57,7 @@ public class MessageComposerTest {
     }
 
     @Test
-    public void getMessageWhenAllFieldsAppended() throws Exception {
+    public void getMessageWhenAllFieldsAppended() {
         MessageComposer composer = MessageComposer.get(7)
             .appendField((byte) 2)
             .appendField((byte) 2)
@@ -74,7 +74,7 @@ public class MessageComposerTest {
     }
 
     @Test
-    public void appendFieldWhenMessageEmpty() throws Exception {
+    public void appendFieldWhenMessageEmpty() {
         MessageComposer composer = MessageComposer.get(3)
                 .appendField((byte) 6);
 
@@ -85,7 +85,7 @@ public class MessageComposerTest {
     }
 
     @Test
-    public void appendFieldSingleAndArrays() throws Exception {
+    public void appendFieldSingleAndArrays() {
         MessageComposer composer = MessageComposer.get(8)
             .appendField(new byte[] {4, 5, 0})
             .appendField((byte) 9)
@@ -100,7 +100,7 @@ public class MessageComposerTest {
     }
 
     @Test
-    public void appendFieldSingleByteWhenMessageFull() throws Exception {
+    public void appendFieldSingleByteWhenMessageFull() {
         MessageComposer composer = MessageComposer.get(3)
             .appendField(new byte[3]);
 
@@ -110,7 +110,7 @@ public class MessageComposerTest {
     }
 
     @Test
-    public void appendFieldArrayWhenMessageFull() throws Exception {
+    public void appendFieldArrayWhenMessageFull() {
         MessageComposer composer = MessageComposer.get(20)
             .appendField(new byte[20]);
 
@@ -120,7 +120,7 @@ public class MessageComposerTest {
     }
 
     @Test
-    public void appendFieldArrayWhenFieldExcedesMessageLength() throws Exception {
+    public void appendFieldArrayWhenFieldExcedesMessageLength() {
         MessageComposer composer = MessageComposer.get(15)
             .appendField(new byte[10]);
 
@@ -130,7 +130,7 @@ public class MessageComposerTest {
     }
 
     @Test
-    public void appendFieldWhenFieldIsEmpty() throws Exception {
+    public void appendFieldWhenFieldIsEmpty() {
         MessageComposer composer = MessageComposer.get(2)
             .appendField(new byte[0]);
 

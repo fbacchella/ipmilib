@@ -15,16 +15,12 @@ import com.veraxsystems.vxipmi.coding.commands.IpmiCommandCoder;
 import com.veraxsystems.vxipmi.coding.commands.IpmiVersion;
 import com.veraxsystems.vxipmi.coding.commands.ResponseData;
 import com.veraxsystems.vxipmi.coding.payload.IpmiPayload;
-import com.veraxsystems.vxipmi.coding.payload.lan.IPMIException;
 import com.veraxsystems.vxipmi.coding.payload.lan.IpmiLanRequest;
 import com.veraxsystems.vxipmi.coding.payload.lan.NetworkFunction;
 import com.veraxsystems.vxipmi.coding.protocol.AuthenticationType;
 import com.veraxsystems.vxipmi.coding.protocol.IpmiMessage;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
 import com.veraxsystems.vxipmi.common.TypeConverter;
-
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * Wrapper for Close Session request
@@ -68,8 +64,7 @@ public class CloseSession extends IpmiCommandCoder {
     }
 
     @Override
-    protected IpmiPayload preparePayload(int sequenceNumber)
-            throws NoSuchAlgorithmException, InvalidKeyException {
+    protected IpmiPayload preparePayload(int sequenceNumber) {
 
         byte[] payload = TypeConverter.intToLittleEndianByteArray(sessionId);
 
@@ -78,7 +73,7 @@ public class CloseSession extends IpmiCommandCoder {
     }
 
     @Override
-    public ResponseData getResponseData(IpmiMessage message) throws IPMIException, NoSuchAlgorithmException, InvalidKeyException {
+    public ResponseData getResponseData(IpmiMessage message) {
         return new CloseSessionResponseData();
     }
 

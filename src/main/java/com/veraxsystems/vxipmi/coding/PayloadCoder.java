@@ -130,7 +130,8 @@ public abstract class PayloadCoder {
         }
     }
 
-    private Ipmiv15Message encodeV15Payload(int messageSequenceNumber, int sessionSequenceNumber, int sessionId) throws NoSuchAlgorithmException, InvalidKeyException {
+    private Ipmiv15Message encodeV15Payload(int messageSequenceNumber, int sessionSequenceNumber, int sessionId) throws
+            InvalidKeyException {
         Ipmiv15Message message = new Ipmiv15Message();
 
         message.setAuthenticationType(getAuthenticationType());
@@ -144,7 +145,8 @@ public abstract class PayloadCoder {
         return message;
     }
 
-    private Ipmiv20Message encodeV20Payload(int messageSequenceNumber, int sessionSequenceNumber, int sessionId) throws NoSuchAlgorithmException, InvalidKeyException {
+    private Ipmiv20Message encodeV20Payload(int messageSequenceNumber, int sessionSequenceNumber, int sessionId) throws
+            InvalidKeyException {
         Ipmiv20Message message = new Ipmiv20Message(getCipherSuite()
                 .getConfidentialityAlgorithm());
 
@@ -180,13 +182,10 @@ public abstract class PayloadCoder {
      * @param sequenceNumber
      *            sequenceNumber is used as an IPMI payload message tag
      * @return IPMI payload
-     * @throws NoSuchAlgorithmException
-     *             when authentication, confidentiality or integrity algorithm
-     *             fails.
      * @throws InvalidKeyException
      *             when creating of the algorithm key fails
      */
-    protected abstract IpmiPayload preparePayload(int sequenceNumber) throws NoSuchAlgorithmException, InvalidKeyException;
+    protected abstract IpmiPayload preparePayload(int sequenceNumber) throws InvalidKeyException;
 
     /**
      * Retrieves payload-specific response data from IPMI message
@@ -199,12 +198,9 @@ public abstract class PayloadCoder {
      *             response has invalid length.
      * @throws IPMIException
      *             when response completion code isn't OK.
-     * @throws NoSuchAlgorithmException
-     *             when authentication, confidentiality or integrity algorithm
-     *             fails.
      * @throws InvalidKeyException
      *             when creating of the authentication algorithm key fails
      */
-    public abstract ResponseData getResponseData(IpmiMessage message) throws IPMIException, NoSuchAlgorithmException, InvalidKeyException;
+    public abstract ResponseData getResponseData(IpmiMessage message) throws IPMIException, InvalidKeyException;
 
 }

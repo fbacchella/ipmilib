@@ -31,7 +31,7 @@ public class SolOutboundOperationFieldTest {
     private Set<SolOperation> operations;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         this.ackState = SolAckState.ACK;
         this.operations = new HashSet<SolOperation>();
 
@@ -39,7 +39,7 @@ public class SolOutboundOperationFieldTest {
     }
 
     @Test
-    public void createNewFromRawByte() throws Exception {
+    public void createNewFromRawByte() {
         byte raw = 0;
         raw = TypeConverter.setBitOnPosition(6, raw);
 
@@ -57,17 +57,17 @@ public class SolOutboundOperationFieldTest {
     }
 
     @Test
-    public void getAckStateReturnsPassedState() throws Exception {
+    public void getAckStateReturnsPassedState() {
         assertEquals(ackState, operationField.getAckState());
     }
 
     @Test
-    public void getOperationsWhenEmptyOperationsReturnsEmptySet() throws Exception {
+    public void getOperationsWhenEmptyOperationsReturnsEmptySet() {
         assertThat(operationField.getOperations(), is(empty()));
     }
 
     @Test
-    public void getOperationsReturnsPassedOperations() throws Exception {
+    public void getOperationsReturnsPassedOperations() {
         Set<SolOperation> expectedOperations = new HashSet<SolOperation>() {{
             add(SolOperation.CTS);
             add(SolOperation.Break);
@@ -80,12 +80,12 @@ public class SolOutboundOperationFieldTest {
     }
 
     @Test
-    public void convertToByteWhenAckAndNoOperations() throws Exception {
+    public void convertToByteWhenAckAndNoOperations() {
         assertEquals(0, operationField.convertToByte());
     }
 
     @Test
-    public void convertToByteWhenNack() throws Exception {
+    public void convertToByteWhenNack() {
         byte expectedValue = TypeConverter.setBitOnPosition(6, (byte) 0);
         this.operationField = new SolOutboundOperationField(SolAckState.NACK, operations);
 
@@ -93,7 +93,7 @@ public class SolOutboundOperationFieldTest {
     }
 
     @Test
-    public void convertToByteWhenAckAndSomeOperations() throws Exception {
+    public void convertToByteWhenAckAndSomeOperations() {
         Set<SolOperation> newOperation = new HashSet<SolOperation>() {{
             add(SolOperation.Break);
             add(SolOperation.DCD_DSR);

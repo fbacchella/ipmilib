@@ -46,7 +46,7 @@ public class ParallelTest {
     }
 
     @AfterClass
-    public static void tearDownAfterClass() throws Exception {
+    public static void tearDownAfterClass() {
         connector.tearDown();
     }
 
@@ -70,7 +70,7 @@ public class ParallelTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         for(ConnectionHandle handle : connections) {
             connector.closeConnection(handle);
         }

@@ -15,7 +15,6 @@ import com.veraxsystems.vxipmi.coding.commands.CommandCodes;
 import com.veraxsystems.vxipmi.coding.commands.IpmiCommandCoder;
 import com.veraxsystems.vxipmi.coding.commands.IpmiVersion;
 import com.veraxsystems.vxipmi.coding.commands.ResponseData;
-import com.veraxsystems.vxipmi.coding.payload.lan.IPMIException;
 import com.veraxsystems.vxipmi.coding.payload.lan.IpmiLanMessage;
 import com.veraxsystems.vxipmi.coding.payload.lan.IpmiLanRequest;
 import com.veraxsystems.vxipmi.coding.payload.lan.NetworkFunction;
@@ -26,9 +25,6 @@ import com.veraxsystems.vxipmi.coding.protocol.PayloadType;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
 import com.veraxsystems.vxipmi.coding.security.ConfidentialityNone;
 import com.veraxsystems.vxipmi.common.TypeConverter;
-
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * Wrapper for RMCP+ Get Channel Cipher Suites command. This command can be
@@ -99,8 +95,7 @@ public class GetChannelCipherSuites extends IpmiCommandCoder {
     }
 
     @Override
-    public IpmiMessage encodePayload(int messageSequenceNumber, int sessionSequenceNumber, int sessionId)
-            throws NoSuchAlgorithmException, InvalidKeyException {
+    public IpmiMessage encodePayload(int messageSequenceNumber, int sessionSequenceNumber, int sessionId) {
         Ipmiv20Message message = new Ipmiv20Message(new ConfidentialityNone());
 
         message.setAuthenticationType(getAuthenticationType());
@@ -145,7 +140,7 @@ public class GetChannelCipherSuites extends IpmiCommandCoder {
     }
 
     @Override
-    public ResponseData getResponseData(IpmiMessage message) throws IPMIException, NoSuchAlgorithmException, InvalidKeyException {
+    public ResponseData getResponseData(IpmiMessage message) {
 
         GetChannelCipherSuitesResponseData data = new GetChannelCipherSuitesResponseData();
 

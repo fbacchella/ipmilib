@@ -11,9 +11,6 @@
  */
 package com.veraxsystems.vxipmi.coding.commands.fru;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
 import com.veraxsystems.vxipmi.coding.commands.CommandCodes;
 import com.veraxsystems.vxipmi.coding.commands.IpmiCommandCoder;
 import com.veraxsystems.vxipmi.coding.commands.IpmiVersion;
@@ -72,15 +69,14 @@ public class GetFruInventoryAreaInfo extends IpmiCommandCoder {
     }
 
     @Override
-    protected IpmiPayload preparePayload(int sequenceNumber)
-            throws NoSuchAlgorithmException, InvalidKeyException {
+    protected IpmiPayload preparePayload(int sequenceNumber) {
         byte[] payload = new byte[] { TypeConverter.intToByte(fruId) };
         return new IpmiLanRequest(getNetworkFunction(), getCommandCode(),
                 payload, TypeConverter.intToByte(sequenceNumber));
     }
 
     @Override
-    public ResponseData getResponseData(IpmiMessage message) throws IPMIException, NoSuchAlgorithmException, InvalidKeyException {
+    public ResponseData getResponseData(IpmiMessage message) throws IPMIException {
 
         if (!isCommandResponse(message)) {
             throw new IllegalArgumentException(

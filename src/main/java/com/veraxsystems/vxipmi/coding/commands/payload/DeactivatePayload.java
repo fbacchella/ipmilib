@@ -30,9 +30,6 @@ import com.veraxsystems.vxipmi.common.MessageComposer;
 import com.veraxsystems.vxipmi.common.TypeConverter;
 import org.apache.log4j.Logger;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
 /**
  * A wrapper class for Deactivate Payload Command.
  */
@@ -80,7 +77,7 @@ public class DeactivatePayload extends IpmiCommandCoder {
     }
 
     @Override
-    protected IpmiPayload preparePayload(int sequenceNumber) throws NoSuchAlgorithmException, InvalidKeyException {
+    protected IpmiPayload preparePayload(int sequenceNumber) {
         //We put just 2 bytes into the 6-bytes array, as specification for this command says to leave the rest 4 bytes as zeros
         byte[] message = MessageComposer.get(REQUEST_DATA_LENGTH)
                 .appendField(TypeConverter.intToByte(payloadType.getCode()))
@@ -91,7 +88,7 @@ public class DeactivatePayload extends IpmiCommandCoder {
     }
 
     @Override
-    public ResponseData getResponseData(IpmiMessage message) throws IPMIException, NoSuchAlgorithmException, InvalidKeyException {
+    public ResponseData getResponseData(IpmiMessage message) throws IPMIException {
         if (!isCommandResponse(message)) {
             throw new IllegalArgumentException("This is not a response for Deactivate Payload command");
         }

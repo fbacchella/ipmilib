@@ -27,7 +27,7 @@ public class SolInboundMessageTest {
     private SolInboundStatusField statusField;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         statusField = new SolInboundStatusField(SolAckState.ACK, new HashSet<SolStatus>());
         rawResponseData = new byte[] {(byte) 1, (byte) 1, (byte) 1, statusField.convertToByte()};
 
@@ -35,7 +35,7 @@ public class SolInboundMessageTest {
     }
 
     @Test
-    public void getStatusFieldReturnsPassedObject() throws Exception {
+    public void getStatusFieldReturnsPassedObject() {
         SolInboundStatusField actualStatusField = response.getStatusField();
 
         assertEquals(this.statusField.getAckState(), actualStatusField.getAckState());

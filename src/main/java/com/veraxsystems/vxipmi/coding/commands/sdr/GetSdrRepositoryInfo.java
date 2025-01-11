@@ -26,9 +26,6 @@ import com.veraxsystems.vxipmi.coding.protocol.IpmiMessage;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
 import com.veraxsystems.vxipmi.common.TypeConverter;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
 /**
  * A wrapper class for Get SDR Repository Info Command. <br>
  * This command returns the SDR command version for the SDR Repository. It also
@@ -63,14 +60,13 @@ public class GetSdrRepositoryInfo extends IpmiCommandCoder {
     }
 
     @Override
-    protected IpmiPayload preparePayload(int sequenceNumber)
-            throws NoSuchAlgorithmException, InvalidKeyException {
+    protected IpmiPayload preparePayload(int sequenceNumber) {
         return new IpmiLanRequest(getNetworkFunction(), getCommandCode(), null,
                 TypeConverter.intToByte(sequenceNumber));
     }
 
     @Override
-    public ResponseData getResponseData(IpmiMessage message) throws IPMIException, NoSuchAlgorithmException, InvalidKeyException {
+    public ResponseData getResponseData(IpmiMessage message) throws IPMIException {
         if (!isCommandResponse(message)) {
             throw new IllegalArgumentException(
                     "This is not a response for Get SDR Repository Info command");

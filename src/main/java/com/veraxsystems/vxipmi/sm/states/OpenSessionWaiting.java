@@ -11,6 +11,9 @@
  */
 package com.veraxsystems.vxipmi.sm.states;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+
 import com.veraxsystems.vxipmi.coding.commands.session.OpenSession;
 import com.veraxsystems.vxipmi.coding.payload.PlainMessage;
 import com.veraxsystems.vxipmi.coding.protocol.AuthenticationType;
@@ -23,8 +26,10 @@ import com.veraxsystems.vxipmi.coding.rmcp.RmcpMessage;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
 import com.veraxsystems.vxipmi.common.TypeConverter;
 import com.veraxsystems.vxipmi.sm.StateMachine;
-import com.veraxsystems.vxipmi.sm.actions.ErrorAction;
+import com.veraxsystems.vxipmi.sm.actions.IOErrorAction;
 import com.veraxsystems.vxipmi.sm.actions.ResponseAction;
+import com.veraxsystems.vxipmi.sm.actions.RuntimeErrorAction;
+import com.veraxsystems.vxipmi.sm.actions.SecurityErrorAction;
 import com.veraxsystems.vxipmi.sm.events.DefaultAck;
 import com.veraxsystems.vxipmi.sm.events.StateMachineEvent;
 import com.veraxsystems.vxipmi.sm.events.Timeout;
@@ -52,7 +57,7 @@ public class OpenSessionWaiting extends State {
         } else if (machineEvent instanceof Timeout) {
             stateMachine.setCurrent(new Authcap());
         } else {
-            stateMachine.doExternalAction(new ErrorAction(
+            stateMachine.doExternalAction(new RuntimeErrorAction(
                     new IllegalArgumentException("Invalid transition")));
         }
     }
@@ -68,17 +73,17 @@ public class OpenSessionWaiting extends State {
             return;
         }
         IpmiMessage ipmiMessage = null;
+        ipmiMessage = decoder.decode(message);
+        OpenSession openSession = new OpenSession(CipherSuite.getEmpty());
         try {
-            ipmiMessage = decoder.decode(message);
-            OpenSession openSession = new OpenSession(CipherSuite.getEmpty());
             if (openSession.isCommandResponse(ipmiMessage)
-                    && TypeConverter.byteToInt(((PlainMessage) ipmiMessage
-                            .getPayload()).getPayloadData()[0]) == tag) {
+                        && TypeConverter.byteToInt(((PlainMessage) ipmiMessage
+                                                                           .getPayload()).getPayloadData()[0]) == tag) {
                 stateMachine.doExternalAction(new ResponseAction(openSession
-                        .getResponseData(ipmiMessage)));
+                                                                         .getResponseData(ipmiMessage)));
             }
-        } catch (Exception e) {
-            stateMachine.doExternalAction(new ErrorAction(e));
+        } catch (IOException e) {
+            stateMachine.doExternalAction(new IOErrorAction(e));
         }
     }
 }

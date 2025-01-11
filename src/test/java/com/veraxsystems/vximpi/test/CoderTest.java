@@ -246,8 +246,7 @@ public class CoderTest extends TestCase {
     }
 
     private void sendCommand(IpmiCommandCoder coder)
-            throws ArithmeticException, ConnectionException,
-            InterruptedException {
+            throws ArithmeticException, ConnectionException {
         connection.sendMessage(coder, false);
 
         int time = 0;

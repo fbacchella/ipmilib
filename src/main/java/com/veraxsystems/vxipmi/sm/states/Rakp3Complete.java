@@ -13,7 +13,7 @@ package com.veraxsystems.vxipmi.sm.states;
 
 import com.veraxsystems.vxipmi.coding.rmcp.RmcpMessage;
 import com.veraxsystems.vxipmi.sm.StateMachine;
-import com.veraxsystems.vxipmi.sm.actions.ErrorAction;
+import com.veraxsystems.vxipmi.sm.actions.RuntimeErrorAction;
 import com.veraxsystems.vxipmi.sm.events.DefaultAck;
 import com.veraxsystems.vxipmi.sm.events.StartSession;
 import com.veraxsystems.vxipmi.sm.events.StateMachineEvent;
@@ -34,7 +34,7 @@ public class Rakp3Complete extends State {
                     event.getCipherSuite(), event.getSessionId()));
 
         } else {
-            stateMachine.doExternalAction(new ErrorAction(
+            stateMachine.doExternalAction(new RuntimeErrorAction(
                     new IllegalArgumentException("Invalid transition")));
         }
     }

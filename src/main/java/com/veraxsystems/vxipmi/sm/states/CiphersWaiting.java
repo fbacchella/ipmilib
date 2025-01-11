@@ -11,6 +11,9 @@
  */
 package com.veraxsystems.vxipmi.sm.states;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+
 import com.veraxsystems.vxipmi.coding.Encoder;
 import com.veraxsystems.vxipmi.coding.commands.session.GetChannelCipherSuites;
 import com.veraxsystems.vxipmi.coding.payload.lan.IpmiLanResponse;
@@ -24,8 +27,10 @@ import com.veraxsystems.vxipmi.coding.rmcp.RmcpMessage;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
 import com.veraxsystems.vxipmi.common.TypeConverter;
 import com.veraxsystems.vxipmi.sm.StateMachine;
-import com.veraxsystems.vxipmi.sm.actions.ErrorAction;
+import com.veraxsystems.vxipmi.sm.actions.IOErrorAction;
 import com.veraxsystems.vxipmi.sm.actions.ResponseAction;
+import com.veraxsystems.vxipmi.sm.actions.RuntimeErrorAction;
+import com.veraxsystems.vxipmi.sm.actions.SecurityErrorAction;
 import com.veraxsystems.vxipmi.sm.events.DefaultAck;
 import com.veraxsystems.vxipmi.sm.events.GetChannelCipherSuitesPending;
 import com.veraxsystems.vxipmi.sm.events.StateMachineEvent;
@@ -72,13 +77,15 @@ public class CiphersWaiting extends State {
                         new Protocolv20Encoder(), cipherSuites,
                         event.getSequenceNumber(), 0, 0));
                 ++index;
-            } catch (Exception e) {
-                stateMachine.doExternalAction(new ErrorAction(e));
+            } catch (IOException e) {
+                stateMachine.doExternalAction(new IOErrorAction(e));
+            } catch (GeneralSecurityException e) {
+                stateMachine.doExternalAction(new SecurityErrorAction(e));
             }
         } else if (machineEvent instanceof DefaultAck) {
             stateMachine.setCurrent(new Ciphers());
         } else {
-            stateMachine.doExternalAction(new ErrorAction(
+            stateMachine.doExternalAction(new RuntimeErrorAction(
                     new IllegalArgumentException("Invalid transition")));
         }
     }
@@ -100,17 +107,13 @@ public class CiphersWaiting extends State {
             return;    //message is authenticated so it does belong to the other session
         }
         IpmiMessage ipmiMessage = null;
-        try {
-            ipmiMessage = decoder.decode(message);
-            GetChannelCipherSuites suites = new GetChannelCipherSuites();
-            if (suites.isCommandResponse(ipmiMessage)
-                    && TypeConverter.byteToInt(((IpmiLanResponse) ipmiMessage
-                            .getPayload()).getSequenceNumber()) == tag) {
-                stateMachine.doExternalAction(new ResponseAction(suites
-                        .getResponseData(ipmiMessage)));
-            }
-        } catch (Exception e) {
-            stateMachine.doExternalAction(new ErrorAction(e));
+        ipmiMessage = decoder.decode(message);
+        GetChannelCipherSuites suites = new GetChannelCipherSuites();
+        if (suites.isCommandResponse(ipmiMessage)
+                && TypeConverter.byteToInt(((IpmiLanResponse) ipmiMessage
+                        .getPayload()).getSequenceNumber()) == tag) {
+            stateMachine.doExternalAction(new ResponseAction(suites
+                    .getResponseData(ipmiMessage)));
         }
     }
 

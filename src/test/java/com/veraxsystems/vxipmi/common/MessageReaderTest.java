@@ -23,14 +23,14 @@ public class MessageReaderTest {
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void createMessageReaderWhenMessageNull() throws Exception {
+    public void createMessageReaderWhenMessageNull() {
         expectedException.expect(NullPointerException.class);
 
         new MessageReader(null);
     }
 
     @Test
-    public void readNextFieldWhenMessageEmpty() throws Exception {
+    public void readNextFieldWhenMessageEmpty() {
         MessageReader messageReader = new MessageReader(new byte[0]);
 
         expectedException.expect(ArrayIndexOutOfBoundsException.class);
@@ -39,7 +39,7 @@ public class MessageReaderTest {
     }
 
     @Test
-    public void readNextFieldWhenFieldExcedingMessageLength() throws Exception {
+    public void readNextFieldWhenFieldExcedingMessageLength() {
         MessageReader messageReader = new MessageReader(new byte[10]);
 
         expectedException.expect(ArrayIndexOutOfBoundsException.class);
@@ -48,7 +48,7 @@ public class MessageReaderTest {
     }
 
     @Test
-    public void readNextFieldWhenFieldLengthMessThanMessageLength() throws Exception {
+    public void readNextFieldWhenFieldLengthMessThanMessageLength() {
         MessageReader messageReader = new MessageReader(new byte[] {1, 2, 3, 4});
         byte[] expectedFieldData = new byte[] {1, 2};
         byte[] actualFieldData = messageReader.readNextField(2);
@@ -57,7 +57,7 @@ public class MessageReaderTest {
     }
 
     @Test
-    public void readNextFieldWhenSomeFieldsWereRead() throws Exception {
+    public void readNextFieldWhenSomeFieldsWereRead() {
         MessageReader messageReader = new MessageReader(new byte[] {1, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 5, 5});
         messageReader.readNextField(3);
         messageReader.readNextField(3);

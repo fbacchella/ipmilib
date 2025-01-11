@@ -11,9 +11,11 @@
  */
 package com.veraxsystems.vxipmi.coding.payload.lan;
 
+import java.io.IOException;
+
 import com.veraxsystems.vxipmi.coding.payload.CompletionCode;
 
-public class IPMIException extends Exception {
+public class IPMIException extends IOException {
 
     private static final long serialVersionUID = 1L;
 

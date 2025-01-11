@@ -11,10 +11,12 @@
  */
 package com.veraxsystems.vxipmi.connection;
 
+import java.io.IOException;
+
 /**
  * Exception indicating that connecting to the remote machine failed.
  */
-public class ConnectionException extends Exception {
+public class ConnectionException extends IOException {
 
     /**
      *

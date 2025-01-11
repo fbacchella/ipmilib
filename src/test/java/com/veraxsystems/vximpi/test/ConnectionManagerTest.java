@@ -12,8 +12,6 @@
 package com.veraxsystems.vximpi.test;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -175,11 +173,9 @@ public class ConnectionManagerTest extends TestCase {
 
     /**
      * Tests sending in-session message.
-     * @throws FileNotFoundException
-     * @throws IOException
      */
     @Test
-    public void testSessionMessages() throws FileNotFoundException, IOException {
+    public void testSessionMessages() {
         logger.info("Testing Session Messages");
         // lock = true;
         int messages = 100;
@@ -226,13 +222,7 @@ public class ConnectionManagerTest extends TestCase {
         public void run() {
             super.run();
             int index = -1;
-            try {
-                index = manager.createConnection(address, Constants.IPMI_PORT);
-            } catch (FileNotFoundException e1) {
-                e1.printStackTrace();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
+            index = manager.createConnection(address, Constants.IPMI_PORT);
             assertEquals(true, index != -1);
 
             manager.registerListener(index, this);
@@ -261,7 +251,7 @@ public class ConnectionManagerTest extends TestCase {
                     + (new Date().getTime() - d.getTime()));
         }
 
-        public void sendSessionMessages(int count) throws IOException {
+        public void sendSessionMessages(int count) {
             int index = -1;
             index = manager.createConnection(address, Constants.IPMI_PORT);
             assertEquals(true, index != -1);

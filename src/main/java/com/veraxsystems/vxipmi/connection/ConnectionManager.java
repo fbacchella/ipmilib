@@ -11,6 +11,12 @@
  */
 package com.veraxsystems.vxipmi.connection;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.veraxsystems.vxipmi.coding.commands.PrivilegeLevel;
 import com.veraxsystems.vxipmi.coding.commands.session.GetChannelAuthenticationCapabilitiesResponseData;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
@@ -18,12 +24,6 @@ import com.veraxsystems.vxipmi.common.PropertiesManager;
 import com.veraxsystems.vxipmi.transport.Messenger;
 import com.veraxsystems.vxipmi.transport.UdpListener;
 import com.veraxsystems.vxipmi.transport.UdpMessenger;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Manages multiple {@link Connection}s
@@ -190,10 +190,8 @@ public class ConnectionManager {
      * @param skipCiphers
      * determines if the getAvailableCipherSuites and getChannelAuthenticationCapabilities phases should be skipped
      * @return index of the connection
-     * @throws IOException
-     * when properties file was not found
      */
-    public int createConnection(InetAddress address, int port, int pingPeriod, boolean skipCiphers) throws IOException {
+    public int createConnection(InetAddress address, int port, int pingPeriod, boolean skipCiphers) {
         Connection connection = new Connection(messenger, 0);
         connection.connect(address, port, pingPeriod, skipCiphers);
 
@@ -212,10 +210,8 @@ public class ConnectionManager {
      *            - frequency of the no-op commands that will be sent to keep up
      *            the session
      * @return index of the connection
-     * @throws IOException
-     *             - when properties file was not found
      */
-    public int createConnection(InetAddress address, int port, int pingPeriod) throws IOException {
+    public int createConnection(InetAddress address, int port, int pingPeriod) {
         Connection connection = new Connection(messenger, 0);
         connection.connect(address, port, pingPeriod);
 
@@ -232,10 +228,8 @@ public class ConnectionManager {
      * @param address
      *            - {@link InetAddress} of the remote host
      * @return index of the connection
-     * @throws IOException
-     *             when properties file was not found
      */
-    public int createConnection(InetAddress address, int port) throws IOException {
+    public int createConnection(InetAddress address, int port) {
 
         synchronized (connections) {
             Connection connection = new Connection(messenger,
@@ -253,10 +247,8 @@ public class ConnectionManager {
      * @param skipCiphers
      * - determines if the getAvailableCipherSuites and getChannelAuthenticationCapabilities phases should be skipped
      * @return index of the connection
-     * @throws IOException
-     * when properties file was not found
      */
-    public int createConnection(InetAddress address, int port, boolean skipCiphers) throws IOException {
+    public int createConnection(InetAddress address, int port, boolean skipCiphers) {
         synchronized (connections) {
             Connection connection = new Connection(messenger, connections.size());
             connection.connect(address, port, pingPeriod, skipCiphers);
@@ -276,16 +268,15 @@ public class ConnectionManager {
      * @throws ConnectionException
      *             when connection is in the state that does not allow to
      *             perform this operation.
-     * @throws Exception
+     * @throws IOException
      *             when sending message to the managed system fails
      */
-    public List<CipherSuite> getAvailableCipherSuites(int connection)
-            throws Exception {
+    public List<CipherSuite> getAvailableCipherSuites(int connection) throws IOException {
         int tag = generateSessionlessTag();
         List<CipherSuite> suites;
         try {
             suites = connections.get(connection).getAvailableCipherSuites(tag);
-        } catch (Exception e) {
+        } catch (IOException e) {
             freeTag(tag);
             throw e;
         }

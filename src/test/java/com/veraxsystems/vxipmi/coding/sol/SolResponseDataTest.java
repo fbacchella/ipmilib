@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 public class SolResponseDataTest {
 
     @Test
-    public void getRequestSequenceNumberReturnsPassedNumber() throws Exception {
+    public void getRequestSequenceNumberReturnsPassedNumber() {
         byte sequenceNumber = 12;
 
         SolResponseData solResponseData = new SolResponseData(sequenceNumber, SolAckState.ACK, new HashSet<SolStatus>(), (byte) 5);
@@ -31,7 +31,7 @@ public class SolResponseDataTest {
     }
 
     @Test
-    public void getAcknowledgeStateReturnsPassedState() throws Exception {
+    public void getAcknowledgeStateReturnsPassedState() {
         SolAckState ackState = SolAckState.ACK;
 
         SolResponseData solResponseData = new SolResponseData((byte) 1, ackState, new HashSet<SolStatus>(), (byte) 10);
@@ -39,7 +39,7 @@ public class SolResponseDataTest {
     }
 
     @Test
-    public void getStatusesReturnsPassedStatuses() throws Exception {
+    public void getStatusesReturnsPassedStatuses() {
         Set<SolStatus> statuses = new HashSet<SolStatus>() {{
             add(SolStatus.CharacterTransferUnavailable);
             add(SolStatus.TransmitOverrun);
@@ -51,7 +51,7 @@ public class SolResponseDataTest {
     }
 
     @Test
-    public void getAcceptedCharactersReturnsPassedData() throws Exception {
+    public void getAcceptedCharactersReturnsPassedData() {
         byte acceptedCharacters = (byte) 22;
 
         SolResponseData solResponseData = new SolResponseData((byte) 1, SolAckState.ACK, new HashSet<SolStatus>(), acceptedCharacters);

@@ -12,14 +12,16 @@
 
 package com.veraxsystems.vxipmi.connection;
 
+import java.security.InvalidKeyException;
+
+import org.apache.log4j.Logger;
+
 import com.veraxsystems.vxipmi.coding.PayloadCoder;
 import com.veraxsystems.vxipmi.coding.commands.ResponseData;
 import com.veraxsystems.vxipmi.coding.commands.session.GetChannelAuthenticationCapabilities;
+import com.veraxsystems.vxipmi.coding.payload.lan.IPMIException;
 import com.veraxsystems.vxipmi.coding.payload.lan.IpmiLanMessage;
 import com.veraxsystems.vxipmi.coding.protocol.Ipmiv20Message;
-import org.apache.log4j.Logger;
-
-import java.io.IOException;
 
 /**
  * Default implementation of {@link MessageHandler} for {@link IpmiLanMessage}s.
@@ -28,7 +30,7 @@ public class IpmiMessageHandler extends MessageHandler {
 
     private static final Logger logger = Logger.getLogger(IpmiMessageHandler.class);
 
-    public IpmiMessageHandler(Connection connection, int timeout) throws IOException {
+    public IpmiMessageHandler(Connection connection, int timeout) {
         super(connection, timeout, IpmiLanMessage.MIN_SEQUENCE_NUMBER, IpmiLanMessage.MAX_SEQUENCE_NUMBER);
     }
 
@@ -58,11 +60,10 @@ public class IpmiMessageHandler extends MessageHandler {
             if (coder.getClass() == GetChannelAuthenticationCapabilities.class) {
                 messageQueue.remove(tag);
             } else {
-
                 try {
                     ResponseData responseData = coder.getResponseData(message);
                     connection.notifyResponseListeners(connection.getHandle(), tag, responseData, null);
-                } catch (Exception e) {
+                } catch (IPMIException | InvalidKeyException e) {
                     connection.notifyResponseListeners(connection.getHandle(), tag, null, e);
                 }
                 messageQueue.remove(lanMessagePayload.getSequenceNumber());

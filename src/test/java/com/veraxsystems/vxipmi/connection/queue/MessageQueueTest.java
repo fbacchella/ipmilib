@@ -50,12 +50,12 @@ public class MessageQueueTest {
     private final int maxSequenceNumber = 63;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         this.messageQueue = new MessageQueue(connection, 10000, minSequenceNumber, maxSequenceNumber);
     }
 
     @Test
-    public void getTimeoutReturnsValuePassedInConstructor() throws Exception {
+    public void getTimeoutReturnsValuePassedInConstructor() {
         int timeout = 20;
         messageQueue = new MessageQueue(connection, timeout, minSequenceNumber, maxSequenceNumber);
 
@@ -63,7 +63,7 @@ public class MessageQueueTest {
     }
 
     @Test
-    public void setTimeoutChangesPreviouslySetTimeout() throws Exception {
+    public void setTimeoutChangesPreviouslySetTimeout() {
         int timeout = 111;
         messageQueue.setTimeout(timeout);
 
@@ -71,14 +71,14 @@ public class MessageQueueTest {
     }
 
     @Test
-    public void addWhenQueueEmpty() throws Exception {
+    public void addWhenQueueEmpty() {
         int sequenceNumber = messageQueue.add(mock(IpmiCommandCoder.class));
 
         assertEquals(minSequenceNumber, sequenceNumber);
     }
 
     @Test
-    public void addWhenSomeMessagesAlreadyInQueue() throws Exception {
+    public void addWhenSomeMessagesAlreadyInQueue() {
         messageQueue.add(mock(IpmiCommandCoder.class));
         messageQueue.add(mock(IpmiCommandCoder.class));
 
@@ -88,7 +88,7 @@ public class MessageQueueTest {
     }
 
     @Test
-    public void addWhenSequenceNumberOverflowed() throws Exception {
+    public void addWhenSequenceNumberOverflowed() {
         messageQueue.setTimeout(-1);
 
         for (int i = 0; i < maxSequenceNumber; ++i) {
@@ -100,7 +100,7 @@ public class MessageQueueTest {
     }
 
     @Test
-    public void addWhenQueueIsFull() throws Exception {
+    public void addWhenQueueIsFull() {
         for (int i = 0; i < 8; ++i) {
             messageQueue.add(mock(IpmiCommandCoder.class));
         }
@@ -111,7 +111,7 @@ public class MessageQueueTest {
     }
 
     @Test
-    public void addWhenSomeMessagesAddedAndSequenceNumbersReturned() throws Exception {
+    public void addWhenSomeMessagesAddedAndSequenceNumbersReturned() {
         messageQueue.getSequenceNumber();
         messageQueue.add(mock(IpmiCommandCoder.class));
         messageQueue.getSequenceNumber();
@@ -124,7 +124,7 @@ public class MessageQueueTest {
     }
 
     @Test
-    public void removeOneMessageByTag() throws Exception {
+    public void removeOneMessageByTag() {
         int tag = messageQueue.add(mock(IpmiCommandCoder.class));
         messageQueue.remove(tag);
 
@@ -132,7 +132,7 @@ public class MessageQueueTest {
     }
 
     @Test
-    public void removeOneMessageByIndex() throws Exception {
+    public void removeOneMessageByIndex() {
         int tag = messageQueue.add(mock(IpmiCommandCoder.class));
         int index = messageQueue.getMessageIndexFromQueue(tag);
         messageQueue.removeAt(index);
@@ -141,31 +141,31 @@ public class MessageQueueTest {
     }
 
     @Test
-    public void removeOneMessageByIndexWhenMessageNotExists() throws Exception {
+    public void removeOneMessageByIndexWhenMessageNotExists() {
         expectedException.expect(IndexOutOfBoundsException.class);
 
         messageQueue.removeAt(17);
     }
 
     @Test
-    public void containsIdWhenMessageDoesntExist() throws Exception {
+    public void containsIdWhenMessageDoesntExist() {
         assertFalse("Empty queue should not contain any message", messageQueue.containsId(20));
     }
 
     @Test
-    public void containsIdWhenMessageExists() throws Exception {
+    public void containsIdWhenMessageExists() {
         int tag = messageQueue.add(mock(IpmiCommandCoder.class));
 
         assertTrue(messageQueue.containsId(tag));
     }
 
     @Test
-    public void getSequenceNumberWhenEmptyQueue() throws Exception {
+    public void getSequenceNumberWhenEmptyQueue() {
         assertEquals(minSequenceNumber, messageQueue.getSequenceNumber());
     }
 
     @Test
-    public void getSequenceNumberWhenSomeMessagesAdded() throws Exception {
+    public void getSequenceNumberWhenSomeMessagesAdded() {
         int lastSequenceNumber = 0;
 
         for (int i = 0; i < 4; ++i) {
@@ -177,7 +177,7 @@ public class MessageQueueTest {
     }
 
     @Test
-    public void getSequenceNumberWhenSequenceNumberOverflow() throws Exception {
+    public void getSequenceNumberWhenSequenceNumberOverflow() {
         for (int i = 0; i < maxSequenceNumber; ++i) {
             messageQueue.getSequenceNumber();
         }
@@ -187,7 +187,7 @@ public class MessageQueueTest {
     }
 
     @Test
-    public void getSequenceNumberWhenSomeNumbersAlreadyReturned() throws Exception {
+    public void getSequenceNumberWhenSomeNumbersAlreadyReturned() {
         int lastSequenceNumber = 0;
 
         for (int i = 0; i < 7; ++i) {
@@ -199,7 +199,7 @@ public class MessageQueueTest {
     }
 
     @Test
-    public void getSequenceNumberWhenSomeMessagesAddedAndSequenceNumbersReturned() throws Exception {
+    public void getSequenceNumberWhenSomeMessagesAddedAndSequenceNumbersReturned() {
         messageQueue.add(mock(IpmiCommandCoder.class));
         messageQueue.add(mock(IpmiCommandCoder.class));
         messageQueue.getSequenceNumber();
@@ -211,12 +211,12 @@ public class MessageQueueTest {
     }
 
     @Test
-    public void getMessageFromQueueWhenQueueIsEmpty() throws Exception {
+    public void getMessageFromQueueWhenQueueIsEmpty() {
         assertNull("Message should be returned from empty queue", messageQueue.getMessageFromQueue(10));
     }
 
     @Test
-    public void getMessageFromQueueWhenNoSuchMessage() throws Exception {
+    public void getMessageFromQueueWhenNoSuchMessage() {
         int tag = messageQueue.add(mock(IpmiCommandCoder.class));
         int notExistingTag = tag + 5;
 
@@ -224,7 +224,7 @@ public class MessageQueueTest {
     }
 
     @Test
-    public void getMessageFromQueueWhenMessageExists() throws Exception {
+    public void getMessageFromQueueWhenMessageExists() {
         PayloadCoder message = mock(IpmiCommandCoder.class);
         int tag = messageQueue.add(message);
 
@@ -232,12 +232,12 @@ public class MessageQueueTest {
     }
 
     @Test
-    public void getMessageIndexFromQueueWhenQueueIsEmpty() throws Exception {
+    public void getMessageIndexFromQueueWhenQueueIsEmpty() {
         assertEquals(-1, messageQueue.getMessageIndexFromQueue(15));
     }
 
     @Test
-    public void getMessageIndexFromQueueWhenNoSuchMessage() throws Exception {
+    public void getMessageIndexFromQueueWhenNoSuchMessage() {
         int tag = messageQueue.add(mock(IpmiCommandCoder.class));
         int notExistingTag = tag + 10;
 
@@ -245,14 +245,14 @@ public class MessageQueueTest {
     }
 
     @Test
-    public void getMessageIndexFromQueueWhenMessageExists() throws Exception {
+    public void getMessageIndexFromQueueWhenMessageExists() {
         int tag = messageQueue.add(mock(IpmiCommandCoder.class));
 
         assertEquals(0, messageQueue.getMessageIndexFromQueue(tag));
     }
 
     @Test
-    public void messageIsRemovedAfterTimeout() throws Exception {
+    public void messageIsRemovedAfterTimeout() {
         int tag = messageQueue.add(mock(IpmiCommandCoder.class));
         messageQueue.setTimeout(-1);
         messageQueue.run();
@@ -261,7 +261,7 @@ public class MessageQueueTest {
     }
 
     @Test
-    public void connectionIsNotifiedWhenMessageTimedOut() throws Exception {
+    public void connectionIsNotifiedWhenMessageTimedOut() {
         int tag = messageQueue.add(mock(IpmiCommandCoder.class));
         messageQueue.setTimeout(-1);
         messageQueue.run();

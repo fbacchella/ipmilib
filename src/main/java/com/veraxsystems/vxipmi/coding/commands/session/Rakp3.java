@@ -30,7 +30,6 @@ import com.veraxsystems.vxipmi.coding.security.SecurityConstants;
 import com.veraxsystems.vxipmi.common.TypeConverter;
 
 import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * A wrapper for RMCP+ RAKP3 message and it's response - RAKP4 message.
@@ -130,7 +129,7 @@ public class Rakp3 extends IpmiCommandCoder {
 
     @Override
     public IpmiMessage encodePayload(int messageSequenceNumber, int sessionSequenceNumber, int sessionId)
-            throws NoSuchAlgorithmException, InvalidKeyException {
+            throws InvalidKeyException {
 
         if (sessionId != 0) {
             throw new IllegalArgumentException("Session ID must be 0");
@@ -158,7 +157,7 @@ public class Rakp3 extends IpmiCommandCoder {
 
     @Override
     protected IpmiPayload preparePayload(int sequenceNumber)
-            throws NoSuchAlgorithmException, InvalidKeyException {
+            throws InvalidKeyException {
         byte[] payload = new byte[8];
 
         payload[0] = TypeConverter.intToByte(sequenceNumber); // message
@@ -240,7 +239,7 @@ public class Rakp3 extends IpmiCommandCoder {
     }
 
     @Override
-    public ResponseData getResponseData(IpmiMessage message) throws IPMIException, InvalidKeyException, NoSuchAlgorithmException {
+    public ResponseData getResponseData(IpmiMessage message) throws IPMIException, InvalidKeyException {
 
         if (!isCommandResponse(message)) {
             throw new IllegalArgumentException("This is not RAKP 4 message!");

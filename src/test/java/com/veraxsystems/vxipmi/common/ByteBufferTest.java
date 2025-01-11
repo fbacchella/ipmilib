@@ -16,19 +16,19 @@ public class ByteBufferTest {
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void createWithNegativeSize() throws Exception {
+    public void createWithNegativeSize() {
         expectedException.expect(IllegalArgumentException.class);
         new ByteBuffer(-2);
     }
 
     @Test
-    public void createEmpty() throws Exception {
+    public void createEmpty() {
         expectedException.expect(IllegalArgumentException.class);
         new ByteBuffer(0);
     }
 
     @Test
-    public void getCapacityAfterConstructed() throws Exception {
+    public void getCapacityAfterConstructed() {
         int capacity = 7;
 
         ByteBuffer buffer = new ByteBuffer(capacity);
@@ -36,7 +36,7 @@ public class ByteBufferTest {
     }
 
     @Test
-    public void writeNull() throws Exception {
+    public void writeNull() {
         ByteBuffer buffer = new ByteBuffer(2);
 
         expectedException.expect(NullPointerException.class);
@@ -44,7 +44,7 @@ public class ByteBufferTest {
     }
 
     @Test
-    public void writeZeroBytes() throws Exception {
+    public void writeZeroBytes() {
         ByteBuffer buffer = new ByteBuffer(5);
 
         int bytesWritten = buffer.write(new byte[0]);
@@ -54,7 +54,7 @@ public class ByteBufferTest {
     }
 
     @Test
-    public void writeMoreBytesThanCapacityAtOnce() throws Exception {
+    public void writeMoreBytesThanCapacityAtOnce() {
         ByteBuffer buffer = new ByteBuffer(5);
 
         int bytesWritten = buffer.write(new byte[7]);
@@ -64,7 +64,7 @@ public class ByteBufferTest {
     }
 
     @Test
-    public void writeMoreBytesThanCapacityInFewSteps() throws Exception {
+    public void writeMoreBytesThanCapacityInFewSteps() {
         ByteBuffer buffer = new ByteBuffer(5);
 
         int bytesWritten = buffer.write(new byte[2]);
@@ -78,7 +78,7 @@ public class ByteBufferTest {
     }
 
     @Test
-    public void writeLessBytesThanCapacityAtOnce() throws Exception {
+    public void writeLessBytesThanCapacityAtOnce() {
         ByteBuffer buffer = new ByteBuffer(6);
         byte[] bytesToWrite = new byte[4];
 
@@ -89,7 +89,7 @@ public class ByteBufferTest {
     }
 
     @Test
-    public void writeLessBytesThanCapacityInFewSteps() throws Exception {
+    public void writeLessBytesThanCapacityInFewSteps() {
         ByteBuffer buffer = new ByteBuffer(10);
         byte[] firstBytesToWrite = new byte[3];
         int bytesWritten = buffer.write(firstBytesToWrite);
@@ -105,7 +105,7 @@ public class ByteBufferTest {
     }
 
     @Test
-    public void writeExactlyAsManyBytesAsPossible() throws Exception {
+    public void writeExactlyAsManyBytesAsPossible() {
         ByteBuffer buffer = new ByteBuffer(4);
 
         int bytesWritten = buffer.write(new byte[buffer.capacity()]);
@@ -114,7 +114,7 @@ public class ByteBufferTest {
     }
 
     @Test
-    public void readWhenEmpty() throws Exception {
+    public void readWhenEmpty() {
         ByteBuffer buffer = new ByteBuffer(10);
 
         byte[] expectedResult = new byte[0];
@@ -122,7 +122,7 @@ public class ByteBufferTest {
     }
 
     @Test
-    public void readWhenFull() throws Exception {
+    public void readWhenFull() {
         ByteBuffer buffer = new ByteBuffer(3);
         buffer.write(new byte[] {1, 2, 3});
 
@@ -133,7 +133,7 @@ public class ByteBufferTest {
     }
 
     @Test
-    public void readZeroBytes() throws Exception {
+    public void readZeroBytes() {
         ByteBuffer buffer = new ByteBuffer(6);
         buffer.write(new byte[6]);
 
@@ -144,7 +144,7 @@ public class ByteBufferTest {
     }
 
     @Test
-    public void readMoreBytesThanSizeAtOnce() throws Exception {
+    public void readMoreBytesThanSizeAtOnce() {
         ByteBuffer buffer = new ByteBuffer(12);
         buffer.write(new byte[] {1, 2, 3, 4});
 
@@ -155,7 +155,7 @@ public class ByteBufferTest {
     }
 
     @Test
-    public void readMoreBytesThanSizeInFewSteps() throws Exception {
+    public void readMoreBytesThanSizeInFewSteps() {
         ByteBuffer buffer = new ByteBuffer(15);
         buffer.write(new byte[6]);
 
@@ -171,7 +171,7 @@ public class ByteBufferTest {
     }
 
     @Test
-    public void readMoreBytesThanCapacityAtOnce() throws Exception {
+    public void readMoreBytesThanCapacityAtOnce() {
         ByteBuffer buffer = new ByteBuffer(8);
         buffer.write(new byte[buffer.capacity()]);
 
@@ -182,7 +182,7 @@ public class ByteBufferTest {
     }
 
     @Test
-    public void readMoreBytesThanCapacityInFewSteps() throws Exception {
+    public void readMoreBytesThanCapacityInFewSteps() {
         ByteBuffer buffer = new ByteBuffer(5);
         buffer.write(new byte[buffer.capacity()]);
 
@@ -198,7 +198,7 @@ public class ByteBufferTest {
     }
 
     @Test
-    public void readExactlyAsManyBytesAsAvailable() throws Exception {
+    public void readExactlyAsManyBytesAsAvailable() {
         ByteBuffer buffer = new ByteBuffer(12);
         buffer.write(new byte[] {1, 2, 3});
 
@@ -209,7 +209,7 @@ public class ByteBufferTest {
     }
 
     @Test
-    public void writeAndReadSubsequently() throws Exception {
+    public void writeAndReadSubsequently() {
         ByteBuffer buffer = new ByteBuffer(10);
         buffer.write(new byte[] {1, 2, 3});
         buffer.read(2);
@@ -227,7 +227,7 @@ public class ByteBufferTest {
     }
 
     @Test
-    public void writeAndReadOverBufferCapacity() throws Exception {
+    public void writeAndReadOverBufferCapacity() {
         ByteBuffer buffer = new ByteBuffer(8);
         buffer.write(new byte[3]);
         buffer.read(3);
@@ -244,7 +244,7 @@ public class ByteBufferTest {
     }
 
     @Test
-    public void getSizeAfterFewWritesAndReads() throws Exception {
+    public void getSizeAfterFewWritesAndReads() {
         ByteBuffer buffer = new ByteBuffer(5);
         buffer.write(new byte[2]);
         buffer.read(1);
@@ -256,7 +256,7 @@ public class ByteBufferTest {
     }
 
     @Test
-    public void getRemainingSpaceWhenBufferEmpty() throws Exception {
+    public void getRemainingSpaceWhenBufferEmpty() {
         ByteBuffer buffer = new ByteBuffer(9);
 
         int expectedRemainingSpace = buffer.capacity();
@@ -265,7 +265,7 @@ public class ByteBufferTest {
     }
 
     @Test
-    public void getRemainingSpaceWhenBufferFull() throws Exception {
+    public void getRemainingSpaceWhenBufferFull() {
         ByteBuffer buffer = new ByteBuffer(18);
         buffer.write(new byte[buffer.capacity()]);
 
@@ -273,7 +273,7 @@ public class ByteBufferTest {
     }
 
     @Test
-    public void getRemainingSpaceAfterFewWritesAndReads() throws Exception {
+    public void getRemainingSpaceAfterFewWritesAndReads() {
         ByteBuffer buffer = new ByteBuffer(16);
         buffer.write(new byte[10]);
         buffer.read(5);

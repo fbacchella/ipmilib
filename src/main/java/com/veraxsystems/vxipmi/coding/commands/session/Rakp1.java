@@ -30,7 +30,6 @@ import com.veraxsystems.vxipmi.common.Randomizer;
 import com.veraxsystems.vxipmi.common.TypeConverter;
 
 import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * <p>
@@ -259,14 +258,11 @@ public class Rakp1 extends IpmiCommandCoder {
      * @throws IllegalArgumentException
      *             when message is not a response for class-specific command,
      *             response has invalid length or authentication check fails.
-     * @throws NoSuchAlgorithmException
-     *             when authentication, confidentiality or integrity algorithm
-     *             fails.
      * @throws InvalidKeyException
      *             when creating of the algorithm key fails
      */
     @Override
-    public ResponseData getResponseData(IpmiMessage message) throws IPMIException, NoSuchAlgorithmException, InvalidKeyException {
+    public ResponseData getResponseData(IpmiMessage message) throws IPMIException, InvalidKeyException {
         if (!isCommandResponse(message)) {
             throw new IllegalArgumentException("This is not RAKP 2 message!");
         }
@@ -378,14 +374,11 @@ public class Rakp1 extends IpmiCommandCoder {
      * @param responseData
      *            RAKP Message 2 data
      * @return Session Integrity Key
-     * @throws NoSuchAlgorithmException
-     *             when authentication, confidentiality or integrity algorithm
-     *             fails.
      * @throws InvalidKeyException
      *             when creating of the algorithm key fails
      */
     public byte[] calculateSik(Rakp1ResponseData responseData)
-            throws InvalidKeyException, NoSuchAlgorithmException {
+            throws InvalidKeyException {
         byte[] key = null;
         if (getBmcKey() == null || getBmcKey().length <= 0) {
             key = getPassword().getBytes();

@@ -11,9 +11,6 @@
  */
 package com.veraxsystems.vxipmi.coding.commands.sdr;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
 import com.veraxsystems.vxipmi.coding.commands.IpmiCommandCoder;
 import com.veraxsystems.vxipmi.coding.commands.IpmiVersion;
 import com.veraxsystems.vxipmi.coding.commands.ResponseData;
@@ -65,15 +62,14 @@ public class GetSensorReading extends IpmiCommandCoder {
     }
 
     @Override
-    protected IpmiPayload preparePayload(int sequenceNumber)
-            throws NoSuchAlgorithmException, InvalidKeyException {
+    protected IpmiPayload preparePayload(int sequenceNumber) {
         byte[] payloadData = new byte[] { sensorId };
         return new IpmiLanRequest(getNetworkFunction(), getCommandCode(),
                 payloadData, TypeConverter.intToByte(sequenceNumber));
     }
 
     @Override
-    public ResponseData getResponseData(IpmiMessage message) throws IPMIException, NoSuchAlgorithmException, InvalidKeyException {
+    public ResponseData getResponseData(IpmiMessage message) throws IPMIException {
 
         if (!isCommandResponse(message)) {
             throw new IllegalArgumentException(

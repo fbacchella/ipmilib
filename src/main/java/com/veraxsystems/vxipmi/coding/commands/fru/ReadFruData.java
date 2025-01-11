@@ -33,8 +33,6 @@ import com.veraxsystems.vxipmi.coding.protocol.IpmiMessage;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
 import com.veraxsystems.vxipmi.common.TypeConverter;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -145,8 +143,7 @@ public class ReadFruData extends IpmiCommandCoder {
     }
 
     @Override
-    protected IpmiPayload preparePayload(int sequenceNumber)
-            throws NoSuchAlgorithmException, InvalidKeyException {
+    protected IpmiPayload preparePayload(int sequenceNumber) {
         byte[] payload = new byte[4];
         payload[0] = TypeConverter.intToByte(fruId);
         byte[] buffer = TypeConverter.intToLittleEndianByteArray(offset);
@@ -159,7 +156,7 @@ public class ReadFruData extends IpmiCommandCoder {
     }
 
     @Override
-    public ResponseData getResponseData(IpmiMessage message) throws IPMIException, NoSuchAlgorithmException, InvalidKeyException {
+    public ResponseData getResponseData(IpmiMessage message) throws IPMIException {
 
         if (!isCommandResponse(message)) {
             throw new IllegalArgumentException(

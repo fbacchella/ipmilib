@@ -11,8 +11,6 @@
  */
 package com.veraxsystems.vxipmi.coding.protocol.decoder;
 
-import java.security.InvalidKeyException;
-
 import com.veraxsystems.vxipmi.coding.protocol.IpmiMessage;
 import com.veraxsystems.vxipmi.coding.rmcp.RmcpMessage;
 
@@ -27,10 +25,6 @@ public interface IpmiDecoder {
      * - RMCP message to decode.
      * @see IpmiMessage
      * @return Decoded IPMI message
-     * @throws IllegalArgumentException
-     * when delivered RMCP message does not contain encapsulated IPMI message.
-     * @throws InvalidKeyException 
-     *             - when initiation of the integrity algorithm fails
      */
-    IpmiMessage decode(RmcpMessage rmcpMessage) throws InvalidKeyException;
+    IpmiMessage decode(RmcpMessage rmcpMessage);
 }

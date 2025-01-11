@@ -11,6 +11,8 @@
  */
 package com.veraxsystems.vxipmi.connection;
 
+import java.io.IOException;
+
 import com.veraxsystems.vxipmi.coding.PayloadCoder;
 import com.veraxsystems.vxipmi.coding.commands.IpmiCommandCoder;
 import com.veraxsystems.vxipmi.coding.commands.ResponseData;
@@ -62,7 +64,7 @@ public class SolMessageHandlerTest {
     private SolMessageHandler messageHandler;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         this.messageHandler = new SolMessageHandler(connection, 10000);
         sessionId = 1;
         cipherSuite = CipherSuite.getEmpty();
@@ -71,7 +73,7 @@ public class SolMessageHandlerTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         messageHandler.tearDown();
     }
 
@@ -191,12 +193,13 @@ public class SolMessageHandlerTest {
         messageHandler.handleIncomingMessage(message);
 
         verify(coder).getResponseData(message);
-        verify(connection).notifyResponseListeners(eq(connection.getHandle()), eq(sequenceNumber), eq(responseData), isNull(Exception.class));
+        verify(connection).notifyResponseListeners(eq(connection.getHandle()), eq(sequenceNumber), eq(responseData), isNull(
+                IOException.class));
     }
 
     @Ignore
     @Test
-    public void handleIncomingMessageWhenDataCarrier() throws Exception {
+    public void handleIncomingMessageWhenDataCarrier() {
         byte sequenceNumber = 1;
 
         SolInboundMessage payload = mock(SolInboundMessage.class);

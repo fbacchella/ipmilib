@@ -14,12 +14,12 @@ public class GetChannelPayloadSupportResponseDataTest {
     private GetChannelPayloadSupportResponseData responseData;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         this.responseData = new GetChannelPayloadSupportResponseData();
     }
 
     @Test
-    public void getSupportedPayloadsWhenNothingSupported() throws Exception {
+    public void getSupportedPayloadsWhenNothingSupported() {
         responseData.setStandardPayloads((byte) 0);
         responseData.setSessionSetupPayloads((byte) 0);
         responseData.setOemPayloads((byte) 0);
@@ -29,7 +29,7 @@ public class GetChannelPayloadSupportResponseDataTest {
     }
 
     @Test
-    public void getSupportedPayloadsWhenIpmiAndSOLSupported() throws Exception {
+    public void getSupportedPayloadsWhenIpmiAndSOLSupported() {
         responseData.setStandardPayloads((byte) 3);
         responseData.setSessionSetupPayloads((byte) 0);
         responseData.setOemPayloads((byte) 0);
@@ -38,7 +38,7 @@ public class GetChannelPayloadSupportResponseDataTest {
     }
 
     @Test
-    public void getSupportedtPayloadsWhenAllSupported() throws Exception {
+    public void getSupportedtPayloadsWhenAllSupported() {
         responseData.setStandardPayloads((byte) 255);
         responseData.setSessionSetupPayloads((byte) 255);
         responseData.setOemPayloads((byte) 255);

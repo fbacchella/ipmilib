@@ -45,19 +45,19 @@ public class SolCoderTest {
     private CipherSuite cipherSuite;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         this.cipherSuite = CipherSuite.getEmpty();
     }
 
     @Test
-    public void getSupportedPayloadReturnsSol() throws Exception {
+    public void getSupportedPayloadReturnsSol() {
         SolCoder solCoder = new SolCoder(new byte[0], cipherSuite);
 
         assertEquals(PayloadType.Sol, solCoder.getSupportedPayloadType());
     }
 
     @Test
-    public void preparePayloadWhenCharacterDataOnly() throws Exception {
+    public void preparePayloadWhenCharacterDataOnly() {
         byte[] characterData = new byte[] {17, 18, 20, 25};
         byte sequenceNumber = 1;
 
@@ -75,7 +75,7 @@ public class SolCoderTest {
     }
 
     @Test
-    public void preparePayloadWhenAckOnly() throws Exception {
+    public void preparePayloadWhenAckOnly() {
         byte ackSequenceNumber = 7;
         byte acceptedCharactersCount = 20;
         SolAckState solAckState = SolAckState.ACK;
@@ -95,7 +95,7 @@ public class SolCoderTest {
     }
 
     @Test
-    public void preparePayloadWhenOperationsOnly() throws Exception {
+    public void preparePayloadWhenOperationsOnly() {
         Set<SolOperation> operations = new HashSet<SolOperation>() {{
             add(SolOperation.Break);
             add(SolOperation.DCD_DSR);
@@ -118,7 +118,7 @@ public class SolCoderTest {
     }
 
     @Test
-    public void preparePayloadWhenBothDataCarrierAndAck() throws Exception {
+    public void preparePayloadWhenBothDataCarrierAndAck() {
         byte[] characterData = new byte[] {1, 2, 3, 4};
         Set<SolOperation> operations = new HashSet<SolOperation>(){{
             add(SolOperation.RingWOR);
@@ -145,7 +145,7 @@ public class SolCoderTest {
     }
 
     @Test
-    public void preparePayloadWhenSequenceNumberIs0() throws Exception {
+    public void preparePayloadWhenSequenceNumberIs0() {
         SolCoder solCoder = new SolCoder(new byte[4], cipherSuite);
         IpmiPayload payload = solCoder.preparePayload(0);
 
@@ -154,7 +154,7 @@ public class SolCoderTest {
     }
 
     @Test
-    public void preparePayloadWhenSequenceNumberIsGreaterThanMax() throws Exception {
+    public void preparePayloadWhenSequenceNumberIsGreaterThanMax() {
         SolCoder solCoder = new SolCoder(new byte[4], cipherSuite);
 
         int sequenceNumber = SolMessage.MAX_SEQUENCE_NUMBER + 3;
@@ -165,7 +165,7 @@ public class SolCoderTest {
     }
 
     @Test
-    public void getResponseDataWhenMessageGiven() throws Exception {
+    public void getResponseDataWhenMessageGiven() {
         Set<SolStatus> statuses = new HashSet<SolStatus>() {{
             add(SolStatus.SolDeactivated);
         }};

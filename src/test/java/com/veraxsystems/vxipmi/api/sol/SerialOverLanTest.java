@@ -456,14 +456,14 @@ public class SerialOverLanTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenWriteIntLessThan0() throws Exception {
+    public void shouldThrowExceptionWhenWriteIntLessThan0() {
         expectedException.expect(IllegalArgumentException.class);
 
         serialOverLan.writeInt(-1);
     }
 
     @Test
-    public void shouldThrowExceptionWhenWriteIntGreaterThan255() throws Exception {
+    public void shouldThrowExceptionWhenWriteIntGreaterThan255() {
         expectedException.expect(IllegalArgumentException.class);
 
         serialOverLan.writeInt(256);
@@ -507,14 +507,14 @@ public class SerialOverLanTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenWriteIntArrayWithIntLessThan0() throws Exception {
+    public void shouldThrowExceptionWhenWriteIntArrayWithIntLessThan0() {
         expectedException.expect(IllegalArgumentException.class);
 
         serialOverLan.writeIntArray(new int[] {2, 7, -1, 4, 6});
     }
 
     @Test
-    public void shouldThrowExceptionWhenWriteIntArrayWithIntGreaterThan255() throws Exception {
+    public void shouldThrowExceptionWhenWriteIntArrayWithIntGreaterThan255() {
         expectedException.expect(IllegalArgumentException.class);
 
         serialOverLan.writeIntArray(new int[] {1, 17, 99, 256});
@@ -577,7 +577,7 @@ public class SerialOverLanTest {
     }
 
     @Test
-    public void shouldReadEmptyByteArrayWhenNoBytesAvailable() throws Exception {
+    public void shouldReadEmptyByteArrayWhenNoBytesAvailable() {
         verify(connector).registerIncomingMessageListener(any(InboundSolMessageListener.class));
 
         byte[] bytesRead = serialOverLan.readBytes();
@@ -586,7 +586,7 @@ public class SerialOverLanTest {
     }
 
     @Test
-    public void shouldReadAllAvailableBytesWhenMessageReceived() throws Exception {
+    public void shouldReadAllAvailableBytesWhenMessageReceived() {
         InboundSolMessageListener messageListener = getSolMessageListener();
 
         byte[] receivedBytes = new byte[] {1, 2, 3, 4, 5};
@@ -599,7 +599,7 @@ public class SerialOverLanTest {
     }
 
     @Test
-    public void shouldReadEmptyByteArrayWhenNoBytesAvailableAndReadSpecificNumber() throws Exception {
+    public void shouldReadEmptyByteArrayWhenNoBytesAvailableAndReadSpecificNumber() {
         verify(connector).registerIncomingMessageListener(any(InboundSolMessageListener.class));
 
         byte[] bytesRead = serialOverLan.readBytes(15);
@@ -608,7 +608,7 @@ public class SerialOverLanTest {
     }
 
     @Test
-    public void shouldReadSpecificNumberOfBytesWhenMessageReceived() throws Exception {
+    public void shouldReadSpecificNumberOfBytesWhenMessageReceived() {
         InboundSolMessageListener messageListener = getSolMessageListener();
 
         byte[] receivedBytes = new byte[] {1, 2, 3, 4, 5};
@@ -622,7 +622,7 @@ public class SerialOverLanTest {
     }
 
     @Test
-    public void shouldReadSpecificNumberOfBytesWhenMessageArrivedBeforeTimeout() throws Exception {
+    public void shouldReadSpecificNumberOfBytesWhenMessageArrivedBeforeTimeout() {
         InboundSolMessageListener messageListener = getSolMessageListener();
 
         byte[] receivedBytes = new byte[] {12, 22, 32, 42, 52};
@@ -636,7 +636,7 @@ public class SerialOverLanTest {
     }
 
     @Test
-    public void shouldReadEmptyIntArrayWhenNoDataAvailable() throws Exception {
+    public void shouldReadEmptyIntArrayWhenNoDataAvailable() {
         verify(connector).registerIncomingMessageListener(any(InboundSolMessageListener.class));
 
         int[] intsRead = serialOverLan.readIntArray();
@@ -645,7 +645,7 @@ public class SerialOverLanTest {
     }
 
     @Test
-    public void shouldReadAllAvailableIntegersWhenMessageReceived() throws Exception {
+    public void shouldReadAllAvailableIntegersWhenMessageReceived() {
         InboundSolMessageListener messageListener = getSolMessageListener();
 
         byte[] receivedBytes = new byte[] {5, 6, 7, 8};
@@ -664,7 +664,7 @@ public class SerialOverLanTest {
     }
 
     @Test
-    public void shouldReadEmptyIntArrayWhenNoDataAvailableAndReadSpecificNumber() throws Exception {
+    public void shouldReadEmptyIntArrayWhenNoDataAvailableAndReadSpecificNumber() {
         verify(connector).registerIncomingMessageListener(any(InboundSolMessageListener.class));
 
         int[] intsRead = serialOverLan.readIntArray(1);
@@ -673,7 +673,7 @@ public class SerialOverLanTest {
     }
 
     @Test
-    public void shouldReadSpecificNumberOfIntegersWhenMessageReceived() throws Exception {
+    public void shouldReadSpecificNumberOfIntegersWhenMessageReceived() {
         InboundSolMessageListener messageListener = getSolMessageListener();
 
         byte[] receivedBytes = new byte[] {7, 7, 7};
@@ -693,7 +693,7 @@ public class SerialOverLanTest {
     }
 
     @Test
-    public void shouldReadSpecificNumberOfIntegersWhenMessageArrivedBeforeTimeout() throws Exception {
+    public void shouldReadSpecificNumberOfIntegersWhenMessageArrivedBeforeTimeout() {
         InboundSolMessageListener messageListener = getSolMessageListener();
 
         byte[] receivedBytes = new byte[] {9, 10, 23, 12, 3};
@@ -713,7 +713,7 @@ public class SerialOverLanTest {
     }
 
     @Test
-    public void shouldReadEmptyStringWhenNoDataAvailable() throws Exception {
+    public void shouldReadEmptyStringWhenNoDataAvailable() {
         verify(connector).registerIncomingMessageListener(any(InboundSolMessageListener.class));
 
         String stringRead = serialOverLan.readString();
@@ -722,7 +722,7 @@ public class SerialOverLanTest {
     }
 
     @Test
-    public void shouldReadWholeAvailableStringWhenMessageReceived() throws Exception {
+    public void shouldReadWholeAvailableStringWhenMessageReceived() {
         InboundSolMessageListener messageListener = getSolMessageListener();
 
         String receivedString = "This is the whole message";
@@ -735,7 +735,7 @@ public class SerialOverLanTest {
     }
 
     @Test
-    public void shouldReadEmptyStringWhenNoDataAvailableAndReadSpecificNumber() throws Exception {
+    public void shouldReadEmptyStringWhenNoDataAvailableAndReadSpecificNumber() {
         verify(connector).registerIncomingMessageListener(any(InboundSolMessageListener.class));
 
         String stringRead = serialOverLan.readString(15);
@@ -744,7 +744,7 @@ public class SerialOverLanTest {
     }
 
     @Test
-    public void shouldReadLimitedStringWhenMessageReceived() throws Exception {
+    public void shouldReadLimitedStringWhenMessageReceived() {
         InboundSolMessageListener messageListener = getSolMessageListener();
 
         String receivedString = "The message that was received is longer than we want to read";
@@ -758,7 +758,7 @@ public class SerialOverLanTest {
     }
 
     @Test
-    public void shouldReadLimitedStringWhenMessageArrivedBeforeTimeout() throws Exception {
+    public void shouldReadLimitedStringWhenMessageArrivedBeforeTimeout() {
         InboundSolMessageListener messageListener = getSolMessageListener();
 
         String receivedString = "Very short message";
@@ -772,7 +772,7 @@ public class SerialOverLanTest {
     }
 
     @Test
-    public void shouldReadEmptyStringWithCharsetWhenNoDataAvailable() throws Exception {
+    public void shouldReadEmptyStringWithCharsetWhenNoDataAvailable() {
         verify(connector).registerIncomingMessageListener(any(InboundSolMessageListener.class));
 
         String stringRead = serialOverLan.readString(Charset.forName("UTF-8"));
@@ -781,7 +781,7 @@ public class SerialOverLanTest {
     }
 
     @Test
-    public void shouldReadWholeAvailableStringWithCharsetWhenMessageReceived() throws Exception {
+    public void shouldReadWholeAvailableStringWithCharsetWhenMessageReceived() {
         InboundSolMessageListener messageListener = getSolMessageListener();
 
         Charset charset = Charset.forName("UTF-8");
@@ -795,7 +795,7 @@ public class SerialOverLanTest {
     }
 
     @Test
-    public void shouldReadEmptyStringWithCharsetWhenNoDataAvailableAndReadSpecificNumber() throws Exception {
+    public void shouldReadEmptyStringWithCharsetWhenNoDataAvailableAndReadSpecificNumber() {
         verify(connector).registerIncomingMessageListener(any(InboundSolMessageListener.class));
 
         String stringRead = serialOverLan.readString(Charset.forName("UTF-8"),15);
@@ -804,7 +804,7 @@ public class SerialOverLanTest {
     }
 
     @Test
-    public void shouldReadLimitedStringWithCharsetWhenMessageReceived() throws Exception {
+    public void shouldReadLimitedStringWithCharsetWhenMessageReceived() {
         InboundSolMessageListener messageListener = getSolMessageListener();
 
         Charset charset = Charset.forName("UTF-8");
@@ -819,7 +819,7 @@ public class SerialOverLanTest {
     }
 
     @Test
-    public void shouldReadLimitedStringWithCharsetWhenMessageArrivedBeforeTimeout() throws Exception {
+    public void shouldReadLimitedStringWithCharsetWhenMessageArrivedBeforeTimeout() {
         InboundSolMessageListener messageListener = getSolMessageListener();
 
         Charset charset = Charset.forName("UTF-8");
@@ -1005,7 +1005,7 @@ public class SerialOverLanTest {
     }
 
     @Test
-    public void shouldNotifyListenerAboutRequestEventWhenRegistered() throws Exception {
+    public void shouldNotifyListenerAboutRequestEventWhenRegistered() {
         InboundSolMessageListener inboundSolMessageListener = getSolMessageListener();
 
         SolEventListener listener = mock(SolEventListener.class);
@@ -1025,7 +1025,7 @@ public class SerialOverLanTest {
     }
 
     @Test
-    public void shouldNotNotifyListenerWhenRequestEventHasNoStatuses() throws Exception {
+    public void shouldNotNotifyListenerWhenRequestEventHasNoStatuses() {
         InboundSolMessageListener inboundSolMessageListener = getSolMessageListener();
 
         SolEventListener listener = mock(SolEventListener.class);
@@ -1040,7 +1040,7 @@ public class SerialOverLanTest {
     }
 
     @Test
-    public void shouldNotNotifyListenerAboutRequestEventWhenUnregistered() throws Exception {
+    public void shouldNotNotifyListenerAboutRequestEventWhenUnregistered() {
         InboundSolMessageListener inboundSolMessageListener = getSolMessageListener();
 
         SolEventListener listener = mock(SolEventListener.class);

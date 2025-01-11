@@ -26,7 +26,7 @@ public class SolOutboundMessageTest {
     private SolOutboundOperationField operationField;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         operationField = new SolOutboundOperationField(SolAckState.ACK, new HashSet<SolOperation>());
         rawRequestData = new byte[] {(byte) 1, (byte) 1, (byte) 1, operationField.convertToByte()};
 
@@ -34,12 +34,12 @@ public class SolOutboundMessageTest {
     }
 
     @Test
-    public void getPayloadLengthWhenNoData() throws Exception {
+    public void getPayloadLengthWhenNoData() {
         assertEquals(4, request.getPayloadLength());
     }
 
     @Test
-    public void getPayloadLengthWhenSomeData() throws Exception {
+    public void getPayloadLengthWhenSomeData() {
         byte[] data = new byte[] {1, 2, 3, 4, 5, 6};
         request.setData(data);
 
@@ -49,13 +49,13 @@ public class SolOutboundMessageTest {
     }
 
     @Test
-    public void getPayloadDataWhenNoData() throws Exception {
+    public void getPayloadDataWhenNoData() {
         assertArrayEquals(rawRequestData, request.getPayloadData());
         assertArrayEquals(new byte[0], request.getData());
     }
 
     @Test
-    public void getPayloadDataWhenSomeData() throws Exception {
+    public void getPayloadDataWhenSomeData() {
         byte[] data = new byte[12];
         request.setData(data);
 
@@ -68,12 +68,12 @@ public class SolOutboundMessageTest {
     }
 
     @Test
-    public void getIpmiCommandDataWhenNoData() throws Exception {
+    public void getIpmiCommandDataWhenNoData() {
         assertArrayEquals(request.getData(), request.getIpmiCommandData());
     }
 
     @Test
-    public void getIpmiCommandDataWhenSomeData() throws Exception {
+    public void getIpmiCommandDataWhenSomeData() {
         byte[] data = new byte[] {15, 18, 10, 33, 34, 111, 90};
         request.setData(data);
 
@@ -81,19 +81,19 @@ public class SolOutboundMessageTest {
     }
 
     @Test
-    public void getOperationFieldReturnsPassedObject() throws Exception {
+    public void getOperationFieldReturnsPassedObject() {
         assertEquals(operationField, request.getOperationField());
     }
 
     @Test
-    public void getSequenceNumberWhenAckOnly() throws Exception {
+    public void getSequenceNumberWhenAckOnly() {
         request = new SolOutboundMessage((byte) 0, (byte) 10, (byte) 20, operationField);
 
         assertEquals(0, request.getSequenceNumber());
     }
 
     @Test
-    public void getSequenceNumberWhenLessThanMax() throws Exception {
+    public void getSequenceNumberWhenLessThanMax() {
         byte sequenceNumber = SolMessage.MAX_SEQUENCE_NUMBER - 12;
         request = new SolOutboundMessage(sequenceNumber, (byte) 0, (byte) 0, operationField);
 
@@ -101,21 +101,21 @@ public class SolOutboundMessageTest {
     }
 
     @Test
-    public void getSequenceNumberWhenEquelsMax() throws Exception {
+    public void getSequenceNumberWhenEquelsMax() {
         request = new SolOutboundMessage(SolMessage.MAX_SEQUENCE_NUMBER, (byte) 0, (byte) 0, operationField);
 
         assertEquals(SolMessage.MAX_SEQUENCE_NUMBER, request.getSequenceNumber());
     }
 
     @Test
-    public void getSequenceNumberWhenGreaterThanMax() throws Exception {
+    public void getSequenceNumberWhenGreaterThanMax() {
         request = new SolOutboundMessage((byte) (SolMessage.MAX_SEQUENCE_NUMBER + 13), (byte) 0, (byte) 0, operationField);
 
         assertEquals(12, request.getSequenceNumber());
     }
 
     @Test
-    public void getAckNackSequenceNumberWhenLessThanMax() throws Exception {
+    public void getAckNackSequenceNumberWhenLessThanMax() {
         byte ackNackSequenceNumber = SolMessage.MAX_SEQUENCE_NUMBER - 7;
         request = new SolOutboundMessage((byte) 0, ackNackSequenceNumber, (byte) 0, operationField);
 
@@ -123,14 +123,14 @@ public class SolOutboundMessageTest {
     }
 
     @Test
-    public void getAckNackSequenceNumberWhenEquelsMax() throws Exception {
+    public void getAckNackSequenceNumberWhenEquelsMax() {
         request = new SolOutboundMessage((byte) 0, SolMessage.MAX_SEQUENCE_NUMBER, (byte) 0, operationField);
 
         assertEquals(SolMessage.MAX_SEQUENCE_NUMBER, request.getAckNackSequenceNumber());
     }
 
     @Test
-    public void getAckNackSequenceNumberWhenGreaterThanMax() throws Exception {
+    public void getAckNackSequenceNumberWhenGreaterThanMax() {
         request = new SolOutboundMessage((byte) 0, (byte) (SolMessage.MAX_SEQUENCE_NUMBER + 22), (byte) 0, operationField);
 
         assertEquals(5, request.getAckNackSequenceNumber());

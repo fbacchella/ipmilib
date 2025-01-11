@@ -11,9 +11,6 @@
  */
 package com.veraxsystems.vxipmi.coding.commands.chassis;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
 import com.veraxsystems.vxipmi.coding.commands.CommandCodes;
 import com.veraxsystems.vxipmi.coding.commands.IpmiCommandCoder;
 import com.veraxsystems.vxipmi.coding.commands.IpmiVersion;
@@ -66,8 +63,7 @@ public class ChassisControl extends IpmiCommandCoder {
     }
 
     @Override
-    protected IpmiPayload preparePayload(int sequenceNumber)
-            throws NoSuchAlgorithmException, InvalidKeyException {
+    protected IpmiPayload preparePayload(int sequenceNumber) {
         byte[] requestData = new byte[1];
 
         requestData[0] = TypeConverter.intToByte(powerCommand.getCode());
@@ -77,8 +73,7 @@ public class ChassisControl extends IpmiCommandCoder {
     }
 
     @Override
-    public ResponseData getResponseData(IpmiMessage message) throws IPMIException,
-            NoSuchAlgorithmException, InvalidKeyException {
+    public ResponseData getResponseData(IpmiMessage message) throws IPMIException {
         if (!isCommandResponse(message)) {
             throw new IllegalArgumentException(
                     "This is not a response for Get Chassis Status command");

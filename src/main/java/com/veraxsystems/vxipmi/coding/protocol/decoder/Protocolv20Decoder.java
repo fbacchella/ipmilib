@@ -11,6 +11,10 @@
  */
 package com.veraxsystems.vxipmi.coding.protocol.decoder;
 
+import java.util.Arrays;
+
+import org.apache.log4j.Logger;
+
 import com.veraxsystems.vxipmi.coding.protocol.AuthenticationType;
 import com.veraxsystems.vxipmi.coding.protocol.IpmiMessage;
 import com.veraxsystems.vxipmi.coding.protocol.Ipmiv20Message;
@@ -19,10 +23,6 @@ import com.veraxsystems.vxipmi.coding.rmcp.RmcpMessage;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
 import com.veraxsystems.vxipmi.coding.security.ConfidentialityNone;
 import com.veraxsystems.vxipmi.common.TypeConverter;
-import org.apache.log4j.Logger;
-
-import java.security.InvalidKeyException;
-import java.util.Arrays;
 
 /**
  * Decodes IPMI v2.0 session header and retrieves encrypted payload.
@@ -51,15 +51,9 @@ public class Protocolv20Decoder extends ProtocolDecoder {
      *            - RMCP message to decode.
      * @return decoded message
      * @see Ipmiv20Message
-     * @throws IllegalArgumentException
-     *             when delivered RMCP message does not contain encapsulated
-     *             IPMI message or when AuthCode field is incorrect (integrity
-     *             check fails).
-     * @throws InvalidKeyException
-     *             - when initiation of the integrity algorithm fails
      */
     @Override
-    public IpmiMessage decode(RmcpMessage rmcpMessage) throws InvalidKeyException {
+    public IpmiMessage decode(RmcpMessage rmcpMessage) {
         Ipmiv20Message message = new Ipmiv20Message(
                 cipherSuite.getConfidentialityAlgorithm());
 
@@ -241,8 +235,6 @@ public class Protocolv20Decoder extends ProtocolDecoder {
      * @param offset
      *            - offset to the AuthCode field in the message
      * @return True if AuthCode is correct, false otherwise.
-     * @throws InvalidKeyException
-     *             - when initiation of the integrity algorithm fails
      */
     private boolean validateAuthCode(byte[] rawMessage, int offset) {
         byte[] base = new byte[offset];

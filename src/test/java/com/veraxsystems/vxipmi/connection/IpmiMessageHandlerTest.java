@@ -11,6 +11,8 @@
  */
 package com.veraxsystems.vxipmi.connection;
 
+import java.io.IOException;
+
 import com.veraxsystems.vxipmi.coding.PayloadCoder;
 import com.veraxsystems.vxipmi.coding.commands.IpmiCommandCoder;
 import com.veraxsystems.vxipmi.coding.commands.ResponseData;
@@ -58,7 +60,7 @@ public class IpmiMessageHandlerTest {
     private IpmiMessageHandler messageHandler;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         this.messageHandler = new IpmiMessageHandler(connection, 10000);
         sessionId = 1;
         cipherSuite = CipherSuite.getEmpty();
@@ -67,7 +69,7 @@ public class IpmiMessageHandlerTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         messageHandler.tearDown();
     }
 
@@ -157,7 +159,7 @@ public class IpmiMessageHandlerTest {
         messageHandler.handleIncomingMessage(message);
 
         verify(coder).getResponseData(message);
-        verify(connection).notifyResponseListeners(eq(connection.getHandle()), eq(sequenceNumber), eq(responseData), isNull(Exception.class));
+        verify(connection).notifyResponseListeners(eq(connection.getHandle()), eq(sequenceNumber), eq(responseData), isNull(IOException.class));
     }
 
     @Ignore
@@ -175,7 +177,7 @@ public class IpmiMessageHandlerTest {
         messageHandler.handleIncomingMessage(message);
 
         verify(coder, never()).getResponseData(message);
-        verify(connection, never()).notifyResponseListeners(anyInt(), anyInt(), any(ResponseData.class), any(Exception.class));
+        verify(connection, never()).notifyResponseListeners(anyInt(), anyInt(), any(ResponseData.class), any(IOException.class));
     }
 
     @Ignore
@@ -198,7 +200,8 @@ public class IpmiMessageHandlerTest {
         messageHandler.handleIncomingMessage(message);
 
         verify(coder, never()).getResponseData(message);
-        verify(connection, never()).notifyResponseListeners(anyInt(), anyInt(), any(ResponseData.class), any(Exception.class));
+        verify(connection, never()).notifyResponseListeners(anyInt(), anyInt(), any(ResponseData.class), any(
+                IOException.class));
     }
 
     @Ignore
@@ -225,12 +228,12 @@ public class IpmiMessageHandlerTest {
         Exception testException = new IllegalArgumentException("Test exception");
 
         doThrow(testException)
-                .when(connection).notifyResponseListeners(anyInt(), anyInt(), eq(responseData), isNull(Exception.class));
+                .when(connection).notifyResponseListeners(anyInt(), anyInt(), eq(responseData), isNull(IOException.class));
 
         messageHandler.handleIncomingMessage(message);
 
         verify(coder).getResponseData(message);
-        verify(connection).notifyResponseListeners(anyInt(), eq(sequenceNumber), eq(responseData), isNull(Exception.class));
+        verify(connection).notifyResponseListeners(anyInt(), eq(sequenceNumber), eq(responseData), isNull(IOException.class));
         verify(connection).notifyResponseListeners(anyInt(), eq(sequenceNumber), isNull(ResponseData.class), eq(testException));
     }
 }

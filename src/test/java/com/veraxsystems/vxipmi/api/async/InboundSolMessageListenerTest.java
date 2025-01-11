@@ -56,19 +56,19 @@ public class InboundSolMessageListenerTest {
     private InboundSolMessageListener solMessageListener;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         eventListeners = new LinkedList<SolEventListener>();
         solMessageListener = new InboundSolMessageListener(connector, connectionHandle, eventListeners);
     }
 
     @Test
-    public void isPayloadSupportedForSolReturnsTrue() throws Exception {
+    public void isPayloadSupportedForSolReturnsTrue() {
         IpmiPayload payload = mock(SolInboundMessage.class);
         assertTrue("SOL payload should be supported;", solMessageListener.isPayloadSupported(payload));
     }
 
     @Test
-    public void isPayloadSupportedForLanReturnsFalse() throws Exception {
+    public void isPayloadSupportedForLanReturnsFalse() {
         IpmiPayload payload = mock(IpmiLanResponse.class);
         assertFalse("Lan Response payload should not be supported", solMessageListener.isPayloadSupported(payload));
     }
@@ -116,7 +116,7 @@ public class InboundSolMessageListenerTest {
     }
 
     @Test
-    public void shouldNotifyEventListenersWhenMessageWithStatusesCame() throws Exception {
+    public void shouldNotifyEventListenersWhenMessageWithStatusesCame() {
         byte payloadSequenceNumber = 1;
         Set<SolStatus> statuses = new HashSet<SolStatus>() {{
             add(SolStatus.Break);
@@ -174,13 +174,13 @@ public class InboundSolMessageListenerTest {
     }
 
     @Test
-    public void readBytesWhenNoMessages() throws Exception {
+    public void readBytesWhenNoMessages() {
         byte[] bytesRead = solMessageListener.readBytes(12);
         assertEquals(0, bytesRead.length);
     }
 
     @Test
-    public void readBytesAtOnceWhenMessageCame() throws Exception {
+    public void readBytesAtOnceWhenMessageCame() {
         byte[] characterData = new byte[] {7, 7, 7};
 
         SolInboundMessage payload = prepareMockPayload(characterData, (byte) 1);
@@ -191,7 +191,7 @@ public class InboundSolMessageListenerTest {
     }
 
     @Test
-    public void readBytesDividedWhenMessageCame() throws Exception {
+    public void readBytesDividedWhenMessageCame() {
         byte[] characterData = new byte[] {1, 2, 3, 4, 5, 6};
 
         SolInboundMessage payload = prepareMockPayload(characterData, (byte) 1);
@@ -239,12 +239,12 @@ public class InboundSolMessageListenerTest {
     }
 
     @Test
-    public void shouldReturn0WhenGetAvailableByteCountAndEmptyBuffer() throws Exception {
+    public void shouldReturn0WhenGetAvailableByteCountAndEmptyBuffer() {
         assertEquals(0, solMessageListener.getAvailableBytesCount());
     }
 
     @Test
-    public void shouldReturnProperValueWhenGetAvailableByteCountAndMessageCame() throws Exception {
+    public void shouldReturnProperValueWhenGetAvailableByteCountAndMessageCame() {
         byte[] characterData = new byte[] {2, 8, 14, 33};
 
         SolInboundMessage payload = prepareMockPayload(characterData, (byte) 1);

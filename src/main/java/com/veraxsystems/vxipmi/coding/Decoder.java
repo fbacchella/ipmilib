@@ -21,7 +21,6 @@ import com.veraxsystems.vxipmi.coding.protocol.decoder.Protocolv20Decoder;
 import com.veraxsystems.vxipmi.coding.rmcp.RmcpDecoder;
 
 import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * Decodes RMCP packet into {@link ResponseData}.
@@ -50,14 +49,11 @@ public final class Decoder {
      * @see CompletionCode
      * @throws IllegalArgumentException
      *             when data is corrupted
-     * @throws NoSuchAlgorithmException
-     *             when authentication, confidentiality or integrity algorithm
-     *             fails.
      * @throws InvalidKeyException
      *             when creating of the authentication algorithm key fails
      */
     public static ResponseData decode(byte[] data, IpmiDecoder protocolDecoder,
-            PayloadCoder payloadCoder) throws IPMIException, NoSuchAlgorithmException, InvalidKeyException {
+            PayloadCoder payloadCoder) throws IPMIException, InvalidKeyException {
         return payloadCoder.getResponseData(protocolDecoder.decode(RmcpDecoder
                 .decode(data)));
     }

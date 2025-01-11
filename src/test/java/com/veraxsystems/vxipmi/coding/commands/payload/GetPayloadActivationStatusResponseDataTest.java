@@ -29,12 +29,12 @@ public class GetPayloadActivationStatusResponseDataTest {
     private GetPayloadActivationStatusResponseData responseData;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         this.responseData = new GetPayloadActivationStatusResponseData();
     }
 
     @Test
-    public void shouldReturnInstanceCapacityThatWasPreviouslySet() throws Exception {
+    public void shouldReturnInstanceCapacityThatWasPreviouslySet() {
         byte expectedInstanceCapacity = 10;
         responseData.setInstanceCapacity(expectedInstanceCapacity);
 
@@ -42,7 +42,7 @@ public class GetPayloadActivationStatusResponseDataTest {
     }
 
     @Test
-    public void shouldReturnEmptyListWhenAllInstancesActivated() throws Exception {
+    public void shouldReturnEmptyListWhenAllInstancesActivated() {
         responseData.setAvailableInstances(new byte[] {TypeConverter.intToByte(255), TypeConverter.intToByte(255)});
 
         List<Byte> availableInstances = responseData.getAvailableInstances();
@@ -51,7 +51,7 @@ public class GetPayloadActivationStatusResponseDataTest {
     }
 
     @Test
-    public void shouldReturnAllAvailableInstancesWhenMaxCapacityAndNoneIsActivated() throws Exception {
+    public void shouldReturnAllAvailableInstancesWhenMaxCapacityAndNoneIsActivated() {
         byte instancesCapacity = 16;
         responseData.setInstanceCapacity(instancesCapacity);
         responseData.setAvailableInstances(new byte[2]);
@@ -66,7 +66,7 @@ public class GetPayloadActivationStatusResponseDataTest {
     }
 
     @Test
-    public void shouldNotReturnAvailableInstancesGreaterThanCapacity() throws Exception {
+    public void shouldNotReturnAvailableInstancesGreaterThanCapacity() {
         byte instancesCapacity = 6;
         responseData.setInstanceCapacity(instancesCapacity);
         responseData.setAvailableInstances(new byte[2]);
@@ -81,7 +81,7 @@ public class GetPayloadActivationStatusResponseDataTest {
     }
 
     @Test
-    public void shouldReturnJustInstancesThatWasDeclaredAvailable() throws Exception {
+    public void shouldReturnJustInstancesThatWasDeclaredAvailable() {
         byte instancesCapacity = 13;
         responseData.setInstanceCapacity(instancesCapacity);
         responseData.setAvailableInstances(new byte[] {TypeConverter.intToByte(237), TypeConverter.intToByte(169)});

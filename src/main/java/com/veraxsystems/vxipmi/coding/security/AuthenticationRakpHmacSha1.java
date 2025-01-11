@@ -43,8 +43,7 @@ public class AuthenticationRakpHmacSha1 extends AuthenticationAlgorithm {
 
     @Override
     public boolean checkKeyExchangeAuthenticationCode(byte[] data, byte[] key,
-            String password) throws NoSuchAlgorithmException,
-            InvalidKeyException {
+            String password) throws InvalidKeyException {
         byte[] check = getKeyExchangeAuthenticationCode(data, password);
         return Arrays.equals(check, key);
     }
@@ -52,7 +51,7 @@ public class AuthenticationRakpHmacSha1 extends AuthenticationAlgorithm {
     @Override
     public byte[] getKeyExchangeAuthenticationCode(byte[] data,
         String password)
-            throws NoSuchAlgorithmException, InvalidKeyException {
+            throws InvalidKeyException {
 
         byte[] key = password.getBytes();
 
@@ -63,7 +62,7 @@ public class AuthenticationRakpHmacSha1 extends AuthenticationAlgorithm {
     }
 
     @Override
-    public boolean doIntegrityCheck(byte[] data, byte[] reference, byte[] sik) throws InvalidKeyException, NoSuchAlgorithmException {
+    public boolean doIntegrityCheck(byte[] data, byte[] reference, byte[] sik) throws InvalidKeyException {
 
         SecretKeySpec sKey = new SecretKeySpec(sik, ALGORITHM_NAME);
         mac.init(sKey);

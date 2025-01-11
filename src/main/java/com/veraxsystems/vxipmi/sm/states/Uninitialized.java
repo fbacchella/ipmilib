@@ -11,13 +11,18 @@
  */
 package com.veraxsystems.vxipmi.sm.states;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+
 import com.veraxsystems.vxipmi.coding.Encoder;
 import com.veraxsystems.vxipmi.coding.commands.session.GetChannelCipherSuites;
 import com.veraxsystems.vxipmi.coding.protocol.encoder.Protocolv20Encoder;
 import com.veraxsystems.vxipmi.coding.rmcp.RmcpMessage;
 import com.veraxsystems.vxipmi.common.TypeConverter;
 import com.veraxsystems.vxipmi.sm.StateMachine;
-import com.veraxsystems.vxipmi.sm.actions.ErrorAction;
+import com.veraxsystems.vxipmi.sm.actions.IOErrorAction;
+import com.veraxsystems.vxipmi.sm.actions.RuntimeErrorAction;
+import com.veraxsystems.vxipmi.sm.actions.SecurityErrorAction;
 import com.veraxsystems.vxipmi.sm.events.Default;
 import com.veraxsystems.vxipmi.sm.events.GetChannelCipherSuitesPending;
 import com.veraxsystems.vxipmi.sm.events.StateMachineEvent;
@@ -42,12 +47,15 @@ public class Uninitialized extends State {
                 stateMachine.sendMessage(Encoder.encode(
                         new Protocolv20Encoder(), cipherSuites,
                         event.getSequenceNumber(), 0,0));
-            } catch (Exception e) {
+            } catch (IOException e) {
                 stateMachine.setCurrent(this);
-                stateMachine.doExternalAction(new ErrorAction(e));
+                stateMachine.doExternalAction(new IOErrorAction(e));
+            } catch (GeneralSecurityException e) {
+                stateMachine.setCurrent(this);
+                stateMachine.doExternalAction(new SecurityErrorAction(e));
             }
         } else {
-            stateMachine.doExternalAction(new ErrorAction(
+            stateMachine.doExternalAction(new RuntimeErrorAction(
                     new IllegalArgumentException("Invalid transition")));
         }
     }

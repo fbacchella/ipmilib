@@ -63,15 +63,9 @@ public class SessionRunner extends Thread {
 		}
 
 		for (int i = 0; i < 1; ++i) {
-			try {
-				connection = new Connection(messenger, i);
-				connection.connect(address, Constants.IPMI_PORT, 30000);
-			} catch (FileNotFoundException e1) {
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			logger.info("[SR " + getId() + "] intitializing");
+            connection = new Connection(messenger, i);
+            connection.connect(address, Constants.IPMI_PORT, 30000);
+            logger.info("[SR " + getId() + "] intitializing");
 			try {
 				int tag = ConnectionManager.generateSessionlessTag();
 				Thread.sleep(Math.abs(Randomizer.getInt()) % 200);

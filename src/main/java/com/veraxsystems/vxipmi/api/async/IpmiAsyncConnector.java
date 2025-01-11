@@ -11,9 +11,18 @@
  */
 package com.veraxsystems.vxipmi.api.async;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+
 import com.veraxsystems.vxipmi.api.async.messages.IpmiError;
 import com.veraxsystems.vxipmi.api.async.messages.IpmiResponse;
 import com.veraxsystems.vxipmi.api.async.messages.IpmiResponseData;
+import com.veraxsystems.vxipmi.api.async.messages.SecurityError;
 import com.veraxsystems.vxipmi.coding.PayloadCoder;
 import com.veraxsystems.vxipmi.coding.commands.PrivilegeLevel;
 import com.veraxsystems.vxipmi.coding.commands.ResponseData;
@@ -28,13 +37,6 @@ import com.veraxsystems.vxipmi.connection.ConnectionListener;
 import com.veraxsystems.vxipmi.connection.ConnectionManager;
 import com.veraxsystems.vxipmi.connection.Session;
 import com.veraxsystems.vxipmi.connection.SessionManager;
-import org.apache.log4j.Logger;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * <p>
@@ -129,13 +131,8 @@ public class IpmiAsyncConnector implements ConnectionListener {
      * @param address
      *            {@link InetAddress} of the remote host
      * @return handle to the connection to the remote host
-     * @throws IOException
-     *             when properties file was not found
-     * @throws FileNotFoundException
-     *             when properties file was not found
      */
-    public ConnectionHandle createConnection(InetAddress address, int port)
-            throws IOException {
+    public ConnectionHandle createConnection(InetAddress address, int port) {
         int handle = connectionManager.createConnection(address, port);
         connectionManager.getConnection(handle).registerListener(this);
         return new ConnectionHandle(handle, address, port);
@@ -146,13 +143,8 @@ public class IpmiAsyncConnector implements ConnectionListener {
      * getAvailableCipherSuites and getChannelAuthenticationCapabilities phases.
      * @param address {@link InetAddress} of the remote host
      * @return handle to the connection to the remote host
-     * @throws IOException
-     * when properties file was not found
-     * @throws FileNotFoundException
-     * when properties file was not found
      */
-    public ConnectionHandle createConnection(InetAddress address, int port, CipherSuite cipherSuite, PrivilegeLevel privilegeLevel)
-            throws IOException {
+    public ConnectionHandle createConnection(InetAddress address, int port, CipherSuite cipherSuite, PrivilegeLevel privilegeLevel) {
         int handle = connectionManager.createConnection(address, port, true);
         connectionManager.getConnection(handle).registerListener(this);
 
@@ -172,11 +164,11 @@ public class IpmiAsyncConnector implements ConnectionListener {
      * @see #createConnection(InetAddress, int)
      * @return list of the {@link CipherSuite}s that are allowed during the
      *         connection
-     * @throws Exception
+     * @throws IOException
      *             when sending message to the managed system fails
      */
     public List<CipherSuite> getAvailableCipherSuites(
-            ConnectionHandle connectionHandle) throws Exception {
+            ConnectionHandle connectionHandle) throws IOException {
         int tries = 0;
         List<CipherSuite> result = null;
         while (tries <= retries && result == null) {
@@ -184,7 +176,7 @@ public class IpmiAsyncConnector implements ConnectionListener {
                 ++tries;
                 result = connectionManager
                         .getAvailableCipherSuites(connectionHandle.getHandle());
-            } catch (Exception e) {
+            } catch (IOException e) {
                 logger.warn(FAILED_TO_RECEIVE_ANSWER_CAUSE_MESSAGE, e);
                 if (tries > retries) {
                     throw e;
@@ -353,12 +345,13 @@ public class IpmiAsyncConnector implements ConnectionListener {
      * @throws ConnectionException
      *             when connection is in the state that does not allow to
      *             perform this operation.
-     * @throws Exception
+     * @throws IOException
      *             when sending message to the managed system or initializing
      *             one of the cipherSuite's algorithms fails
+     * @throws InterruptedException
      */
     public int sendMessage(ConnectionHandle connectionHandle,
-            PayloadCoder request, boolean isOneWay) throws Exception {
+            PayloadCoder request, boolean isOneWay) throws IOException, InterruptedException {
         int tries = 0;
         int tag = -1;
         while (tries <= retries && tag < 0) {
@@ -375,9 +368,7 @@ public class IpmiAsyncConnector implements ConnectionListener {
                 }
                 logger.debug("Sending message with tag " + tag + ", try "
                         + tries);
-            } catch (IllegalArgumentException e) {
-                throw e;
-            } catch (Exception e) {
+            } catch (IOException e) {
                 logger.warn("Failed to send message, cause:", e);
                 if (tries > retries) {
                     throw e;
@@ -459,15 +450,18 @@ public class IpmiAsyncConnector implements ConnectionListener {
         IpmiResponse response = null;
         Connection connection = connectionManager.getConnection(handle);
 
-        if (responseData == null || exception != null) {
-            Exception notNullException = exception != null ? exception : new Exception("Empty response");
-
-            response = new IpmiError(notNullException, tag, new ConnectionHandle(
+        if (exception instanceof GeneralSecurityException) {
+            response = new SecurityError((GeneralSecurityException)exception, tag, new ConnectionHandle(
+                    handle, connection.getRemoteMachineAddress(), connection.getRemoteMachinePort()));
+        } else if (exception instanceof IOException) {
+            response = new IpmiError((IOException) exception, tag, new ConnectionHandle(
+                    handle, connection.getRemoteMachineAddress(), connection.getRemoteMachinePort()));
+        } else if (responseData == null ) {
+            response = new IpmiError(new IOException("Empty response"), tag, new ConnectionHandle(
                     handle, connection.getRemoteMachineAddress(), connection.getRemoteMachinePort()));
         } else {
             response = new IpmiResponseData(responseData, tag,
                     new ConnectionHandle(handle, connection.getRemoteMachineAddress(), connection.getRemoteMachinePort()));
-
         }
         synchronized (responseListeners) {
             for (IpmiResponseListener listener : responseListeners) {

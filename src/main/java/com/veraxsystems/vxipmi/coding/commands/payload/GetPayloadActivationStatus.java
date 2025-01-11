@@ -30,9 +30,6 @@ import com.veraxsystems.vxipmi.common.MessageComposer;
 import com.veraxsystems.vxipmi.common.MessageReader;
 import com.veraxsystems.vxipmi.common.TypeConverter;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
 /**
  * Wrapper for Get Payload Activation Status Command.
  */
@@ -64,7 +61,7 @@ public class GetPayloadActivationStatus extends IpmiCommandCoder {
     }
 
     @Override
-    protected IpmiPayload preparePayload(int sequenceNumber) throws NoSuchAlgorithmException, InvalidKeyException {
+    protected IpmiPayload preparePayload(int sequenceNumber) {
         byte[] message = MessageComposer.get(REQUEST_DATA_LENGTH)
                 .appendField(TypeConverter.intToByte(payloadType.getCode()))
                 .getMessage();
@@ -73,7 +70,7 @@ public class GetPayloadActivationStatus extends IpmiCommandCoder {
     }
 
     @Override
-    public ResponseData getResponseData(IpmiMessage message) throws IPMIException, NoSuchAlgorithmException, InvalidKeyException {
+    public ResponseData getResponseData(IpmiMessage message) throws IPMIException {
         if (!isCommandResponse(message)) {
             throw new IllegalArgumentException("This is not a response for Get Payload Activation Status");
         }

@@ -52,22 +52,22 @@ public class ActivateSolPayloadTest {
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         this.activatePayload = new ActivateSolPayload(Connection.getDefaultCipherSuite(), payloadInstance);
     }
 
     @Test
-    public void getCommandCodeReturnsValidCode() throws Exception {
+    public void getCommandCodeReturnsValidCode() {
         assertEquals(CommandCodes.ACTIVATE_PAYLOAD, activatePayload.getCommandCode());
     }
 
     @Test
-    public void getNetworkFunctionReturnsProperFunction() throws Exception {
+    public void getNetworkFunctionReturnsProperFunction() {
         assertEquals(NetworkFunction.ApplicationRequest, activatePayload.getNetworkFunction());
     }
 
     @Test
-    public void createEmptyResposeDataReturnsSolResponseData() throws Exception {
+    public void createEmptyResposeDataReturnsSolResponseData() {
         assertThat(activatePayload.createEmptyResponse(), instanceOf(ActivateSolPayloadResponseData.class));
     }
 
@@ -125,12 +125,12 @@ public class ActivateSolPayloadTest {
     }
 
     @Test
-    public void preparePayloadReturnsNonNullPayload() throws Exception {
+    public void preparePayloadReturnsNonNullPayload() {
         assertNotNull("Return payload cannot be null", activatePayload.preparePayload(1));
     }
 
     @Test
-    public void preparePayloadReturnsDataOfValidLength() throws Exception {
+    public void preparePayloadReturnsDataOfValidLength() {
         IpmiPayload payload = activatePayload.preparePayload(1);
         byte[] rawData = payload.getData();
 
@@ -139,12 +139,12 @@ public class ActivateSolPayloadTest {
     }
 
     @Test
-    public void getPayloadTypeReturnsPassedType() throws Exception {
+    public void getPayloadTypeReturnsPassedType() {
         assertEquals(PayloadType.Sol, activatePayload.getPayloadType());
     }
 
     @Test
-    public void preparePayloadReturnsValidPayloadTypeAndInstance() throws Exception {
+    public void preparePayloadReturnsValidPayloadTypeAndInstance() {
         byte expectedPayloadTypeByte = TypeConverter.intToByte(PayloadType.Sol.getCode());
         int expectedPayloadInstanceByte = TypeConverter.intToByte(payloadInstance);
 
@@ -156,7 +156,7 @@ public class ActivateSolPayloadTest {
     }
 
     @Test
-    public void preparePayloadReservedBytesAre0() throws Exception {
+    public void preparePayloadReservedBytesAre0() {
         IpmiPayload payload = activatePayload.preparePayload(1);
         byte[] rawData = payload.getData();
 
@@ -166,7 +166,7 @@ public class ActivateSolPayloadTest {
     }
 
     @Test
-    public void preparePayloadEncryptionAndAuthenticationDisabled() throws Exception {
+    public void preparePayloadEncryptionAndAuthenticationDisabled() {
         CipherSuite cipherSuite = new CipherSuite((byte) 1, SecurityConstants.AA_RAKP_NONE, SecurityConstants.CA_NONE, SecurityConstants.IA_NONE);
         activatePayload.setCipherSuite(cipherSuite);
 
@@ -178,7 +178,7 @@ public class ActivateSolPayloadTest {
     }
 
     @Test
-    public void preparePayloadEncryptionActive() throws Exception {
+    public void preparePayloadEncryptionActive() {
         CipherSuite cipherSuite = new CipherSuite((byte) 1, SecurityConstants.AA_RAKP_NONE, SecurityConstants.CA_AES_CBC128, SecurityConstants.IA_NONE);
         activatePayload.setCipherSuite(cipherSuite);
 
@@ -189,7 +189,7 @@ public class ActivateSolPayloadTest {
     }
 
     @Test
-    public void preparePayloadAuthenticationActive() throws Exception {
+    public void preparePayloadAuthenticationActive() {
         CipherSuite cipherSuite = new CipherSuite((byte) 1, SecurityConstants.AA_RAKP_HMAC_SHA1, SecurityConstants.CA_NONE, SecurityConstants.IA_NONE);
         activatePayload.setCipherSuite(cipherSuite);
 

@@ -11,6 +11,8 @@
  */
 package com.veraxsystems.vximpi.test;
 
+import java.io.IOException;
+
 import com.veraxsystems.vxipmi.coding.Encoder;
 import com.veraxsystems.vxipmi.coding.PayloadCoder;
 import com.veraxsystems.vxipmi.coding.commands.IpmiVersion;
@@ -133,7 +135,7 @@ public class ConnectionTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         if (connection != null)
             connection.disconnect();
     }
@@ -145,7 +147,7 @@ public class ConnectionTest {
      * {@link Connection#startSession(int, CipherSuite, PrivilegeLevel, String, String, byte[])}
      */
     @Test
-    public void testSessionChallenge() throws Exception {
+    public void testSessionChallenge() {
         logger.info("Testing Session Challenge");
 
         try {
@@ -167,7 +169,7 @@ public class ConnectionTest {
      * {@link Connection#sendMessage(PayloadCoder, boolean)}
      */
     @Test
-    public void testSendMessage() throws Exception {
+    public void testSendMessage() {
         logger.info("Testing Send Message");
 
         ConnectionListener listener = mock(ConnectionListener.class);
@@ -198,7 +200,7 @@ public class ConnectionTest {
 
             int tag = connection.sendMessage(payloadCoder, false);
 
-            verify(listener).processResponse(eq(expectedResponseData), eq(connection.getHandle()), eq(tag), isNull(Exception.class));
+            verify(listener).processResponse(eq(expectedResponseData), eq(connection.getHandle()), eq(tag), isNull(IOException.class));
             verify(messenger).send(refEq(udpMessage));
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -333,7 +335,7 @@ public class ConnectionTest {
 
         doAnswer(new Answer<Void>() {
             @Override
-            public Void answer(InvocationOnMock invocationOnMock) throws Throwable {
+            public Void answer(InvocationOnMock invocationOnMock) {
                 connection.notify(responseAction);
                 return null;
             }

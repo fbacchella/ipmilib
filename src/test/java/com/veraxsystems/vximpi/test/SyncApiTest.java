@@ -66,7 +66,7 @@ public class SyncApiTest {
     }
 
     @AfterClass
-    public static void tearDownAfterClass() throws Exception {
+    public static void tearDownAfterClass() {
         connector.tearDown();
     }
 

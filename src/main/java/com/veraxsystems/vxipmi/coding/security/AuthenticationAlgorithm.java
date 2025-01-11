@@ -12,7 +12,6 @@
 package com.veraxsystems.vxipmi.coding.security;
 
 import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 
 import com.veraxsystems.vxipmi.coding.commands.session.Rakp1;
 
@@ -48,14 +47,11 @@ public abstract class AuthenticationAlgorithm {
      * @param password
      *            - password of the user establishing a session
      * @return True if authentication check was successful, false otherwise.
-     * @throws NoSuchAlgorithmException
-     *             when initiation of the algorithm fails
      * @throws InvalidKeyException
      *             when creating of the algorithm key failsS
      */
     public abstract boolean checkKeyExchangeAuthenticationCode(byte[] data,
-            byte[] key, String password) throws NoSuchAlgorithmException,
-            InvalidKeyException;
+            byte[] key, String password) throws InvalidKeyException;
 
     /**
      * Calculates value of the Key Exchange Authentication Code in RAKP messages
@@ -65,14 +61,11 @@ public abstract class AuthenticationAlgorithm {
      *            Message.
      * @param password
      *            - password of the user establishing a session
-     * @throws NoSuchAlgorithmException
-     *             when initiation of the algorithm fails
      * @throws InvalidKeyException
      *             when creating of the algorithm key fails
      */
     public abstract byte[] getKeyExchangeAuthenticationCode(byte[] data,
-            String password) throws NoSuchAlgorithmException,
-            InvalidKeyException;
+            String password) throws InvalidKeyException;
 
     /**
      * Validates Integrity Check Value in RAKP Message 4.
@@ -86,11 +79,9 @@ public abstract class AuthenticationAlgorithm {
      *            1 and 2.
      * @see Rakp1#calculateSik(com.veraxsystems.vxipmi.coding.commands.session.Rakp1ResponseData)
      * @return True if integrity check was successful, false otherwise.
-     * @throws NoSuchAlgorithmException
-     *             when initiation of the algorithm fails
      * @throws InvalidKeyException
      *             when creating of the algorithm key fails
      */
     public abstract boolean doIntegrityCheck(byte[] data, byte[] reference,
-            byte[] sik) throws InvalidKeyException, NoSuchAlgorithmException;
+            byte[] sik) throws InvalidKeyException;
 }

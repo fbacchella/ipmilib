@@ -11,15 +11,17 @@
  */
 package com.veraxsystems.vxipmi.connection;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+
+import org.apache.log4j.Logger;
+
 import com.veraxsystems.vxipmi.coding.PayloadCoder;
 import com.veraxsystems.vxipmi.coding.commands.ResponseData;
 import com.veraxsystems.vxipmi.coding.payload.sol.SolAckState;
 import com.veraxsystems.vxipmi.coding.payload.sol.SolInboundMessage;
 import com.veraxsystems.vxipmi.coding.payload.sol.SolMessage;
 import com.veraxsystems.vxipmi.coding.protocol.Ipmiv20Message;
-import org.apache.log4j.Logger;
-
-import java.io.IOException;
 
 /**
  * Implementation of {@link MessageHandler} for {@link com.veraxsystems.vxipmi.coding.protocol.PayloadType#Sol}.
@@ -28,7 +30,7 @@ public class SolMessageHandler extends MessageHandler {
 
     private static final Logger logger = Logger.getLogger(SolMessageHandler.class);
 
-    public SolMessageHandler(Connection connection, int timeout) throws IOException {
+    public SolMessageHandler(Connection connection, int timeout) {
         super(connection, timeout, SolMessage.MIN_SEQUENCE_NUMBER, SolMessage.MAX_SEQUENCE_NUMBER);
     }
 
@@ -66,7 +68,7 @@ public class SolMessageHandler extends MessageHandler {
         try {
             ResponseData responseData = coder.getResponseData(message);
             connection.notifyResponseListeners(connection.getHandle(), tag, responseData, null);
-        } catch (Exception e) {
+        } catch (IOException | InvalidKeyException e) {
             connection.notifyResponseListeners(connection.getHandle(), tag, null, e);
         }
 

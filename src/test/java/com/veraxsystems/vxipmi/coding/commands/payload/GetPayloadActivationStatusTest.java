@@ -47,17 +47,17 @@ public class GetPayloadActivationStatusTest {
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         this.getPayloadActivationStatus = new GetPayloadActivationStatus(payloadType);
     }
 
     @Test
-    public void shouldReturnProperCommandCode() throws Exception {
+    public void shouldReturnProperCommandCode() {
         assertEquals(CommandCodes.GET_PAYLOAD_ACTIVATION_STATUS, getPayloadActivationStatus.getCommandCode());
     }
 
     @Test
-    public void shouldReturnProperNetworkFunction() throws Exception {
+    public void shouldReturnProperNetworkFunction() {
         assertEquals(NetworkFunction.ApplicationRequest, getPayloadActivationStatus.getNetworkFunction());
     }
 
@@ -123,7 +123,7 @@ public class GetPayloadActivationStatusTest {
     }
 
     @Test
-    public void shouldReturnNotNullProperPayloadWhenPreparePayload() throws Exception {
+    public void shouldReturnNotNullProperPayloadWhenPreparePayload() {
         IpmiPayload payload = getPayloadActivationStatus.preparePayload(1);
 
         assertNotNull("Should not return null payload", payload);
@@ -131,7 +131,7 @@ public class GetPayloadActivationStatusTest {
     }
 
     @Test
-    public void shouldReturnDataWithProperLengthWhenPreparePayload() throws Exception {
+    public void shouldReturnDataWithProperLengthWhenPreparePayload() {
         IpmiPayload payload = getPayloadActivationStatus.preparePayload(1);
         byte[] rawData = payload.getData();
 
@@ -140,7 +140,7 @@ public class GetPayloadActivationStatusTest {
     }
 
     @Test
-    public void shouldReturnValidPayloadTypeWhenPreparePayload() throws Exception {
+    public void shouldReturnValidPayloadTypeWhenPreparePayload() {
         byte expectedPayloadTypeByte = TypeConverter.intToByte(payloadType.getCode());
 
         IpmiPayload payload = getPayloadActivationStatus.preparePayload(1);

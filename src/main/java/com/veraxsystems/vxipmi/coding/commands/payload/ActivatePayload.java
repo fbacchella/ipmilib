@@ -30,9 +30,6 @@ import com.veraxsystems.vxipmi.common.MessageComposer;
 import com.veraxsystems.vxipmi.common.MessageReader;
 import com.veraxsystems.vxipmi.common.TypeConverter;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
 /**
  * An abstract wrapper class for Activate Payload Command. Every {@link PayloadType} should have it's own concrete implementation.
  */
@@ -95,7 +92,7 @@ public abstract class ActivatePayload extends IpmiCommandCoder {
     }
 
     @Override
-    protected IpmiPayload preparePayload(int sequenceNumber) throws NoSuchAlgorithmException, InvalidKeyException {
+    protected IpmiPayload preparePayload(int sequenceNumber) {
        byte[] message = MessageComposer.get(REQUEST_DATA_LENGTH)
                .appendField(TypeConverter.intToByte(getPayloadType().getCode()))
                .appendField(TypeConverter.intToByte(payloadInstance))
@@ -113,7 +110,7 @@ public abstract class ActivatePayload extends IpmiCommandCoder {
     protected abstract byte[] prepareAuxilaryRequestData();
 
     @Override
-    public ResponseData getResponseData(IpmiMessage message) throws IPMIException, NoSuchAlgorithmException, InvalidKeyException {
+    public ResponseData getResponseData(IpmiMessage message) throws IPMIException {
         if (!isCommandResponse(message)) {
             throw new IllegalArgumentException("This is not a response for Activate Payload command");
         }

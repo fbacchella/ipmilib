@@ -11,6 +11,9 @@
  */
 package com.veraxsystems.vxipmi.sm.states;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+
 import com.veraxsystems.vxipmi.coding.Encoder;
 import com.veraxsystems.vxipmi.coding.commands.IpmiVersion;
 import com.veraxsystems.vxipmi.coding.commands.PrivilegeLevel;
@@ -26,8 +29,10 @@ import com.veraxsystems.vxipmi.coding.rmcp.RmcpMessage;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
 import com.veraxsystems.vxipmi.common.TypeConverter;
 import com.veraxsystems.vxipmi.sm.StateMachine;
-import com.veraxsystems.vxipmi.sm.actions.ErrorAction;
+import com.veraxsystems.vxipmi.sm.actions.IOErrorAction;
 import com.veraxsystems.vxipmi.sm.actions.MessageAction;
+import com.veraxsystems.vxipmi.sm.actions.RuntimeErrorAction;
+import com.veraxsystems.vxipmi.sm.actions.SecurityErrorAction;
 import com.veraxsystems.vxipmi.sm.events.Sendv20Message;
 import com.veraxsystems.vxipmi.sm.events.SessionUpkeep;
 import com.veraxsystems.vxipmi.sm.events.StateMachineEvent;
@@ -73,8 +78,10 @@ public class SessionValid extends State {
                 stateMachine.sendMessage(Encoder.encode(
                         new Protocolv20Encoder(), event.getPayloadCoder(), event.getMessageSequenceNumber(),
                         event.getSessionSequenceNumber(), event.getSessionId()));
-            } catch (Exception e) {
-                stateMachine.doExternalAction(new ErrorAction(e));
+            } catch (IOException e) {
+                stateMachine.doExternalAction(new IOErrorAction(e));
+            } catch (GeneralSecurityException e) {
+                stateMachine.doExternalAction(new SecurityErrorAction(e));
             }
         } else if (machineEvent instanceof SessionUpkeep) {
             SessionUpkeep event = (SessionUpkeep) machineEvent;
@@ -85,8 +92,10 @@ public class SessionValid extends State {
                                 IpmiVersion.V20, IpmiVersion.V20, cipherSuite,
                                 PrivilegeLevel.Callback, TypeConverter.intToByte(0xe)),
                                 event.getMessageSequenceNumber(), event.getSessionSequenceNumber(), event.getSessionId()));
-            } catch (Exception e) {
-                stateMachine.doExternalAction(new ErrorAction(e));
+            } catch (IOException e) {
+                stateMachine.doExternalAction(new IOErrorAction(e));
+            } catch (GeneralSecurityException e) {
+                stateMachine.doExternalAction(new SecurityErrorAction(e));
             }
         } else if (machineEvent instanceof Timeout) {
             stateMachine.setCurrent(new Authcap());
@@ -99,12 +108,15 @@ public class SessionValid extends State {
                         new Protocolv20Encoder(),
                         new CloseSession(IpmiVersion.V20, cipherSuite, AuthenticationType.RMCPPlus, event.getSessionId()),
                                 event.getMessageSequenceNumber(), event.getSessionSequenceNumber(), event.getSessionId()));
-            } catch (Exception e) {
+            } catch (IOException e) {
                 stateMachine.setCurrent(this);
-                stateMachine.doExternalAction(new ErrorAction(e));
+                stateMachine.doExternalAction(new IOErrorAction(e));
+            } catch (GeneralSecurityException e) {
+                stateMachine.setCurrent(this);
+                stateMachine.doExternalAction(new SecurityErrorAction(e));
             }
         } else {
-            stateMachine.doExternalAction(new ErrorAction(
+            stateMachine.doExternalAction(new RuntimeErrorAction(
                     new IllegalArgumentException("Invalid transition")));
         }
 
@@ -127,13 +139,9 @@ public class SessionValid extends State {
         if (Protocolv20Decoder.decodeSessionID(message) != sessionId) {
             return; // this message belongs to other session so we ignore it
         }
-        try {
-            Ipmiv20Message message20 = (Ipmiv20Message) decoder.decode(message);
-            if (message20.getSessionID() == sessionId) {
-                stateMachine.doExternalAction(new MessageAction(message20));
-            }
-        } catch (Exception e) {
-            stateMachine.doExternalAction(new ErrorAction(e));
+        Ipmiv20Message message20 = (Ipmiv20Message) decoder.decode(message);
+        if (message20.getSessionID() == sessionId) {
+            stateMachine.doExternalAction(new MessageAction(message20));
         }
     }
 

@@ -11,9 +11,11 @@
  */
 package com.veraxsystems.vxipmi.sm.states;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+
 import com.veraxsystems.vxipmi.coding.commands.session.Rakp1;
 import com.veraxsystems.vxipmi.coding.commands.session.Rakp1ResponseData;
-import com.veraxsystems.vxipmi.coding.commands.session.Rakp3;
 import com.veraxsystems.vxipmi.coding.payload.PlainMessage;
 import com.veraxsystems.vxipmi.coding.protocol.AuthenticationType;
 import com.veraxsystems.vxipmi.coding.protocol.IpmiMessage;
@@ -25,8 +27,10 @@ import com.veraxsystems.vxipmi.coding.rmcp.RmcpMessage;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
 import com.veraxsystems.vxipmi.common.TypeConverter;
 import com.veraxsystems.vxipmi.sm.StateMachine;
-import com.veraxsystems.vxipmi.sm.actions.ErrorAction;
+import com.veraxsystems.vxipmi.sm.actions.IOErrorAction;
 import com.veraxsystems.vxipmi.sm.actions.ResponseAction;
+import com.veraxsystems.vxipmi.sm.actions.RuntimeErrorAction;
+import com.veraxsystems.vxipmi.sm.actions.SecurityErrorAction;
 import com.veraxsystems.vxipmi.sm.events.DefaultAck;
 import com.veraxsystems.vxipmi.sm.events.StateMachineEvent;
 import com.veraxsystems.vxipmi.sm.events.Timeout;
@@ -75,7 +79,7 @@ public class Rakp3Waiting extends State {
         } else if (machineEvent instanceof Timeout) {
             stateMachine.setCurrent(new Authcap());
         } else {
-            stateMachine.doExternalAction(new ErrorAction(
+            stateMachine.doExternalAction(new RuntimeErrorAction(
                     new IllegalArgumentException("Invalid transition")));
         }
     }
@@ -92,17 +96,18 @@ public class Rakp3Waiting extends State {
         }
 
         IpmiMessage ipmiMessage = null;
-        Rakp3 rakp3 = new Rakp3(cipherSuite, rakp1, rakp1ResponseData);
         try {
             ipmiMessage = decoder.decode(message);
-            if (rakp3.isCommandResponse(ipmiMessage)
-                    && TypeConverter.byteToInt(((PlainMessage) ipmiMessage
-                            .getPayload()).getPayloadData()[0]) == tag) {
-                stateMachine.doExternalAction(new ResponseAction(rakp3
-                        .getResponseData(ipmiMessage)));
+            if (rakp1.isCommandResponse(ipmiMessage)
+                        && TypeConverter.byteToInt(((PlainMessage) ipmiMessage
+                                                                           .getPayload()).getPayloadData()[0]) == tag) {
+                stateMachine.doExternalAction(new ResponseAction(rakp1
+                                                                         .getResponseData(ipmiMessage)));
             }
-        } catch (Exception e) {
-            stateMachine.doExternalAction(new ErrorAction(e));
+        } catch (IOException e) {
+            stateMachine.doExternalAction(new IOErrorAction(e));
+        } catch (InvalidKeyException e) {
+            stateMachine.doExternalAction(new SecurityErrorAction(e));
         }
     }
 

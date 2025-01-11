@@ -41,29 +41,29 @@ public class GetChannelPayloadSupportTest {
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         this.command = new GetChannelPayloadSupport();
     }
 
     @Test
-    public void getCommandCodeReturnsValidCode() throws Exception {
+    public void getCommandCodeReturnsValidCode() {
         assertEquals(CommandCodes.GET_CHANNEL_PAYLOAD_SUPPORT, command.getCommandCode());
     }
 
     @Test
-    public void getChannelNumberReturnsPreviouslyAssignedChannel() throws Exception {
+    public void getChannelNumberReturnsPreviouslyAssignedChannel() {
         byte channelNumber = 10;
         command.setChannelNumber(channelNumber);
         assertEquals(channelNumber, command.getChannelNumber());
     }
 
     @Test
-    public void getNetworkFunctionReturnsValidFunction() throws Exception {
+    public void getNetworkFunctionReturnsValidFunction() {
         assertEquals(NetworkFunction.ApplicationRequest, command.getNetworkFunction());
     }
 
     @Test
-    public void preparePayloadPreparesValidObject() throws Exception {
+    public void preparePayloadPreparesValidObject() {
         byte channelNumber = 10;
         command.setChannelNumber(channelNumber);
         IpmiPayload payload = command.preparePayload(15);

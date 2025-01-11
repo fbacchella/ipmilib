@@ -11,17 +11,20 @@
  */
 package com.veraxsystems.vxipmi.api.sync;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.veraxsystems.vxipmi.api.async.ConnectionHandle;
 import com.veraxsystems.vxipmi.api.async.IpmiAsyncConnector;
 import com.veraxsystems.vxipmi.api.async.IpmiResponseListener;
 import com.veraxsystems.vxipmi.api.async.messages.IpmiError;
 import com.veraxsystems.vxipmi.api.async.messages.IpmiResponse;
 import com.veraxsystems.vxipmi.api.async.messages.IpmiResponseData;
+import com.veraxsystems.vxipmi.api.async.messages.SecurityError;
 import com.veraxsystems.vxipmi.coding.commands.ResponseData;
 import com.veraxsystems.vxipmi.connection.Connection;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Listens to the {@link IpmiAsyncConnector} waiting for concrete message to
@@ -68,10 +71,11 @@ public class MessageListener implements IpmiResponseListener {
      * @param tag
      *            tag of the expected message
      * @return {@link ResponseData} for message.
-     * @throws Exception
-     *             when message delivery fails
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws GeneralSecurityException
      */
-    public ResponseData waitForAnswer(int tag) throws Exception {
+    public ResponseData waitForAnswer(int tag) throws IOException, InterruptedException, GeneralSecurityException {
         if (tag < 0 || tag > 63) {
             throw new IllegalArgumentException("Corrupted message tag");
         }
@@ -87,8 +91,10 @@ public class MessageListener implements IpmiResponseListener {
             this.tag = -1;
             quickMessages.clear();
             return ((IpmiResponseData) response).getResponseData();
-        } else /* response instanceof IpmiError */{
+        } else if (response instanceof IpmiError) {
             throw ((IpmiError) response).getException();
+        } else /*if (response instanceof SecurityError)*/ {
+            throw ((SecurityError) response).getException();
         }
     }
 

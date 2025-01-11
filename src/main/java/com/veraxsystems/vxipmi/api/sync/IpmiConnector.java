@@ -11,6 +11,15 @@
  */
 package com.veraxsystems.vxipmi.api.sync;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.security.GeneralSecurityException;
+import java.util.List;
+import java.util.Random;
+
+import org.apache.log4j.Logger;
+
 import com.veraxsystems.vxipmi.api.async.ConnectionHandle;
 import com.veraxsystems.vxipmi.api.async.InboundMessageListener;
 import com.veraxsystems.vxipmi.api.async.IpmiAsyncConnector;
@@ -28,13 +37,6 @@ import com.veraxsystems.vxipmi.connection.Connection;
 import com.veraxsystems.vxipmi.connection.ConnectionException;
 import com.veraxsystems.vxipmi.connection.ConnectionManager;
 import com.veraxsystems.vxipmi.connection.Session;
-import org.apache.log4j.Logger;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.util.List;
-import java.util.Random;
 
 /**
  * <p> Synchronous API for connecting to BMC via IPMI. </p> <p> Creating connection consists of the following steps:</p>
@@ -108,12 +110,8 @@ public class IpmiConnector {
      * @param address
      * {@link InetAddress} of the remote host
      * @return handle to the connection to the remote host
-     * @throws IOException
-     * when properties file was not found
-     * @throws FileNotFoundException
-     * when properties file was not found
      */
-    public ConnectionHandle createConnection(InetAddress address) throws IOException {
+    public ConnectionHandle createConnection(InetAddress address) {
         return createConnection(address, Constants.IPMI_PORT);
     }
 
@@ -124,12 +122,8 @@ public class IpmiConnector {
      * @param port
      * remote UDP port
      * @return handle to the connection to the remote host
-     * @throws IOException
-     * when properties file was not found
-     * @throws FileNotFoundException
-     * when properties file was not found
      */
-    public ConnectionHandle createConnection(InetAddress address, int port) throws IOException {
+    public ConnectionHandle createConnection(InetAddress address, int port) {
         return asyncConnector.createConnection(address, port);
     }
     
@@ -139,13 +133,8 @@ public class IpmiConnector {
      * @param address
      * {@link InetAddress} of the remote host
      * @return handle to the connection to the remote host
-     * @throws IOException
-     * when properties file was not found
-     * @throws FileNotFoundException
-     * when properties file was not found
      */
-    public ConnectionHandle createConnection(InetAddress address, CipherSuite cipherSuite, PrivilegeLevel privilegeLevel)
-            throws IOException {        
+    public ConnectionHandle createConnection(InetAddress address, CipherSuite cipherSuite, PrivilegeLevel privilegeLevel) {
         return createConnection(address, Constants.IPMI_PORT, cipherSuite, privilegeLevel);
     }
 
@@ -157,13 +146,8 @@ public class IpmiConnector {
      * @param port
      * remote UDP port
      * @return handle to the connection to the remote host
-     * @throws IOException
-     * when properties file was not found
-     * @throws FileNotFoundException
-     * when properties file was not found
      */
-    public ConnectionHandle createConnection(InetAddress address, int port, CipherSuite cipherSuite, PrivilegeLevel privilegeLevel)
-            throws IOException {
+    public ConnectionHandle createConnection(InetAddress address, int port, CipherSuite cipherSuite, PrivilegeLevel privilegeLevel) {
         return asyncConnector.createConnection(address, port, cipherSuite, privilegeLevel);
     }
 
@@ -173,10 +157,10 @@ public class IpmiConnector {
      * {@link ConnectionHandle} to the connection created before
      * @see #createConnection(InetAddress)
      * @return list of the {@link CipherSuite}s that are allowed during the connection
-     * @throws Exception
+     * @throws IOException
      * when sending message to the managed system fails
      */
-    public List<CipherSuite> getAvailableCipherSuites(ConnectionHandle connectionHandle) throws Exception {
+    public List<CipherSuite> getAvailableCipherSuites(ConnectionHandle connectionHandle) throws IOException {
         return asyncConnector.getAvailableCipherSuites(connectionHandle);
     }
 
@@ -293,10 +277,13 @@ public class IpmiConnector {
      * @param messagePayloadType
      *             {@link PayloadType} of the message that should be retried
      * @return {@link ResponseData} for the re-sent request or null if message could not be resent.
-     * @throws Exception
+     * @throws IOException
      * when sending message to the managed system fails
+     * @throws GeneralSecurityException
+     * @throws InterruptedException
      */
-    public ResponseData retryMessage(ConnectionHandle connectionHandle, byte tag, PayloadType messagePayloadType) throws Exception {
+    public ResponseData retryMessage(ConnectionHandle connectionHandle, byte tag, PayloadType messagePayloadType)
+            throws IOException, GeneralSecurityException, InterruptedException {
         MessageListener listener = new MessageListener(connectionHandle);
         asyncConnector.registerListener(listener);
 
@@ -309,7 +296,8 @@ public class IpmiConnector {
         return data;
     }
 
-    private ResponseData sendMessage(ConnectionHandle connectionHandle, PayloadCoder request, boolean waitForResponse) throws Exception {
+    private ResponseData sendMessage(ConnectionHandle connectionHandle, PayloadCoder request, boolean waitForResponse)
+            throws IOException, InterruptedException, GeneralSecurityException {
         MessageListener listener = new MessageListener(connectionHandle);
 
         if (waitForResponse) {
@@ -326,7 +314,8 @@ public class IpmiConnector {
     }
 
     private ResponseData sendThroughAsyncConnector(PayloadCoder request, ConnectionHandle connectionHandle,
-                                                   MessageListener listener, boolean waitForResponse) throws Exception {
+                                                   MessageListener listener, boolean waitForResponse)
+            throws IOException, InterruptedException, GeneralSecurityException {
         ResponseData responseData = null;
 
         int tries = 0;
@@ -352,13 +341,9 @@ public class IpmiConnector {
                 }
 
                 messageSent = true;
-            } catch (IllegalArgumentException e) {
-                throw e;
-            } catch (InterruptedException e) {
-                throw e;
             } catch (IPMIException e) {
                 handleErrorResponse(tries, e);
-            } catch (Exception e) {
+            } catch (IOException e) {
                 handleRetriesWhenException(tries, e);
             }
         }
@@ -366,7 +351,7 @@ public class IpmiConnector {
         return responseData;
     }
 
-    private void handleRetriesWhenException(int tries, Exception e) throws Exception {
+    private void handleRetriesWhenException(int tries, IOException e) throws IOException, InterruptedException {
         if (tries > retries) {
             throw e;
         } else {
@@ -377,7 +362,7 @@ public class IpmiConnector {
         }
     }
 
-    private void handleErrorResponse(int tries, IPMIException e) throws Exception {
+    private void handleErrorResponse(int tries, IPMIException e) throws IOException, InterruptedException {
         if (e.getCompletionCode() == CompletionCode.InitializationInProgress
                 || e.getCompletionCode() == CompletionCode.InsufficientResources
                 || e.getCompletionCode() == CompletionCode.NodeBusy

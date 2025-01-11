@@ -120,7 +120,7 @@ public class StateMachineTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         machine.stop();
     }
 
@@ -128,7 +128,7 @@ public class StateMachineTest {
      * Tests {@link StateMachine} set up.
      */
     @Test
-    public void testSetUp() throws Exception {
+    public void testSetUp() {
         logger.info("Testing State Machine set up");
 
         verify(messenger).register(eq(machine));
@@ -138,7 +138,7 @@ public class StateMachineTest {
      * Tests {@link CiphersWaiting} timeout.
      */
     @Test
-    public void testCwTimeout() throws Exception {
+    public void testCwTimeout() {
         logger.info("Testing CiphersWaiting timeout");
         machine.doTransition(new GetChannelCipherSuitesPending(getSequenceNumber()));
         assertEquals(CiphersWaiting.class, machine.getCurrent().getClass());

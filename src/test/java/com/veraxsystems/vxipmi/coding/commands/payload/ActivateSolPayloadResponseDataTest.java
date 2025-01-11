@@ -29,12 +29,12 @@ public class ActivateSolPayloadResponseDataTest {
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         this.responseData = new ActivateSolPayloadResponseData();
     }
 
     @Test
-    public void setAuxilaryInformationNull() throws Exception {
+    public void setAuxilaryInformationNull() {
         byte[] auxilaryInformation = null;
 
         expectedException.expect(IllegalArgumentException.class);
@@ -43,7 +43,7 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void setAuxilaryInformationEmpty() throws Exception {
+    public void setAuxilaryInformationEmpty() {
         byte[] auxilaryInformation = new byte[0];
 
         expectedException.expect(IllegalArgumentException.class);
@@ -52,7 +52,7 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void setAuxilaryInformationTooLarge() throws Exception {
+    public void setAuxilaryInformationTooLarge() {
         byte[] auxilaryInformation = new byte[] {0, 0, 0, 0, 0};
 
         expectedException.expect(IllegalArgumentException.class);
@@ -61,21 +61,21 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void isTestModeTrueWhenTestModeSet() throws Exception {
+    public void isTestModeTrueWhenTestModeSet() {
         byte[] auxilaryInformation = new byte[] {1, 0};
         responseData.setAuxilaryInformationData(auxilaryInformation);
         assertTrue("Test mode should be true when set", responseData.isTestMode());
     }
 
     @Test
-    public void isTestModeFalseWhenTestModeNotSet() throws Exception {
+    public void isTestModeFalseWhenTestModeNotSet() {
         byte[] auxilaryInformation = new byte[] {0, 0};
         responseData.setAuxilaryInformationData(auxilaryInformation);
         assertFalse("Test mode should be false when not set", responseData.isTestMode());
     }
 
     @Test
-    public void setInboundPayloadSizeNull() throws Exception {
+    public void setInboundPayloadSizeNull() {
         byte[] inboundPayloadSize = null;
 
         expectedException.expect(IllegalArgumentException.class);
@@ -84,7 +84,7 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void setInboundPayloadSizeEmpty() throws Exception {
+    public void setInboundPayloadSizeEmpty() {
         byte[] inboundPayloadSize = new byte[0];
 
         expectedException.expect(IllegalArgumentException.class);
@@ -93,7 +93,7 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void setInboundPayloadSizeTooLarge() throws Exception {
+    public void setInboundPayloadSizeTooLarge() {
         byte[] inboundPayloadSize = new byte[] {0, 0, 0};
 
         expectedException.expect(IllegalArgumentException.class);
@@ -102,7 +102,7 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void setInboundPayloadSizeWhen0() throws Exception {
+    public void setInboundPayloadSizeWhen0() {
         byte[] inboundPayloadSize = new byte[] {0, 0};
         responseData.setInboundPayloadSize(inboundPayloadSize);
 
@@ -110,7 +110,7 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void setInboundPayloadSizeWhenFirstByte0() throws Exception {
+    public void setInboundPayloadSizeWhenFirstByte0() {
         byte[] inboundPayloadSize = new byte[] {0, 5};
         responseData.setInboundPayloadSize(inboundPayloadSize);
 
@@ -118,7 +118,7 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void setInboundPayloadSizeWhenBothBytesNon0() throws Exception {
+    public void setInboundPayloadSizeWhenBothBytesNon0() {
         byte[] inboundPayloadSize = new byte[] {2, 7};
         responseData.setInboundPayloadSize(inboundPayloadSize);
 
@@ -126,7 +126,7 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void setOutboundPayloadSizeNull() throws Exception {
+    public void setOutboundPayloadSizeNull() {
         byte[] inboundPayloadSize = null;
 
         expectedException.expect(IllegalArgumentException.class);
@@ -135,7 +135,7 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void setOutboundPayloadSizeEmpty() throws Exception {
+    public void setOutboundPayloadSizeEmpty() {
         byte[] inboundPayloadSize = new byte[0];
 
         expectedException.expect(IllegalArgumentException.class);
@@ -144,7 +144,7 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void setOutboundPayloadSizeTooLarge() throws Exception {
+    public void setOutboundPayloadSizeTooLarge() {
         byte[] inboundPayloadSize = new byte[] {0, 0, 0};
 
         expectedException.expect(IllegalArgumentException.class);
@@ -153,7 +153,7 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void setOutboundPayloadSizeWhen0() throws Exception {
+    public void setOutboundPayloadSizeWhen0() {
         byte[] inboundPayloadSize = new byte[] {0, 0};
         responseData.setOutboundPayloadSize(inboundPayloadSize);
 
@@ -161,7 +161,7 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void setOutboundPayloadSizeWhenFirstByte0() throws Exception {
+    public void setOutboundPayloadSizeWhenFirstByte0() {
         byte[] inboundPayloadSize = new byte[] {0, 27};
         responseData.setOutboundPayloadSize(inboundPayloadSize);
 
@@ -169,7 +169,7 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void setOutboundPayloadSizeWhenBothBytesNon0() throws Exception {
+    public void setOutboundPayloadSizeWhenBothBytesNon0() {
         byte[] inboundPayloadSize = new byte[] {4, 1};
         responseData.setOutboundPayloadSize(inboundPayloadSize);
 
@@ -177,7 +177,7 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void setPayloadUdpPortNumberNull() throws Exception {
+    public void setPayloadUdpPortNumberNull() {
         byte[] payloadUdpPortNumber = null;
 
         expectedException.expect(IllegalArgumentException.class);
@@ -186,7 +186,7 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void setPayloadUdpPortNumberEmpty() throws Exception {
+    public void setPayloadUdpPortNumberEmpty() {
         byte[] payloadUdpPortNumber = new byte[0];
 
         expectedException.expect(IllegalArgumentException.class);
@@ -195,7 +195,7 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void setPayloadUdpPortNumberTooLarge() throws Exception {
+    public void setPayloadUdpPortNumberTooLarge() {
         byte[] payloadUdpPortNumber = new byte[] {0, 0, 0};
 
         expectedException.expect(IllegalArgumentException.class);
@@ -204,7 +204,7 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void setPayloadUdpPortNumberWhen0() throws Exception {
+    public void setPayloadUdpPortNumberWhen0() {
         byte[] payloadUdpPortNumber = new byte[] {0, 0};
         responseData.setPayloadUdpPortNumber(payloadUdpPortNumber);
 
@@ -212,7 +212,7 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void setPayloadUdpPortNumberWhenFirstByte0() throws Exception {
+    public void setPayloadUdpPortNumberWhenFirstByte0() {
         byte[] payloadUdpPortNumber = new byte[] {0, 127};
         responseData.setPayloadUdpPortNumber(payloadUdpPortNumber);
 
@@ -220,7 +220,7 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void setPayloadUdpPortNumberWhenBothBytesNon0() throws Exception {
+    public void setPayloadUdpPortNumberWhenBothBytesNon0() {
         byte[] payloadUdpPortNumber = new byte[] {14, 84};
         responseData.setPayloadUdpPortNumber(payloadUdpPortNumber);
 
@@ -228,7 +228,7 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void setPayloadVlanNumberNull() throws Exception {
+    public void setPayloadVlanNumberNull() {
         byte[] payloadVlanNumber = null;
 
         expectedException.expect(IllegalArgumentException.class);
@@ -237,7 +237,7 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void setPayloadVlanNumberEmpty() throws Exception {
+    public void setPayloadVlanNumberEmpty() {
         byte[] payloadVlanNumber = new byte[0];
 
         expectedException.expect(IllegalArgumentException.class);
@@ -246,7 +246,7 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void setPayloadVlanNumberTooLarge() throws Exception {
+    public void setPayloadVlanNumberTooLarge() {
         byte[] payloadVlanNumber = new byte[] {0, 0, 0};
 
         expectedException.expect(IllegalArgumentException.class);
@@ -255,7 +255,7 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void setPayloadVlanNumberWhen0() throws Exception {
+    public void setPayloadVlanNumberWhen0() {
         byte[] payloadVlanNumber = new byte[] {0, 0};
         responseData.setPayloadVlanNumber(payloadVlanNumber);
 
@@ -263,7 +263,7 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void setPayloadVlanNumberWhenFirstByte0() throws Exception {
+    public void setPayloadVlanNumberWhenFirstByte0() {
         byte[] payloadVlanNumber = new byte[] {0, 44};
         responseData.setPayloadVlanNumber(payloadVlanNumber);
 
@@ -271,7 +271,7 @@ public class ActivateSolPayloadResponseDataTest {
     }
 
     @Test
-    public void setPayloadVlanNumberWhenBothBytesNon0() throws Exception {
+    public void setPayloadVlanNumberWhenBothBytesNon0() {
         byte[] payloadVlanNumber = new byte[] {111, 111};
         responseData.setPayloadVlanNumber(payloadVlanNumber);
 

@@ -31,7 +31,7 @@ public class SessionTest {
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void shouldReturnSessionIdPassedInConstructor() throws Exception {
+    public void shouldReturnSessionIdPassedInConstructor() {
         int sessionId = 15;
         Session session = new Session(sessionId, null);
 

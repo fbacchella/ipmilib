@@ -36,17 +36,17 @@ public class DeactivatePayloadTest {
 
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         this.deactivatePayload = new DeactivatePayload(payloadType, payloadInstance);
     }
 
     @Test
-    public void shouldReturnProperCommandCode() throws Exception {
+    public void shouldReturnProperCommandCode() {
         assertEquals(CommandCodes.DEACTIVATE_PAYLOAD, deactivatePayload.getCommandCode());
     }
 
     @Test
-    public void shouldReturnProperNetworkFunction() throws Exception {
+    public void shouldReturnProperNetworkFunction() {
         assertEquals(NetworkFunction.ApplicationRequest, deactivatePayload.getNetworkFunction());
     }
 
@@ -60,12 +60,12 @@ public class DeactivatePayloadTest {
     }
 
     @Test
-    public void shouldReturnNonNullPayloadWhenPreparePayload() throws Exception {
+    public void shouldReturnNonNullPayloadWhenPreparePayload() {
         assertNotNull("Prepared payload object should not be null", deactivatePayload.preparePayload(1));
     }
 
     @Test
-    public void shouldReturnDataWithProperLengthWhenPreparePayload() throws Exception {
+    public void shouldReturnDataWithProperLengthWhenPreparePayload() {
         IpmiPayload payload = deactivatePayload.preparePayload(1);
         byte[] rawData = payload.getData();
 
@@ -74,7 +74,7 @@ public class DeactivatePayloadTest {
     }
 
     @Test
-    public void shouldReturnValidPayloadTypeAndInstanceWhenPreparePayload() throws Exception {
+    public void shouldReturnValidPayloadTypeAndInstanceWhenPreparePayload() {
         byte expectedPayloadTypeByte = TypeConverter.intToByte(payloadType.getCode());
         int expectedPayloadInstanceByte = TypeConverter.intToByte(payloadInstance);
 
@@ -86,7 +86,7 @@ public class DeactivatePayloadTest {
     }
 
     @Test
-    public void shouldReturnReservedBytesAs0WhenPreparePayload() throws Exception {
+    public void shouldReturnReservedBytesAs0WhenPreparePayload() {
         IpmiPayload payload = deactivatePayload.preparePayload(1);
         byte[] rawData = payload.getData();
 
