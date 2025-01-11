@@ -11,7 +11,6 @@
  */
 package com.veraxsystems.vxipmi.coding.commands.fru.record;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import com.veraxsystems.vxipmi.common.TypeConverter;

@@ -11,7 +11,7 @@
  */
 package com.veraxsystems.vxipmi.coding.commands.fru.record;
 
-import java.nio.charset.StandardCharsets;
+import org.apache.log4j.Logger;
 
 import com.veraxsystems.vxipmi.common.TypeConverter;
 
@@ -20,7 +20,9 @@ import com.veraxsystems.vxipmi.common.TypeConverter;
  */
 public abstract class MultiRecordInfo extends FruRecord {
 
-    public MultiRecordInfo() {
+    private static Logger logger = Logger.getLogger(MultiRecordInfo.class);
+
+    protected MultiRecordInfo() {
         super();
     }
 
@@ -33,16 +35,14 @@ public abstract class MultiRecordInfo extends FruRecord {
      *            offset to the record in the data
      */
     public static MultiRecordInfo populateMultiRecord(final byte[] fruData, final int offset) {
-        MultiRecordInfo recordInfo = null;
-
-        // TODO: Test when server containing such records will be available
+        MultiRecordInfo recordInfo;
 
         if ((TypeConverter.byteToInt(fruData[offset + 1]) & 0xf) != 0x2) {
-            throw new IllegalArgumentException("Invalid FRU record version");
+            logger.warn("Invalid FRU record version");
+            return null;
         }
 
-        FruMultiRecordType recordType = FruMultiRecordType
-                .parseInt(TypeConverter.byteToInt(fruData[offset]));
+        FruMultiRecordType recordType = FruMultiRecordType.parseInt(TypeConverter.byteToInt(fruData[offset]));
 
         int length = TypeConverter.byteToInt(fruData[offset + 2]);
 
@@ -71,7 +71,8 @@ public abstract class MultiRecordInfo extends FruRecord {
             recordInfo = new OemInfo(fruData, currentOffset, length);
             break;
         default:
-            throw new IllegalArgumentException("Unsupported record type");
+            logger.warn("Unknown FRU record type " + recordType);
+            return null;
         }
 
         return recordInfo;

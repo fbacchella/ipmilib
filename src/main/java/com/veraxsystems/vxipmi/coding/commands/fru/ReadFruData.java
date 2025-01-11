@@ -11,6 +11,13 @@
  */
 package com.veraxsystems.vxipmi.coding.commands.fru;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+
 import com.veraxsystems.vxipmi.coding.commands.CommandCodes;
 import com.veraxsystems.vxipmi.coding.commands.IpmiCommandCoder;
 import com.veraxsystems.vxipmi.coding.commands.IpmiVersion;
@@ -33,16 +40,13 @@ import com.veraxsystems.vxipmi.coding.protocol.IpmiMessage;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
 import com.veraxsystems.vxipmi.common.TypeConverter;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * A wrapper class for Read FRU Data Command request. <br>
  * The command returns the specified data from the FRU Inventory Info area.
  */
 public class ReadFruData extends IpmiCommandCoder {
+
+    private static Logger logger = Logger.getLogger(ReadFruData.class);
 
     private int offset;
 
@@ -146,7 +150,7 @@ public class ReadFruData extends IpmiCommandCoder {
 
     @Override
     protected IpmiPayload preparePayload(int sequenceNumber)
-            throws NoSuchAlgorithmException, InvalidKeyException {
+            throws InvalidKeyException {
         byte[] payload = new byte[4];
         payload[0] = TypeConverter.intToByte(fruId);
         byte[] buffer = TypeConverter.intToLittleEndianByteArray(offset);
@@ -160,7 +164,6 @@ public class ReadFruData extends IpmiCommandCoder {
 
     @Override
     public ResponseData getResponseData(IpmiMessage message) throws IPMIException, NoSuchAlgorithmException, InvalidKeyException {
-
         if (!isCommandResponse(message)) {
             throw new IllegalArgumentException(
                     "This is not a response for Get SDR Repository Info command");
@@ -176,14 +179,16 @@ public class ReadFruData extends IpmiCommandCoder {
 
         byte[] raw = message.getPayload().getIpmiCommandData();
 
-        if (raw == null || raw.length < 2) {
-            throw new IllegalArgumentException(
-                    "Invalid response payload length");
+        if (raw == null) {
+            throw new IllegalArgumentException("Invalid response payload length");
         }
 
         ReadFruDataResponseData responseData = new ReadFruDataResponseData();
 
         int sizeFromResponse = TypeConverter.byteToInt(raw[0]);
+        if (sizeFromResponse + 1 != raw.length) {
+            throw new IllegalArgumentException("Invalid response payload length");
+        }
 
         byte[] fruData = new byte[sizeFromResponse];
 
@@ -210,7 +215,7 @@ public class ReadFruData extends IpmiCommandCoder {
 
         int size = 0;
 
-        ArrayList<FruRecord> list = new ArrayList<FruRecord>();
+        ArrayList<FruRecord> list = new ArrayList<>();
 
         for (ReadFruDataResponseData responseData : fruData) {
             size += responseData.getFruData().length;
@@ -226,8 +231,7 @@ public class ReadFruData extends IpmiCommandCoder {
             offset += length;
         }
 
-        if (data[0] == 0x1) {
-
+        if (data.length > 0 && data[0] == 0x1) {
             int chassisOffset = TypeConverter.byteToInt(data[2]) * 8;
             int boardOffset = TypeConverter.byteToInt(data[3]) * 8;
             int productInfoOffset = TypeConverter.byteToInt(data[4]) * 8;
@@ -242,11 +246,11 @@ public class ReadFruData extends IpmiCommandCoder {
             if (productInfoOffset != 0) {
                 list.add(new ProductInfo(data, productInfoOffset));
             }
-            if (multiRecordOffset != 0) {
+            if (multiRecordOffset != 0 && multiRecordOffset < data.length) {
                 addMultirecords(list, data, multiRecordOffset);
             }
-        } else if (false) {
-            // TODO: Recognize SPD record (returned from DIMM FRUs)
+        } else if (data.length == 0) {
+            throw new IllegalArgumentException("Empty FRU data");
         } else {
             throw new IllegalArgumentException("Invalid format version: " + data[0]);
         }
@@ -258,9 +262,18 @@ public class ReadFruData extends IpmiCommandCoder {
         int currentMultirecordOffset = multiRecordOffset;
 
         while ((TypeConverter.byteToInt(data[currentMultirecordOffset + 1]) & 0x80) == 0) {
-            list.add(MultiRecordInfo.populateMultiRecord(data, currentMultirecordOffset));
-            currentMultirecordOffset += TypeConverter.byteToInt(data[currentMultirecordOffset + 2]) + 5;
-        }
+            MultiRecordInfo mri = MultiRecordInfo.populateMultiRecord(data, currentMultirecordOffset);
+            if (mri != null) {
+                list.add(mri);
+                currentMultirecordOffset += TypeConverter.byteToInt(data[currentMultirecordOffset + 2]) + 5;
+                if (currentMultirecordOffset > data.length) {
+                    logger.warn("Inconsistent multi record FRU");
+                    break;
+                }
+            } else {
+                break;
+            }
+         }
     }
 
 }
