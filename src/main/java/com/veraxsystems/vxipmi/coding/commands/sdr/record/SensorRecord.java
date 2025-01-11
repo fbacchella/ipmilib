@@ -11,10 +11,9 @@
  */
 package com.veraxsystems.vxipmi.coding.commands.sdr.record;
 
-import com.veraxsystems.vxipmi.common.TypeConverter;
-
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+
+import com.veraxsystems.vxipmi.common.TypeConverter;
 
 /**
  * Wrapper for SDR entry.
@@ -38,7 +37,7 @@ public abstract class SensorRecord {
             throw new IllegalArgumentException("Record data is too short");
         }
 
-        SensorRecord sensorRecord = null;
+        SensorRecord sensorRecord;
 
         byte recType = recordData[3];
 
@@ -81,8 +80,7 @@ public abstract class SensorRecord {
             sensorRecord = new OemRecord();
             break;
         default:
-            throw new IllegalArgumentException("Invalid record type: "
-                    + recType);
+            sensorRecord = new OpaqueRecord();
         }
 
         byte[] buffer = new byte[4];
