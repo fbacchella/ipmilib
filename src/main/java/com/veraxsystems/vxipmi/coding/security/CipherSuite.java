@@ -101,8 +101,15 @@ public class CipherSuite {
             // TODO: RAKP HMAC MD5
             throw new IllegalArgumentException(NOT_YET_IMPLEMENTED_MESSAGE);
         case SecurityConstants.AA_RAKP_HMAC_SHA256:
-            // TODO: RAKP HMAC Sha256
-            throw new IllegalArgumentException(NOT_YET_IMPLEMENTED_MESSAGE);
+            if (aa == null) {
+                try {
+                    aa = new AuthenticationRakpHmacSha256();
+                } catch (NoSuchAlgorithmException e) {
+                    throw new IllegalArgumentException(
+                            "Initiation of the algorithm failed", e);
+                }
+            }
+            return aa;
         default:
             throw new IllegalArgumentException(
                     "Invalid authentication algorithm.");
