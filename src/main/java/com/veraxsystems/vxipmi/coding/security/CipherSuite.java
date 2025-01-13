@@ -11,15 +11,18 @@
  */
 package com.veraxsystems.vxipmi.coding.security;
 
-import com.veraxsystems.vxipmi.coding.commands.session.GetChannelCipherSuites;
-import com.veraxsystems.vxipmi.coding.commands.session.GetChannelCipherSuitesResponseData;
-import com.veraxsystems.vxipmi.common.TypeConverter;
-
-import javax.crypto.NoSuchPaddingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.crypto.NoSuchPaddingException;
+
+import org.apache.log4j.Logger;
+
+import com.veraxsystems.vxipmi.coding.commands.session.GetChannelCipherSuites;
+import com.veraxsystems.vxipmi.coding.commands.session.GetChannelCipherSuitesResponseData;
+import com.veraxsystems.vxipmi.common.TypeConverter;
 
 /**
  * Provides cipher suite (authentication, confidentiality and integrity
@@ -27,7 +30,9 @@ import java.util.List;
  */
 public class CipherSuite {
 
-    public static final String NOT_YET_IMPLEMENTED_MESSAGE = "Not yet implemented.";
+    private static final Logger logger = Logger.getLogger(CipherSuite.class);
+
+    public static final String NOT_YET_IMPLEMENTED_MESSAGE = "not yet implemented.";
 
     private byte id;
 
@@ -99,7 +104,7 @@ public class CipherSuite {
             return aa;
         case SecurityConstants.AA_RAKP_HMAC_MD5:
             // TODO: RAKP HMAC MD5
-            throw new IllegalArgumentException(NOT_YET_IMPLEMENTED_MESSAGE);
+            throw new IllegalArgumentException("RAKP_HMAC_MD5 " + NOT_YET_IMPLEMENTED_MESSAGE);
         case SecurityConstants.AA_RAKP_HMAC_SHA256:
             if (aa == null) {
                 try {
@@ -146,13 +151,13 @@ public class CipherSuite {
             return ia;
         case SecurityConstants.IA_HMAC_SHA256_128:
             // TODO: HMAC SHA256-128
-            throw new IllegalArgumentException(NOT_YET_IMPLEMENTED_MESSAGE);
+            throw new IllegalArgumentException("HMAC_SHA256_128 " + NOT_YET_IMPLEMENTED_MESSAGE);
         case SecurityConstants.IA_MD5_128:
             // TODO: MD5-128
-            throw new IllegalArgumentException(NOT_YET_IMPLEMENTED_MESSAGE);
+            throw new IllegalArgumentException("MD5_128 " + NOT_YET_IMPLEMENTED_MESSAGE);
         case SecurityConstants.IA_HMAC_MD5_128:
             // TODO: HMAC MD5-128
-            throw new IllegalArgumentException(NOT_YET_IMPLEMENTED_MESSAGE);
+            throw new IllegalArgumentException("MD5-128 " + NOT_YET_IMPLEMENTED_MESSAGE);
         default:
             throw new IllegalArgumentException("Invalid integrity algorithm.");
 
@@ -183,10 +188,10 @@ public class CipherSuite {
             return ca;
         case SecurityConstants.CA_XRC4_40:
             // TODO: XRc4-40
-            throw new IllegalArgumentException(NOT_YET_IMPLEMENTED_MESSAGE);
+            throw new IllegalArgumentException("xRC4-40 " + NOT_YET_IMPLEMENTED_MESSAGE);
         case SecurityConstants.CA_XRC4_128:
             // TODO: XRc4-128
-            throw new IllegalArgumentException(NOT_YET_IMPLEMENTED_MESSAGE);
+            throw new IllegalArgumentException("xRC4-128 " + NOT_YET_IMPLEMENTED_MESSAGE);
         default:
             throw new IllegalArgumentException(
                     "Invalid confidentiality algorithm.");
@@ -207,20 +212,29 @@ public class CipherSuite {
      * @return list of Cipher Suites supported by BMC.
      */
     public static List<CipherSuite> getCipherSuites(byte[] bytes) {
-        ArrayList<CipherSuite> suites = new ArrayList<CipherSuite>();
+        ArrayList<CipherSuite> suites = new ArrayList<>();
 
         int offset = 0;
 
         while (offset < bytes.length) {
+            // The minimum size for a Cipher suite record is 3
+            if (offset > (bytes.length - 3)) {
+                logger.info("Invalid trailing Cipher Suite Record");
+                break;
+            }
             byte id = bytes[offset + 1];
             if (bytes[offset] == TypeConverter.intToByte(0xC0)) {
                 offset += 2;
             } else {
                 offset += 5;
             }
+            if (offset >= bytes.length) {
+                logger.info("Invalid trailing Cipher Suite Record");
+                break;
+            }
             byte aa = bytes[offset];
-            byte ca = -1;
-            byte ia = -1;
+            byte ca = 0;
+            byte ia = 0;
             ++offset;
             while (offset < bytes.length
                     && bytes[offset] != TypeConverter.intToByte(0xC0)
@@ -231,6 +245,8 @@ public class CipherSuite {
                 } else if ((TypeConverter.byteToInt(bytes[offset]) & 0xC0) == 0x40) {
                     ia = TypeConverter.intToByte(TypeConverter
                             .byteToInt(bytes[offset]) & 0x3f);
+                } else {
+                    continue;
                 }
                 ++offset;
             }
